@@ -1,0 +1,7 @@
+// applies gradle-processors plugin, adds immutables dependency
+
+apply plugin: 'org.inferred.processors'
+
+dependencies {
+    processor "org.immutables:value:2.2.1"
+}
