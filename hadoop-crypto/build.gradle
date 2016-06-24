@@ -1,0 +1,13 @@
+apply from: "${rootDir}/gradle/publish.gradle"
+
+sourceCompatibility = '1.7'
+
+dependencies {
+    compile project(":hadoop-crypto-api")
+    compile "com.fasterxml.jackson.core:jackson-databind"
+    compile "org.apache.hadoop:hadoop-common"
+
+    testCompile "junit:junit"
+    testCompile "org.hamcrest:hamcrest-all"
+    testCompile "org.mockito:mockito-core"
+}
