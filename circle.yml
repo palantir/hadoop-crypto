@@ -3,6 +3,7 @@ machine:
     version: oraclejdk7
   environment:
     TERM: dumb
+    OVERRIDE_KEY_SAFETY_PROTECTIONS: true
 
 dependencies:
   override:
