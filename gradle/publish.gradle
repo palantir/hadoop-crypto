@@ -23,18 +23,13 @@ bintray {
     publish = true
     pkg {
         repo = 'releases'
-        name = 'http-remoting'
+        name = 'hadoop-crypto'
         userOrg = 'palantir'
         licenses = ['Apache-2.0']
         publications = ['bintray']
     }
 }
 
-bintrayUpload.onlyIf {
-    project.version ==~ /\d+\.\d+\.\d+(-rc[0-9]+)?/
-}
-
 bintrayUpload.dependsOn { generatePomFileForBintrayPublication }
 bintrayUpload.dependsOn { sourceJar }
 bintrayUpload.dependsOn { build }
-
