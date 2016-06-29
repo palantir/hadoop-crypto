@@ -27,6 +27,7 @@ allprojects {
     group 'com.palantir.hadoop-crypto'
     version gitVersion()
 
+    apply plugin: 'com.palantir.configuration-resolver'
     apply plugin: 'nebula.dependency-recommender'
 
     dependencyRecommendations {
