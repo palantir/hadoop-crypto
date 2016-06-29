@@ -16,7 +16,3 @@ bintray {
         publications = ['nebula']
     }
 }
-
-bintrayUpload.dependsOn { generatePomFileForBintrayPublication }
-bintrayUpload.dependsOn { sourceJar }
-bintrayUpload.dependsOn { build }
