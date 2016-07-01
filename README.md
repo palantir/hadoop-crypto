@@ -20,7 +20,7 @@ then stores the encrypted key on the `FileSystem` with the encrypted file.
 Example
 -------
 
-Source for examples can be found [here](hadoop-crypto/src/test/java/com/palantir/ext/hadoop/example/ExampleUsage.java)
+Source for examples can be found [here](hadoop-crypto/src/test/java/com/palantir/hadoop/example/ExampleUsage.java)
 
 ### Initialization
 
