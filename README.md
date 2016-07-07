@@ -1,3 +1,6 @@
+[![CircleCI Build Status](https://circleci.com/gh/palantir/hadoop-crypto/tree/develop.svg?style=shield)](https://circleci.com/gh/palantir/hadoop-crypto)
+[![Download](https://api.bintray.com/packages/palantir/releases/hadoop-crypto/images/download.svg)](https://bintray.com/palantir/releases/hadoop-crypto/_latestVersion)
+
 Hadoop Crypto
 =============
 *Hadoop Crypto* is a library for per-file client-side encryption in Hadoop
