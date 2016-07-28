@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyPair;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.net.util.Base64;
@@ -75,6 +76,8 @@ public final class ConfigurableEncryptedFileSystemTest {
     @Test
     public void testReadWrite() throws IOException {
         String data = "data";
+        byte[] dataBytes = data.getBytes(StandardCharsets.UTF_8);
+        byte[] readData = new byte[data.length()];
 
         // Write encrypted data
         OutputStream os = efs.create(path);
@@ -83,13 +86,13 @@ public final class ConfigurableEncryptedFileSystemTest {
 
         // Read encrypted data
         InputStream dis = efs.open(path);
-        String readData = IOUtils.toString(dis);
-        assertThat(readData, is(data));
+        IOUtils.readFully(dis, readData);
+        assertThat(readData, is(dataBytes));
 
         // Raw data is not the same
         dis = rawFs.open(path);
-        readData = IOUtils.toString(dis);
-        assertThat(readData, is(not(data)));
+        IOUtils.readFully(dis, readData);
+        assertThat(readData, is(not(dataBytes)));
 
         // KeyMaterial file exists
         assertTrue(efs.exists(new Path(path + FileKeyStorageStrategy.EXTENSION)));

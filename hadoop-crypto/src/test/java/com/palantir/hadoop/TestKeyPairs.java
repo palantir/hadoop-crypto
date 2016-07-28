@@ -25,7 +25,7 @@ import java.security.SecureRandom;
 
 public final class TestKeyPairs {
 
-    private TestKeyPairs() {};
+    private TestKeyPairs() {}
 
     public static KeyPair generateKeyPair() {
         KeyPairGenerator keyGen;
