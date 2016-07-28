@@ -23,8 +23,8 @@ import static org.junit.Assert.assertTrue;
 
 import com.palantir.hadoop.EncryptedFileSystem;
 import com.palantir.hadoop.FileKeyStorageStrategy;
-import com.palantir.hadoop.KeyPairs;
 import com.palantir.hadoop.KeyStorageStrategy;
+import com.palantir.hadoop.TestKeyPairs;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -51,7 +51,7 @@ public final class ExampleUsage {
         FileSystem fs = FileSystem.get(new URI("file:///"), new Configuration());
 
         // Initialize EFS with random public/private key pair
-        KeyPair pair = KeyPairs.generateKeyPair();
+        KeyPair pair = TestKeyPairs.generateKeyPair();
         KeyStorageStrategy keyStore = new FileKeyStorageStrategy(fs, pair);
         EncryptedFileSystem efs = new EncryptedFileSystem(fs, keyStore);
 

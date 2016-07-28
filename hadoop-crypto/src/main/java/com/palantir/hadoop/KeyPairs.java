@@ -16,17 +16,12 @@
 
 package com.palantir.hadoop;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
 import com.google.common.base.Throwables;
 import java.security.GeneralSecurityException;
 import java.security.KeyFactory;
 import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
-import java.security.SecureRandom;
 import java.security.spec.KeySpec;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
@@ -55,24 +50,6 @@ public final class KeyPairs {
         } catch (GeneralSecurityException e) {
             throw Throwables.propagate(e);
         }
-    }
-
-    @VisibleForTesting
-    public static KeyPair generateKeyPair() {
-        return generateKeyPair(DEFAULT_KEYSIZE);
-    }
-
-    public static KeyPair generateKeyPair(int keysize) {
-        KeyPairGenerator keyGen;
-        SecureRandom random;
-        try {
-            keyGen = KeyPairGenerator.getInstance("RSA");
-            random = SecureRandom.getInstance("SHA1PRNG", "SUN");
-        } catch (NoSuchAlgorithmException | NoSuchProviderException e) {
-            throw Throwables.propagate(e);
-        }
-        keyGen.initialize(keysize, random);
-        return keyGen.generateKeyPair();
     }
 
 }

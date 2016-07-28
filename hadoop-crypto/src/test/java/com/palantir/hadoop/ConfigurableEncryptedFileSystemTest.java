@@ -55,7 +55,7 @@ public final class ConfigurableEncryptedFileSystemTest {
 
     @Before
     public void before() throws IOException {
-        KeyPair keyPair = KeyPairs.generateKeyPair();
+        KeyPair keyPair = TestKeyPairs.generateKeyPair();
         Configuration conf = getBaseConf();
         conf.set(ConfigurableEncryptedFileSystem.PUBLIC_KEY_CONF,
                 Base64.encodeBase64String(keyPair.getPublic().getEncoded()));

@@ -51,7 +51,7 @@ public final class FileKeyStorageStrategyTest {
 
     @Before
     public void before() throws NoSuchAlgorithmException, NoSuchProviderException, IOException, URISyntaxException {
-        pair = KeyPairs.generateKeyPair();
+        pair = TestKeyPairs.generateKeyPair();
         keyMaterial = AesCtrCipher.generateKeyMaterial();
         fs = FileSystem.get(new URI("file:///"), new Configuration());
         keyStore = new FileKeyStorageStrategy(fs, pair);
