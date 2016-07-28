@@ -80,4 +80,18 @@ public final class FileKeyStorageStrategyTest {
         strategy.get("key");
     }
 
+    @Test
+    public void testMissingPrivateKeyInKeyPair() throws IOException {
+        KeyPair keyPair = new KeyPair(pair.getPublic(), null);
+        FileKeyStorageStrategy strategy = new FileKeyStorageStrategy(fs, keyPair);
+
+        // Put still succeeds with only the public key
+        String path = folder.newFile().getAbsolutePath();
+        strategy.put(path, keyMaterial);
+
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Private key is absent but required to get key material");
+        strategy.get("key");
+    }
+
 }
