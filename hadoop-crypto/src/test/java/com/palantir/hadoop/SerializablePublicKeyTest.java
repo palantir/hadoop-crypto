@@ -27,7 +27,7 @@ public final class SerializablePublicKeyTest {
 
     @Test
     public void testDeserialization() {
-        KeyPair keyPair = KeyPairs.generateKeyPair();
+        KeyPair keyPair = TestKeyPairs.generateKeyPair();
         PublicKey publicKey = keyPair.getPublic();
         assertThat(SerializablePublicKey.of(publicKey).deserialize(), is(publicKey));
     }

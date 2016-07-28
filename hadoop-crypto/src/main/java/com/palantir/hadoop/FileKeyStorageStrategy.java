@@ -45,7 +45,7 @@ public final class FileKeyStorageStrategy implements KeyStorageStrategy {
     public FileKeyStorageStrategy(FileSystem fs, KeyPair keyPair) {
         this.fs = fs;
         this.publicKey = keyPair.getPublic();
-        this.privateKey = Optional.of(keyPair.getPrivate());
+        this.privateKey = Optional.fromNullable(keyPair.getPrivate());
     }
 
     public FileKeyStorageStrategy(FileSystem fs, PublicKey publicKey) {

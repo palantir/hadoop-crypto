@@ -53,7 +53,7 @@ public final class FileKeyStorageStrategyTest {
 
     @Before
     public void before() throws NoSuchAlgorithmException, NoSuchProviderException, IOException, URISyntaxException {
-        pair = KeyPairs.generateKeyPair();
+        pair = TestKeyPairs.generateKeyPair();
         keyMaterial = AesCtrCipher.generateKeyMaterial();
         fs = FileSystem.get(new URI("file:///"), new Configuration());
         keyStore = new FileKeyStorageStrategy(fs, pair);
@@ -80,6 +80,19 @@ public final class FileKeyStorageStrategyTest {
     @Test
     public void testMissingPrivateKey() throws IOException {
         FileKeyStorageStrategy strategy = new FileKeyStorageStrategy(fs, pair.getPublic());
+
+        // Put still succeeds with only the public key
+        strategy.put(path, keyMaterial);
+
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Private key is absent but required to get key material");
+        strategy.get("key");
+    }
+
+    @Test
+    public void testMissingPrivateKeyInKeyPair() throws IOException {
+        KeyPair keyPair = new KeyPair(pair.getPublic(), null);
+        FileKeyStorageStrategy strategy = new FileKeyStorageStrategy(fs, keyPair);
 
         // Put still succeeds with only the public key
         strategy.put(path, keyMaterial);
