@@ -43,9 +43,9 @@ public final class ConfigurableEncryptedFileSystemTest {
 
     private static final URI EFS_URI = URI.create("efs:///");
 
-    private FileSystem efsPublic;
     private FileSystem efs;
     private FileSystem rawFs;
+    private Configuration conf;
     private Path path;
 
     @Rule
@@ -57,14 +57,11 @@ public final class ConfigurableEncryptedFileSystemTest {
     @Before
     public void before() throws IOException {
         KeyPair keyPair = TestKeyPairs.generateKeyPair();
-        Configuration conf = getBaseConf();
+        conf = getBaseConf();
         conf.set(ConfigurableEncryptedFileSystem.PUBLIC_KEY_CONF,
                 Base64.encodeBase64String(keyPair.getPublic().getEncoded()));
         conf.set(ConfigurableEncryptedFileSystem.BACKING_FILESYSTEM_CONF,
                 RawLocalFileSystem.class.getCanonicalName());
-
-        efsPublic = FileSystem.newInstance(EFS_URI, conf);
-
         conf.set(ConfigurableEncryptedFileSystem.PRIVATE_KEY_CONF,
                 Base64.encodeBase64String(keyPair.getPrivate().getEncoded()));
 
@@ -95,17 +92,30 @@ public final class ConfigurableEncryptedFileSystemTest {
         assertThat(readData, is(not(dataBytes)));
 
         // KeyMaterial file exists
-        assertTrue(efs.exists(new Path(path + FileKeyStorageStrategy.EXTENSION)));
+        assertTrue(rawFs.exists(new Path(path + FileKeyStorageStrategy.EXTENSION)));
     }
 
     @Test
     public void testOnlyPublicKey() throws IOException {
         String data = "data";
+        byte[] dataBytes = data.getBytes(StandardCharsets.UTF_8);
+        byte[] readData = new byte[data.length()];
+
+        conf.unset(ConfigurableEncryptedFileSystem.PRIVATE_KEY_CONF);
+        FileSystem efsPublic = FileSystem.newInstance(EFS_URI, conf);
 
         // Write encrypted data
         OutputStream os = efsPublic.create(path);
         IOUtils.write(data, os);
         os.close();
+
+        // Raw data is not the same
+        InputStream dis = rawFs.open(path);
+        IOUtils.readFully(dis, readData);
+        assertThat(readData, is(not(dataBytes)));
+
+        // KeyMaterial file exists
+        assertTrue(rawFs.exists(new Path(path + FileKeyStorageStrategy.EXTENSION)));
 
         // Unable to open files without Private Key
         expectedException.expect(IllegalArgumentException.class);
@@ -123,13 +133,38 @@ public final class ConfigurableEncryptedFileSystemTest {
 
     @Test
     public void testBackingFsInvalid() throws IOException {
-        Configuration conf = getBaseConf();
+        conf = getBaseConf();
         conf.set(ConfigurableEncryptedFileSystem.BACKING_FILESYSTEM_CONF, String.class.getCanonicalName());
 
         expectedException.expect(RuntimeException.class);
-        expectedException.expectMessage(
-                String.format("%s not %s", String.class.getCanonicalName(), FileSystem.class.getCanonicalName()));
+        expectedException.expectMessage(String.format("Expected a %s but found a %s configured as %s",
+                FileSystem.class.getCanonicalName(), String.class.getCanonicalName(),
+                ConfigurableEncryptedFileSystem.BACKING_FILESYSTEM_CONF));
         FileSystem.newInstance(EFS_URI, conf);
+    }
+
+    @Test
+    public void testFileNameCollidesWithKeyMaterial() throws IOException {
+        String data = "data";
+
+        // Write encrypted data
+        OutputStream os = efs.create(path);
+        IOUtils.write(data, os);
+        os.close();
+
+        // Write encrypted data
+        os = efs.create(new Path(path + FileKeyStorageStrategy.EXTENSION));
+        IOUtils.write(data, os);
+        os.close();
+
+        // NOTE(jellis): This is the most likely exception, however if the first byte of the .keymaterial file is the
+        // same as the KeyMaterials version then any number of RuntimeExceptions may be thrown.
+        // expectedException.expect(IllegalArgumentException.class);
+        // expectedException.expectMessage(
+        //         String.format("Invalid KeyMaterials format version. Expected 1 but found"));
+
+        expectedException.expect(RuntimeException.class);
+        efs.open(path);
     }
 
     private static Configuration getBaseConf() {

@@ -34,6 +34,12 @@ public final class KeyPairs {
 
     private KeyPairs() {}
 
+    /**
+     * Construct a {@link KeyPair} from base64 encoded public and private keys.
+     *
+     * @param privateKeyString base64 encoded PKCS8 private key
+     * @param publicKeyString base64 encoded X509 public key
+     */
     public static KeyPair fromStrings(@Nullable String privateKeyString, String publicKeyString, String algorithm) {
         try {
             KeyFactory keyFactory = KeyFactory.getInstance(algorithm);
