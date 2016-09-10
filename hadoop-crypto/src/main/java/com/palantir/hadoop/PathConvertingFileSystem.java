@@ -109,12 +109,10 @@ public final class PathConvertingFileSystem extends FileSystem {
         return delegate.mkdirs(toDelegatePath(f), permission);
     }
 
-    // convenience
     private Path toDelegatePath(Path path) {
         return toDelegatePathFunc.apply(path);
     }
 
-    // convenience
     private Path toReturnPath(Path path) {
         return toReturnPathFunc.apply(path);
     }
