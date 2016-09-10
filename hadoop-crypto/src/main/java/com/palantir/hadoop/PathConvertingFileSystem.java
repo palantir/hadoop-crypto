@@ -29,8 +29,9 @@ import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.util.Progressable;
 
 /**
- * A decorator {@link FileSystem} that converts input paths using {@code toDelegateUri} and returned paths to {@code
- * fromScheme}.
+ * A decorator {@link FileSystem} that delegates calls and converts paths to/from the delegate FileSystem.
+ * {@link Path}s passed into methods are converted using {@code toDelegatePathFunc} before being forwarded.
+ * {@link Path}s returned from the delegate are converted using {@code toReturnPathFunc} before being returned.
  */
 public final class PathConvertingFileSystem extends FileSystem {
 
@@ -47,33 +48,15 @@ public final class PathConvertingFileSystem extends FileSystem {
         super.setConf(delegate.getConf());
     }
 
+    // convenience
     private Path toDelegatePath(Path path) {
         return toDelegatePathFunc.apply(path);
     }
 
+    // convenience
     private Path toReturnPath(Path path) {
         return toReturnPathFunc.apply(path);
     }
-
-    /*
-    private Path toDelegatePath(Path path) {
-        return new Path(toDelegateUri.apply(path.toUri()));
-    }
-
-    private Path toReturnPath(Path path) {
-        return new Path(toReturnUri.apply(path.toUri()));
-    }
-
-    private URI swapSchemeUri(URI uri, String swapScheme) {
-        if (uri.getScheme() != null) {
-            return UriBuilder.fromUri(uri)
-                    .scheme(swapScheme)
-                    .build();
-        } else {
-            return uri;
-        }
-    }
-    */
 
     @Override
     public URI getUri() {
