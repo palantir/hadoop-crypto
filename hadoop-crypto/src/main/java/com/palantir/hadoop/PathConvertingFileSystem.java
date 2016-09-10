@@ -48,16 +48,6 @@ public final class PathConvertingFileSystem extends FileSystem {
         super.setConf(delegate.getConf());
     }
 
-    // convenience
-    private Path toDelegatePath(Path path) {
-        return toDelegatePathFunc.apply(path);
-    }
-
-    // convenience
-    private Path toReturnPath(Path path) {
-        return toReturnPathFunc.apply(path);
-    }
-
     @Override
     public URI getUri() {
         return delegate.getUri();
@@ -104,6 +94,31 @@ public final class PathConvertingFileSystem extends FileSystem {
         return toReturnFileStatus(delegate.getFileStatus(toDelegatePath(f)));
     }
 
+    @Override
+    public void setWorkingDirectory(Path new_dir) {
+        delegate.setWorkingDirectory(toDelegatePath(new_dir));
+    }
+
+    @Override
+    public Path getWorkingDirectory() {
+        return toReturnPath(delegate.getWorkingDirectory());
+    }
+
+    @Override
+    public boolean mkdirs(Path f, FsPermission permission) throws IOException {
+        return delegate.mkdirs(toDelegatePath(f), permission);
+    }
+
+    // convenience
+    private Path toDelegatePath(Path path) {
+        return toDelegatePathFunc.apply(path);
+    }
+
+    // convenience
+    private Path toReturnPath(Path path) {
+        return toReturnPathFunc.apply(path);
+    }
+
     private FileStatus toReturnFileStatus(FileStatus status) throws IOException {
         // same as FileStatus copy constructor
         return new FileStatus(
@@ -118,21 +133,6 @@ public final class PathConvertingFileSystem extends FileSystem {
                 status.getGroup(),
                 (status.isSymlink() ? status.getSymlink() : null), // getSymlink throws if file is not a symlink
                 toReturnPath(status.getPath()));
-    }
-
-    @Override
-    public void setWorkingDirectory(Path new_dir) {
-        delegate.setWorkingDirectory(toDelegatePath(new_dir));
-    }
-
-    @Override
-    public Path getWorkingDirectory() {
-        return toReturnPath(delegate.getWorkingDirectory());
-    }
-
-    @Override
-    public boolean mkdirs(Path f, FsPermission permission) throws IOException {
-        return delegate.mkdirs(toDelegatePath(f), permission);
     }
 
 }
