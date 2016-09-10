@@ -39,7 +39,7 @@ public class PathConvertingFileSystemTest {
     private static final Path PATH = new Path("/dummy/path");
     private static final Path DELEGATE_PATH = new Path("/delagate/path");
     private static final Path RETURN_PATH = new Path("/return/path");
-    private static final URI DUMMY_URI = URI.create("dummy/uri");
+    private static final URI DUMMY_URI = URI.create("/dummy/uri");
 
     private FileSystem delegate;
     private FSDataInputStream inputStream;
@@ -51,7 +51,7 @@ public class PathConvertingFileSystemTest {
         delegate = mock(FileSystem.class);
         inputStream = mock(FSDataInputStream.class);
         outputStream = mock(FSDataOutputStream.class);
-        convertingFs =  new PathConvertingFileSystem(delegate, DELEGATE_PATH_FUNC.INSTANCE, RETURN_PATH_FUNC.INSTANCE);
+        convertingFs = new PathConvertingFileSystem(delegate, DELEGATE_PATH_FUNC.INSTANCE, RETURN_PATH_FUNC.INSTANCE);
     }
 
     @Test
@@ -104,7 +104,7 @@ public class PathConvertingFileSystemTest {
 
     @Test
     public void listStatus() throws Exception {
-        when(delegate.listStatus(DELEGATE_PATH)).thenReturn(new FileStatus[] { fileStatus(DELEGATE_PATH) });
+        when(delegate.listStatus(DELEGATE_PATH)).thenReturn(new FileStatus[] {fileStatus(DELEGATE_PATH)});
         FileStatus[] fileStatuses = convertingFs.listStatus(PATH);
 
         assertThat(Arrays.asList(fileStatuses), contains(fileStatus(RETURN_PATH)));
