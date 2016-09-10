@@ -17,7 +17,7 @@
 package com.palantir.hadoop;
 
 import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.core.Is.is;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -34,7 +34,7 @@ import org.apache.hadoop.fs.Path;
 import org.junit.Before;
 import org.junit.Test;
 
-public class PathConvertingFileSystemTest {
+public final class PathConvertingFileSystemTest {
 
     private static final Path PATH = new Path("/dummy/path");
     private static final Path DELEGATE_PATH = new Path("/delagate/path");
@@ -51,7 +51,7 @@ public class PathConvertingFileSystemTest {
         delegate = mock(FileSystem.class);
         inputStream = mock(FSDataInputStream.class);
         outputStream = mock(FSDataOutputStream.class);
-        convertingFs = new PathConvertingFileSystem(delegate, DELEGATE_PATH_FUNC.INSTANCE, RETURN_PATH_FUNC.INSTANCE);
+        convertingFs = new PathConvertingFileSystem(delegate, DelegatePathFunc.INSTANCE, ReturnPathFunc.INSTANCE);
     }
 
     @Test
@@ -144,7 +144,7 @@ public class PathConvertingFileSystemTest {
         return new FileStatus(0, false, 0, 0, 0, path);
     }
 
-    private enum DELEGATE_PATH_FUNC implements Function<Path, Path> {
+    private enum DelegatePathFunc implements Function<Path, Path> {
         INSTANCE;
 
         @Override
@@ -153,7 +153,7 @@ public class PathConvertingFileSystemTest {
         }
     }
 
-    private enum RETURN_PATH_FUNC implements Function<Path, Path> {
+    private enum ReturnPathFunc implements Function<Path, Path> {
         INSTANCE;
 
         @Override

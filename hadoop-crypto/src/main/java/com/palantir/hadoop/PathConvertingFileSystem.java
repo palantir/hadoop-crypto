@@ -42,10 +42,10 @@ public final class PathConvertingFileSystem extends FileSystem {
     public PathConvertingFileSystem(FileSystem delegate,
             Function<Path, Path> toDelegatePathFunc,
             Function<Path, Path> toReturnPathFunc) {
+        super.setConf(delegate.getConf());
         this.delegate = delegate;
         this.toDelegatePathFunc = toDelegatePathFunc;
         this.toReturnPathFunc = toReturnPathFunc;
-        super.setConf(delegate.getConf());
     }
 
     @Override
@@ -54,20 +54,20 @@ public final class PathConvertingFileSystem extends FileSystem {
     }
 
     @Override
-    public FSDataInputStream open(Path f, int bufferSize) throws IOException {
-        return delegate.open(toDelegatePath(f), bufferSize);
+    public FSDataInputStream open(Path path, int bufferSize) throws IOException {
+        return delegate.open(toDelegatePath(path), bufferSize);
     }
 
     @Override
-    public FSDataOutputStream create(Path f, FsPermission permission, boolean overwrite, int bufferSize,
+    public FSDataOutputStream create(Path path, FsPermission permission, boolean overwrite, int bufferSize,
             short replication, long blockSize, Progressable progress) throws IOException {
-        return delegate.create(toDelegatePath(f), permission, overwrite, bufferSize, replication, blockSize,
+        return delegate.create(toDelegatePath(path), permission, overwrite, bufferSize, replication, blockSize,
                 progress);
     }
 
     @Override
-    public FSDataOutputStream append(Path f, int bufferSize, Progressable progress) throws IOException {
-        return delegate.append(toDelegatePath(f), bufferSize, progress);
+    public FSDataOutputStream append(Path path, int bufferSize, Progressable progress) throws IOException {
+        return delegate.append(toDelegatePath(path), bufferSize, progress);
     }
 
     @Override
@@ -76,13 +76,13 @@ public final class PathConvertingFileSystem extends FileSystem {
     }
 
     @Override
-    public boolean delete(Path f, boolean recursive) throws IOException {
-        return delegate.delete(toDelegatePath(f), recursive);
+    public boolean delete(Path path, boolean recursive) throws IOException {
+        return delegate.delete(toDelegatePath(path), recursive);
     }
 
     @Override
-    public FileStatus[] listStatus(Path f) throws FileNotFoundException, IOException {
-        FileStatus[] fileStatuses = delegate.listStatus(toDelegatePath(f));
+    public FileStatus[] listStatus(Path path) throws FileNotFoundException, IOException {
+        FileStatus[] fileStatuses = delegate.listStatus(toDelegatePath(path));
         for (int i = 0; i < fileStatuses.length; i++) {
             fileStatuses[i] = toReturnFileStatus(fileStatuses[i]);
         }
@@ -90,13 +90,13 @@ public final class PathConvertingFileSystem extends FileSystem {
     }
 
     @Override
-    public FileStatus getFileStatus(Path f) throws IOException {
-        return toReturnFileStatus(delegate.getFileStatus(toDelegatePath(f)));
+    public FileStatus getFileStatus(Path path) throws IOException {
+        return toReturnFileStatus(delegate.getFileStatus(toDelegatePath(path)));
     }
 
     @Override
-    public void setWorkingDirectory(Path new_dir) {
-        delegate.setWorkingDirectory(toDelegatePath(new_dir));
+    public void setWorkingDirectory(Path path) {
+        delegate.setWorkingDirectory(toDelegatePath(path));
     }
 
     @Override
@@ -105,8 +105,8 @@ public final class PathConvertingFileSystem extends FileSystem {
     }
 
     @Override
-    public boolean mkdirs(Path f, FsPermission permission) throws IOException {
-        return delegate.mkdirs(toDelegatePath(f), permission);
+    public boolean mkdirs(Path path, FsPermission permission) throws IOException {
+        return delegate.mkdirs(toDelegatePath(path), permission);
     }
 
     private Path toDelegatePath(Path path) {
@@ -129,7 +129,7 @@ public final class PathConvertingFileSystem extends FileSystem {
                 status.getPermission(),
                 status.getOwner(),
                 status.getGroup(),
-                (status.isSymlink() ? status.getSymlink() : null), // getSymlink throws if file is not a symlink
+                status.isSymlink() ? status.getSymlink() : null, // getSymlink throws if file is not a symlink
                 toReturnPath(status.getPath()));
     }
 
