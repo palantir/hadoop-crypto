@@ -46,6 +46,24 @@ public final class PathConvertingFileSystemTest {
     private FSDataOutputStream outputStream;
     private PathConvertingFileSystem convertingFs;
 
+    private enum DelegatePathFunc implements Function<Path, Path> {
+        INSTANCE;
+
+        @Override
+        public Path apply(Path input) {
+            return DELEGATE_PATH;
+        }
+    }
+
+    private enum ReturnPathFunc implements Function<Path, Path> {
+        INSTANCE;
+
+        @Override
+        public Path apply(Path input) {
+            return RETURN_PATH;
+        }
+    }
+
     @Before
     public void before() {
         delegate = mock(FileSystem.class);
@@ -142,24 +160,6 @@ public final class PathConvertingFileSystemTest {
 
     private static FileStatus fileStatus(Path path) {
         return new FileStatus(0, false, 0, 0, 0, path);
-    }
-
-    private enum DelegatePathFunc implements Function<Path, Path> {
-        INSTANCE;
-
-        @Override
-        public Path apply(Path input) {
-            return DELEGATE_PATH;
-        }
-    }
-
-    private enum ReturnPathFunc implements Function<Path, Path> {
-        INSTANCE;
-
-        @Override
-        public Path apply(Path input) {
-            return RETURN_PATH;
-        }
     }
 
 }

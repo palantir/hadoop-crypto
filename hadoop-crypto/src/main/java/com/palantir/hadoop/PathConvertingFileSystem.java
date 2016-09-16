@@ -17,7 +17,6 @@
 package com.palantir.hadoop;
 
 import com.google.common.base.Function;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
 import org.apache.hadoop.fs.FSDataInputStream;
@@ -30,22 +29,22 @@ import org.apache.hadoop.util.Progressable;
 
 /**
  * A decorator {@link FileSystem} that delegates calls and converts paths to/from the delegate FileSystem.
- * {@link Path}s passed into methods are converted using {@code toDelegatePathFunc} before being forwarded.
- * {@link Path}s returned from the delegate are converted using {@code toReturnPathFunc} before being returned.
+ * {@link Path}s passed into methods are converted using {@link #toFunc} before being forwarded.
+ * {@link Path}s returned from the delegate are converted using {@link #fromFunc} before being returned.
  */
 public final class PathConvertingFileSystem extends FileSystem {
 
     private final FileSystem delegate;
-    private final Function<Path, Path> toDelegatePathFunc;
-    private final Function<Path, Path> toReturnPathFunc;
+    private final Function<Path, Path> toFunc;
+    private final Function<Path, Path> fromFunc;
 
     public PathConvertingFileSystem(FileSystem delegate,
-            Function<Path, Path> toDelegatePathFunc,
-            Function<Path, Path> toReturnPathFunc) {
+            Function<Path, Path> toFunc,
+            Function<Path, Path> fromFunc) {
         super.setConf(delegate.getConf());
         this.delegate = delegate;
-        this.toDelegatePathFunc = toDelegatePathFunc;
-        this.toReturnPathFunc = toReturnPathFunc;
+        this.toFunc = toFunc;
+        this.fromFunc = fromFunc;
     }
 
     @Override
@@ -55,34 +54,34 @@ public final class PathConvertingFileSystem extends FileSystem {
 
     @Override
     public FSDataInputStream open(Path path, int bufferSize) throws IOException {
-        return delegate.open(toDelegatePath(path), bufferSize);
+        return delegate.open(to(path), bufferSize);
     }
 
     @Override
     public FSDataOutputStream create(Path path, FsPermission permission, boolean overwrite, int bufferSize,
             short replication, long blockSize, Progressable progress) throws IOException {
-        return delegate.create(toDelegatePath(path), permission, overwrite, bufferSize, replication, blockSize,
+        return delegate.create(to(path), permission, overwrite, bufferSize, replication, blockSize,
                 progress);
     }
 
     @Override
     public FSDataOutputStream append(Path path, int bufferSize, Progressable progress) throws IOException {
-        return delegate.append(toDelegatePath(path), bufferSize, progress);
+        return delegate.append(to(path), bufferSize, progress);
     }
 
     @Override
     public boolean rename(Path src, Path dst) throws IOException {
-        return delegate.rename(toDelegatePath(src), toDelegatePath(dst));
+        return delegate.rename(to(src), to(dst));
     }
 
     @Override
     public boolean delete(Path path, boolean recursive) throws IOException {
-        return delegate.delete(toDelegatePath(path), recursive);
+        return delegate.delete(to(path), recursive);
     }
 
     @Override
-    public FileStatus[] listStatus(Path path) throws FileNotFoundException, IOException {
-        FileStatus[] fileStatuses = delegate.listStatus(toDelegatePath(path));
+    public FileStatus[] listStatus(Path path) throws IOException {
+        FileStatus[] fileStatuses = delegate.listStatus(to(path));
         for (int i = 0; i < fileStatuses.length; i++) {
             fileStatuses[i] = toReturnFileStatus(fileStatuses[i]);
         }
@@ -91,30 +90,30 @@ public final class PathConvertingFileSystem extends FileSystem {
 
     @Override
     public FileStatus getFileStatus(Path path) throws IOException {
-        return toReturnFileStatus(delegate.getFileStatus(toDelegatePath(path)));
+        return toReturnFileStatus(delegate.getFileStatus(to(path)));
     }
 
     @Override
     public void setWorkingDirectory(Path path) {
-        delegate.setWorkingDirectory(toDelegatePath(path));
+        delegate.setWorkingDirectory(to(path));
     }
 
     @Override
     public Path getWorkingDirectory() {
-        return toReturnPath(delegate.getWorkingDirectory());
+        return from(delegate.getWorkingDirectory());
     }
 
     @Override
     public boolean mkdirs(Path path, FsPermission permission) throws IOException {
-        return delegate.mkdirs(toDelegatePath(path), permission);
+        return delegate.mkdirs(to(path), permission);
     }
 
-    private Path toDelegatePath(Path path) {
-        return toDelegatePathFunc.apply(path);
+    private Path to(Path path) {
+        return toFunc.apply(path);
     }
 
-    private Path toReturnPath(Path path) {
-        return toReturnPathFunc.apply(path);
+    private Path from(Path path) {
+        return fromFunc.apply(path);
     }
 
     private FileStatus toReturnFileStatus(FileStatus status) throws IOException {
@@ -130,7 +129,7 @@ public final class PathConvertingFileSystem extends FileSystem {
                 status.getOwner(),
                 status.getGroup(),
                 status.isSymlink() ? status.getSymlink() : null, // getSymlink throws if file is not a symlink
-                toReturnPath(status.getPath()));
+                from(status.getPath()));
     }
 
 }
