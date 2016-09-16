@@ -27,26 +27,24 @@ public final class SeekableCipherFactory {
     private SeekableCipherFactory() {}
 
     public static SeekableCipher getCipher(String cipherAlgorithm) {
-        if (cipherAlgorithm.equals(AesCtrCipher.ALGORITHM)) {
-            KeyMaterial keyMaterial = AesCtrCipher.generateKeyMaterial();
-            return getCipher(cipherAlgorithm, keyMaterial);
-        } else if (cipherAlgorithm.equals(AesCbcCipher.ALGORITHM)) {
-            KeyMaterial keyMaterial = AesCbcCipher.generateKeyMaterial();
-            return getCipher(cipherAlgorithm, keyMaterial);
-        } else {
-            throw new IllegalArgumentException(
-                    String.format("No known SeekableCipher with algorithm: %s", cipherAlgorithm));
+        switch (cipherAlgorithm) {
+            case AesCtrCipher.ALGORITHM:
+                return getCipher(cipherAlgorithm, AesCtrCipher.generateKeyMaterial());
+            case AesCbcCipher.ALGORITHM:
+                return getCipher(cipherAlgorithm, AesCbcCipher.generateKeyMaterial());
+            default:
+                throw new IllegalArgumentException(
+                        String.format("No known SeekableCipher with algorithm: %s", cipherAlgorithm));
         }
     }
 
     public static SeekableCipher getCipher(String cipherAlgorithm, KeyMaterial keyMaterial) {
-        if (cipherAlgorithm.equals(AesCtrCipher.ALGORITHM)) {
-            return new AesCtrCipher(keyMaterial);
-        } else if (cipherAlgorithm.equals(AesCbcCipher.ALGORITHM)) {
-            return new AesCbcCipher(keyMaterial);
-        } else {
-            throw new IllegalArgumentException(
-                    String.format("No known SeekableCipher with algorithm: %s", cipherAlgorithm));
+        switch (cipherAlgorithm) {
+            case AesCtrCipher.ALGORITHM: return new AesCtrCipher(keyMaterial);
+            case AesCbcCipher.ALGORITHM: return new AesCbcCipher(keyMaterial);
+            default:
+                throw new IllegalArgumentException(
+                        String.format("No known SeekableCipher with algorithm: %s", cipherAlgorithm));
         }
     }
 
