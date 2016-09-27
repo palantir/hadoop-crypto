@@ -53,7 +53,7 @@ public final class KeySerializerV2 implements KeySerializer {
 
     public static final int VERSION = 2;
 
-    public KeySerializerV2() {}
+    KeySerializerV2() {}
 
     @Override
     public byte[] wrap(KeyMaterial keyMaterial, PublicKey key) {

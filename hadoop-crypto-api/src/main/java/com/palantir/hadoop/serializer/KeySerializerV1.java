@@ -47,7 +47,7 @@ public final class KeySerializerV1 implements KeySerializer {
 
     public static final int VERSION = 1;
 
-    public KeySerializerV1() {}
+    KeySerializerV1() {}
 
     @Override
     public byte[] wrap(KeyMaterial keyMaterial, PublicKey key) {
