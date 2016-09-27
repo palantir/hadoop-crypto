@@ -22,9 +22,7 @@ import static org.junit.Assert.fail;
 
 import java.security.KeyPair;
 import java.util.Set;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 public abstract class KeySerializerTest {
 
@@ -33,9 +31,6 @@ public abstract class KeySerializerTest {
     private static final int IV_SIZE = 16;
 
     private KeyPair keyPair;
-
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
 
     public abstract KeySerializer getSerializer();
 
