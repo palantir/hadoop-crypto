@@ -41,7 +41,11 @@ import javax.crypto.SecretKey;
  *  |   byte  |           byte          |       byte[]     |         byte       |    byte[]   |    byte   | byte[] |
  *  +--------------------------------------------------------------------------------------------------------------+
  * </pre>
+ *
+ * @deprecated this serialization format does not work if {@code algorithm, key, or iv} are longer than 255 bytes. Use
+ * {@link KeySerializerV2} instead.
  */
+@Deprecated
 final class KeySerializerV1 implements KeySerializer {
 
     static final int VERSION = 1;

@@ -33,6 +33,9 @@ interface KeySerializer {
      */
     KeyMaterial unwrap(byte[] wrappedKeyMaterial, PrivateKey key);
 
+    /**
+     * Returns the unique version of the serializer.
+     */
     int getVersion();
 
 }
