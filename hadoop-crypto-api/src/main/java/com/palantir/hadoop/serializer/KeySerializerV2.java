@@ -51,10 +51,6 @@ import javax.crypto.SecretKey;
  */
 public final class KeySerializerV2 implements KeySerializer {
 
-    /**
-     * Including a version field in the serialization format to allow for support of previous version when modifications
-     * are made to the format.
-     */
     public static final int VERSION = 2;
 
     public KeySerializerV2() {}
