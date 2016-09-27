@@ -14,36 +14,27 @@
  * limitations under the License.
  */
 
-package com.palantir.hadoop;
+package com.palantir.hadoop.serializer;
 
 import com.google.common.base.Throwables;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
+import java.security.InvalidKeyException;
+import java.security.Key;
 import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.SecureRandom;
+import javax.crypto.Cipher;
+import javax.crypto.NoSuchPaddingException;
 
-public final class KeyPairs {
+public final class KeySerializers {
 
-    public static final int DEFAULT_KEYSIZE = 1024;
+    private KeySerializers() {}
 
-    private KeyPairs() {}
-
-    public static KeyPair generateKeyPair() {
-        return generateKeyPair(DEFAULT_KEYSIZE);
-    }
-
-    public static KeyPair generateKeyPair(int keysize) {
-        KeyPairGenerator keyGen;
-        SecureRandom random;
+    public static Cipher getCipher(int cipherMode, Key key) {
         try {
-            keyGen = KeyPairGenerator.getInstance("RSA");
-            random = SecureRandom.getInstance("SHA1PRNG", "SUN");
-        } catch (NoSuchAlgorithmException | NoSuchProviderException e) {
+            Cipher cipher = Cipher.getInstance(key.getAlgorithm());
+            cipher.init(cipherMode, key);
+            return cipher;
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException e) {
             throw Throwables.propagate(e);
         }
-        keyGen.initialize(keysize, random);
-        return keyGen.generateKeyPair();
     }
 
 }

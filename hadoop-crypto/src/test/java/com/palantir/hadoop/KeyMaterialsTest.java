@@ -20,9 +20,14 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
+import com.google.common.collect.ImmutableSet;
+import com.palantir.hadoop.serializer.KeySerializer;
+import com.palantir.hadoop.serializer.KeySerializerV1;
+import com.palantir.hadoop.serializer.KeySerializerV2;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.util.Set;
 import javax.crypto.SecretKey;
 import org.junit.Before;
 import org.junit.Test;
@@ -64,15 +69,30 @@ public final class KeyMaterialsTest {
     }
 
     @Test
+    public void testWrapAndUnwrap_serializedByAllVersions() {
+        Set<KeySerializer> keySerializers = ImmutableSet.of(new KeySerializerV1(), new KeySerializerV2());
+        for (KeySerializer keySerializer : keySerializers) {
+            testWrapUnwrappedWhenSerializedBy(keySerializer);
+        }
+    }
+
+    private void testWrapUnwrappedWhenSerializedBy(KeySerializer keySerializer) {
+        byte[] wrapped = keySerializer.wrap(keyMaterial, keyPair.getPublic());
+        KeyMaterial unwrapped = KeyMaterials.unwrap(wrapped, keyPair.getPrivate());
+        assertThat(unwrapped, is(keyMaterial));
+    }
+
+    @Test
     public void testUnwrap_wrongVersion() {
         byte[] wrapped = KeyMaterials.wrap(keyMaterial, keyPair.getPublic());
-        wrapped[0] = 0x02;
+        wrapped[0] = 0x00;
 
         try {
             KeyMaterials.unwrap(wrapped, keyPair.getPrivate());
             fail();
         } catch (IllegalArgumentException e) {
-            assertThat(e.getMessage(), is("Invalid KeyMaterials format version. Expected 1 but found 2"));
+            assertThat(e.getMessage(),
+                    is("Invalid serialization format version. Expected version in [1, 2] but found 0"));
         }
     }
 
