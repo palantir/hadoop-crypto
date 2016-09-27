@@ -16,9 +16,9 @@
 
 package com.palantir.hadoop.serializer;
 
-import static junit.framework.TestCase.fail;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 import com.palantir.hadoop.KeyMaterial;
 import com.palantir.hadoop.KeyMaterials;
