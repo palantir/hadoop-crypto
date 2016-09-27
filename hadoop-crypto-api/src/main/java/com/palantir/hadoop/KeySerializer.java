@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package com.palantir.hadoop.serializer;
+package com.palantir.hadoop;
 
-import com.palantir.hadoop.KeyMaterial;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 
-public interface KeySerializer {
+interface KeySerializer {
 
     /**
      * Serializes the given {@link KeyMaterial} and wraps the {@link javax.crypto.SecretKey} using the provided {@link

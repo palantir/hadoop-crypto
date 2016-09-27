@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.palantir.hadoop.serializer;
+package com.palantir.hadoop;
 
 import com.google.common.collect.ImmutableSet;
 import java.util.Set;

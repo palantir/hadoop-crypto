@@ -20,8 +20,6 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
-import com.palantir.hadoop.serializer.KeySerializer;
-import com.palantir.hadoop.serializer.KeySerializers;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;

@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package com.palantir.hadoop.serializer;
+package com.palantir.hadoop;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
-import com.palantir.hadoop.KeyMaterial;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
@@ -49,9 +48,9 @@ import javax.crypto.SecretKey;
  * than ints which meant certain {@link KeyMaterial} couldn't be properly serialized/deserialized when {@link KeyPair}s
  * of certain lengths were used.
  */
-public final class KeySerializerV2 implements KeySerializer {
+final class KeySerializerV2 implements KeySerializer {
 
-    public static final int VERSION = 2;
+    static final int VERSION = 2;
 
     KeySerializerV2() {}
 

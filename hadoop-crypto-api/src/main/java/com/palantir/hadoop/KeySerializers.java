@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.palantir.hadoop.serializer;
+package com.palantir.hadoop;
 
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableMap;
@@ -25,7 +25,7 @@ import java.util.Map;
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
 
-public final class KeySerializers {
+final class KeySerializers {
 
     private static final Map<Integer, KeySerializer> SERIALIZERS = ImmutableMap.of(
             KeySerializerV1.VERSION, new KeySerializerV1(),
@@ -33,7 +33,7 @@ public final class KeySerializers {
 
     private KeySerializers() {}
 
-    public static Cipher getCipher(int cipherMode, Key key) {
+    static Cipher getCipher(int cipherMode, Key key) {
         try {
             Cipher cipher = Cipher.getInstance(key.getAlgorithm());
             cipher.init(cipherMode, key);
@@ -43,7 +43,7 @@ public final class KeySerializers {
         }
     }
 
-    public static Map<Integer, KeySerializer> getSerializers() {
+    static Map<Integer, KeySerializer> getSerializers() {
         return SERIALIZERS;
     }
 

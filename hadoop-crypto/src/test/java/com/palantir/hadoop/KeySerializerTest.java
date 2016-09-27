@@ -14,15 +14,12 @@
  * limitations under the License.
  */
 
-package com.palantir.hadoop.serializer;
+package com.palantir.hadoop;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
-import com.palantir.hadoop.KeyMaterial;
-import com.palantir.hadoop.KeyMaterials;
-import com.palantir.hadoop.KeyPairs;
 import java.security.KeyPair;
 import java.util.Set;
 import org.junit.Rule;
@@ -60,7 +57,7 @@ public abstract class KeySerializerTest {
         }
     }
 
-    public final void testWrapAndUnwrap(Set<Integer> symmetricKeySizes, Set<Integer> wrappingKeySizes) {
+    final void testWrapAndUnwrap(Set<Integer> symmetricKeySizes, Set<Integer> wrappingKeySizes) {
         for (Integer symmetricKeySize : symmetricKeySizes) {
             for (Integer wrappingKeySize : wrappingKeySizes) {
                 testWrapAndUnwrap(symmetricKeySize, wrappingKeySize);
@@ -68,7 +65,7 @@ public abstract class KeySerializerTest {
         }
     }
 
-    public final void testWrapAndUnwrap(int symmetricKeySize, int wrappingKeySize) {
+    final void testWrapAndUnwrap(int symmetricKeySize, int wrappingKeySize) {
         keyPair = KeyPairs.generateKeyPair(wrappingKeySize);
         KeyMaterial keyMaterial = KeyMaterials.generateKeyMaterial(KEY_ALG, symmetricKeySize, IV_SIZE);
 

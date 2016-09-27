@@ -18,9 +18,6 @@ package com.palantir.hadoop;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
-import com.palantir.hadoop.serializer.KeySerializer;
-import com.palantir.hadoop.serializer.KeySerializerV2;
-import com.palantir.hadoop.serializer.KeySerializers;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
