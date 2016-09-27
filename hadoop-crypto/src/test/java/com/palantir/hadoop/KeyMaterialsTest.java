@@ -85,8 +85,9 @@ public final class KeyMaterialsTest {
             KeyMaterials.unwrap(wrapped, keyPair.getPrivate());
             fail();
         } catch (IllegalArgumentException e) {
-            assertThat(e.getMessage(),
-                    is("Invalid serialization format version. Expected version in [1, 2] but found 0"));
+            assertThat(e.getMessage(), is(String.format(
+                    "Invalid serialization format version. Expected version in %s but found 0",
+                    KeySerializers.getSerializers().keySet())));
         }
     }
 
