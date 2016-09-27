@@ -51,9 +51,8 @@ public abstract class KeySerializerTest {
             getSerializer().unwrap(wrapped, keyPair.getPrivate());
             fail();
         } catch (IllegalArgumentException e) {
-            assertThat(e.getMessage(),
-                    is(String.format("Invalid serialization format version. Expected %s but found 0",
-                            getSerializer().getVersion())));
+            assertThat(e.getMessage(), is(String.format(
+                    "Invalid serialization format version. Expected %s but found 0", getSerializer().getVersion())));
         }
     }
 
