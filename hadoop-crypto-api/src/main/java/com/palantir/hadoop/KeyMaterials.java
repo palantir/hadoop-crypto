@@ -18,10 +18,9 @@ package com.palantir.hadoop;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
-import com.google.common.collect.ImmutableMap;
 import com.palantir.hadoop.serializer.KeySerializer;
-import com.palantir.hadoop.serializer.KeySerializerV1;
 import com.palantir.hadoop.serializer.KeySerializerV2;
+import com.palantir.hadoop.serializer.KeySerializers;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -45,9 +44,7 @@ import org.slf4j.LoggerFactory;
 public final class KeyMaterials {
 
     private static final Logger log = LoggerFactory.getLogger(KeyMaterials.class);
-    private static final Map<Integer, KeySerializer> SERIALIZAERS = ImmutableMap.of(
-            KeySerializerV1.VERSION, new KeySerializerV1(),
-            KeySerializerV2.VERSION, new KeySerializerV2());
+    private static final Map<Integer, KeySerializer> SERIALIZERS = KeySerializers.getSerializers();
 
     private KeyMaterials() {}
 
@@ -87,7 +84,7 @@ public final class KeyMaterials {
     }
 
     public static byte[] wrap(KeyMaterial keyMaterial, PublicKey key) {
-        return SERIALIZAERS.get(KeySerializerV2.VERSION).wrap(keyMaterial, key);
+        return SERIALIZERS.get(KeySerializerV2.VERSION).wrap(keyMaterial, key);
     }
 
     public static KeyMaterial unwrap(byte[] wrappedKeyMaterial, PrivateKey key) {
@@ -95,11 +92,11 @@ public final class KeyMaterials {
 
         try {
             int version = stream.read();
-            Preconditions.checkArgument(SERIALIZAERS.containsKey(version),
+            Preconditions.checkArgument(SERIALIZERS.containsKey(version),
                     "Invalid serialization format version. Expected version in %s but found %s",
-                    SERIALIZAERS.keySet(), version);
+                    SERIALIZERS.keySet(), version);
 
-            return SERIALIZAERS.get(version).unwrap(wrappedKeyMaterial, key);
+            return SERIALIZERS.get(version).unwrap(wrappedKeyMaterial, key);
         } catch (IOException e) {
             throw Throwables.propagate(e);
         }

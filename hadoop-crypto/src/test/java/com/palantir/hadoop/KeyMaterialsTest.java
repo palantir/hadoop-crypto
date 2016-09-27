@@ -20,14 +20,11 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
-import com.google.common.collect.ImmutableSet;
 import com.palantir.hadoop.serializer.KeySerializer;
-import com.palantir.hadoop.serializer.KeySerializerV1;
-import com.palantir.hadoop.serializer.KeySerializerV2;
+import com.palantir.hadoop.serializer.KeySerializers;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
-import java.util.Set;
 import javax.crypto.SecretKey;
 import org.junit.Before;
 import org.junit.Test;
@@ -70,13 +67,12 @@ public final class KeyMaterialsTest {
 
     @Test
     public void testWrapAndUnwrap_serializedByAllVersions() {
-        Set<KeySerializer> keySerializers = ImmutableSet.of(new KeySerializerV1(), new KeySerializerV2());
-        for (KeySerializer keySerializer : keySerializers) {
-            testWrapUnwrappedWhenSerializedBy(keySerializer);
+        for (KeySerializer keySerializer : KeySerializers.getSerializers().values()) {
+            testUnwrapWhenSerializedBy(keySerializer);
         }
     }
 
-    private void testWrapUnwrappedWhenSerializedBy(KeySerializer keySerializer) {
+    private void testUnwrapWhenSerializedBy(KeySerializer keySerializer) {
         byte[] wrapped = keySerializer.wrap(keyMaterial, keyPair.getPublic());
         KeyMaterial unwrapped = KeyMaterials.unwrap(wrapped, keyPair.getPrivate());
         assertThat(unwrapped, is(keyMaterial));
