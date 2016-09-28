@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory;
 public final class KeyMaterials {
 
     private static final Logger log = LoggerFactory.getLogger(KeyMaterials.class);
-    private static final Map<Integer, KeySerializer> SERIALIZERS = KeySerializers.getSerializers();
+    private static final Map<Integer, ? extends KeySerializer> SERIALIZERS = KeySerializers.getSerializers();
 
     private KeyMaterials() {}
 
@@ -81,7 +81,7 @@ public final class KeyMaterials {
     }
 
     public static byte[] wrap(KeyMaterial keyMaterial, PublicKey key) {
-        return SERIALIZERS.get(KeySerializerV2.VERSION).wrap(keyMaterial, key);
+        return KeySerializerV2.INSTANCE.wrap(keyMaterial, key);
     }
 
     public static KeyMaterial unwrap(byte[] wrappedKeyMaterial, PrivateKey key) {

@@ -48,11 +48,10 @@ import javax.crypto.SecretKey;
  * than ints which meant certain {@link KeyMaterial} couldn't be properly serialized/deserialized when {@link KeyPair}s
  * of certain lengths were used.
  */
-final class KeySerializerV2 implements KeySerializer {
+enum KeySerializerV2 implements KeySerializer {
+    INSTANCE;
 
     static final int VERSION = 2;
-
-    KeySerializerV2() {}
 
     @Override
     public byte[] wrap(KeyMaterial keyMaterial, PublicKey key) {

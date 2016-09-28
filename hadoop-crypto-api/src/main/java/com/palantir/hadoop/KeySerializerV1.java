@@ -46,11 +46,10 @@ import javax.crypto.SecretKey;
  * {@link KeySerializerV2} instead.
  */
 @Deprecated
-final class KeySerializerV1 implements KeySerializer {
+enum KeySerializerV1 implements KeySerializer {
+    INSTANCE;
 
     static final int VERSION = 1;
-
-    KeySerializerV1() {}
 
     @Override
     public byte[] wrap(KeyMaterial keyMaterial, PublicKey key) {
