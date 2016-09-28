@@ -25,9 +25,15 @@ import java.security.SecureRandom;
 
 public final class KeyPairs {
 
+    public static final int DEFAULT_KEYSIZE = 1024;
+
     private KeyPairs() {}
 
     public static KeyPair generateKeyPair() {
+        return generateKeyPair(DEFAULT_KEYSIZE);
+    }
+
+    public static KeyPair generateKeyPair(int keysize) {
         KeyPairGenerator keyGen;
         SecureRandom random;
         try {
@@ -36,7 +42,7 @@ public final class KeyPairs {
         } catch (NoSuchAlgorithmException | NoSuchProviderException e) {
             throw Throwables.propagate(e);
         }
-        keyGen.initialize(1024, random);
+        keyGen.initialize(keysize, random);
         return keyGen.generateKeyPair();
     }
 

@@ -57,8 +57,30 @@ public final class KeyMaterialsTest {
     }
 
     @Test
+    public void testUsingLastestSerializer() {
+        byte[] wrapped = KeyMaterials.wrap(keyMaterial, keyPair.getPublic());
+        KeyMaterial unwrapped = KeySerializerV2.INSTANCE.unwrap(wrapped, keyPair.getPrivate());
+
+        assertThat(unwrapped, is(keyMaterial));
+    }
+
+    @Test
     public void testWrapAndUnwrap() {
         byte[] wrapped = KeyMaterials.wrap(keyMaterial, keyPair.getPublic());
+        KeyMaterial unwrapped = KeyMaterials.unwrap(wrapped, keyPair.getPrivate());
+
+        assertThat(unwrapped, is(keyMaterial));
+    }
+
+    @Test
+    public void testWrapAndUnwrap_serializedByAllVersions() {
+        for (KeySerializer keySerializer : KeySerializers.getSerializers().values()) {
+            testUnwrapWhenSerializedBy(keySerializer);
+        }
+    }
+
+    private void testUnwrapWhenSerializedBy(KeySerializer keySerializer) {
+        byte[] wrapped = keySerializer.wrap(keyMaterial, keyPair.getPublic());
         KeyMaterial unwrapped = KeyMaterials.unwrap(wrapped, keyPair.getPrivate());
         assertThat(unwrapped, is(keyMaterial));
     }
@@ -66,13 +88,15 @@ public final class KeyMaterialsTest {
     @Test
     public void testUnwrap_wrongVersion() {
         byte[] wrapped = KeyMaterials.wrap(keyMaterial, keyPair.getPublic());
-        wrapped[0] = 0x02;
+        wrapped[0] = 0x00;
 
         try {
             KeyMaterials.unwrap(wrapped, keyPair.getPrivate());
             fail();
         } catch (IllegalArgumentException e) {
-            assertThat(e.getMessage(), is("Invalid KeyMaterials format version. Expected 1 but found 2"));
+            assertThat(e.getMessage(), is(String.format(
+                    "Invalid serialization format version. Expected version in %s but found 0",
+                    KeySerializers.getSerializers().keySet())));
         }
     }
 
