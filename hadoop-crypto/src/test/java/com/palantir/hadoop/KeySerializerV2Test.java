@@ -22,11 +22,9 @@ import org.junit.Test;
 
 public final class KeySerializerV2Test extends KeySerializerTest {
 
-    private static final KeySerializerV2 serializer = new KeySerializerV2();
-
     @Override
     public KeySerializer getSerializer() {
-        return serializer;
+        return KeySerializerV2.INSTANCE;
     }
 
     @Test

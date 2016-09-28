@@ -59,7 +59,7 @@ public final class KeyMaterialsTest {
     @Test
     public void testUsingLastestSerializer() {
         byte[] wrapped = KeyMaterials.wrap(keyMaterial, keyPair.getPublic());
-        KeyMaterial unwrapped = new KeySerializerV2().unwrap(wrapped, keyPair.getPrivate());
+        KeyMaterial unwrapped = KeySerializerV2.INSTANCE.unwrap(wrapped, keyPair.getPrivate());
 
         assertThat(unwrapped, is(keyMaterial));
     }
