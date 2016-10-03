@@ -7,7 +7,11 @@
 
     <!-- @NonnullByDefault doesn't play nicely with overriding @Nullable parameters/outputs -->
     <Match>
-        <Bug pattern="NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE" />
+        <Or>
+            <Bug pattern="NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE" />
+            <Bug pattern="PT_FINAL_TYPE_CONSTRUCTOR" />
+            <Bug pattern="PT_EXTENDS_CONCRETE_TYPE" />
+        </Or>
     </Match>
 
     <!-- Ignore the following bug patterns in test code -->
