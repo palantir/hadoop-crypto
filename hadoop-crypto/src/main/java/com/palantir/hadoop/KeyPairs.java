@@ -21,11 +21,7 @@ import com.google.common.base.Throwables;
 import java.security.GeneralSecurityException;
 import java.security.KeyFactory;
 import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
-import java.security.SecureRandom;
 import java.security.spec.KeySpec;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
@@ -33,8 +29,6 @@ import javax.annotation.Nullable;
 import org.apache.commons.net.util.Base64;
 
 public final class KeyPairs {
-
-    public static final int DEFAULT_KEYSIZE = 1024;
 
     private KeyPairs() {}
 
@@ -60,23 +54,6 @@ public final class KeyPairs {
         } catch (GeneralSecurityException e) {
             throw Throwables.propagate(e);
         }
-    }
-
-    public static KeyPair generateKeyPair() {
-        return generateKeyPair(DEFAULT_KEYSIZE);
-    }
-
-    public static KeyPair generateKeyPair(int keysize) {
-        KeyPairGenerator keyGen;
-        SecureRandom random;
-        try {
-            keyGen = KeyPairGenerator.getInstance("RSA");
-            random = SecureRandom.getInstance("SHA1PRNG", "SUN");
-        } catch (NoSuchAlgorithmException | NoSuchProviderException e) {
-            throw Throwables.propagate(e);
-        }
-        keyGen.initialize(keysize, random);
-        return keyGen.generateKeyPair();
     }
 
 }
