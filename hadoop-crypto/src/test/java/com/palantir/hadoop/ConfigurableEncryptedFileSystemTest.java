@@ -32,7 +32,6 @@ import org.apache.commons.net.util.Base64;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.fs.RawLocalFileSystem;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -41,7 +40,7 @@ import org.junit.rules.TemporaryFolder;
 
 public final class ConfigurableEncryptedFileSystemTest {
 
-    private static final URI EFS_URI = URI.create("efs:///");
+    private static final URI EFS_URI = URI.create("efile:///");
 
     private FileSystem efs;
     private FileSystem rawFs;
@@ -60,8 +59,6 @@ public final class ConfigurableEncryptedFileSystemTest {
         conf = getBaseConf();
         conf.set(ConfigurableEncryptedFileSystem.PUBLIC_KEY_CONF,
                 Base64.encodeBase64String(keyPair.getPublic().getEncoded()));
-        conf.set(ConfigurableEncryptedFileSystem.BACKING_FILESYSTEM_CONF,
-                RawLocalFileSystem.class.getCanonicalName());
         conf.set(ConfigurableEncryptedFileSystem.PRIVATE_KEY_CONF,
                 Base64.encodeBase64String(keyPair.getPrivate().getEncoded()));
 
@@ -134,13 +131,11 @@ public final class ConfigurableEncryptedFileSystemTest {
     @Test
     public void testBackingFsInvalid() throws IOException {
         conf = getBaseConf();
-        conf.set(ConfigurableEncryptedFileSystem.BACKING_FILESYSTEM_CONF, String.class.getCanonicalName());
+        conf.set("fs.enope.impl", ConfigurableEncryptedFileSystem.class.getCanonicalName());
 
-        expectedException.expect(RuntimeException.class);
-        expectedException.expectMessage(String.format("Expected a %s but found a %s configured as %s",
-                FileSystem.class.getCanonicalName(), String.class.getCanonicalName(),
-                ConfigurableEncryptedFileSystem.BACKING_FILESYSTEM_CONF));
-        FileSystem.newInstance(EFS_URI, conf);
+        expectedException.expect(IOException.class);
+        expectedException.expectMessage("No FileSystem for scheme: nope");
+        FileSystem.newInstance(URI.create("enope:///:w"), conf);
     }
 
     @Test
@@ -169,7 +164,7 @@ public final class ConfigurableEncryptedFileSystemTest {
 
     private static Configuration getBaseConf() {
         Configuration conf = new Configuration();
-        conf.set("fs.efs.impl", ConfigurableEncryptedFileSystem.class.getCanonicalName());
+        conf.set("fs.efile.impl", ConfigurableEncryptedFileSystem.class.getCanonicalName());
         return conf;
     }
 
