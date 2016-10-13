@@ -86,14 +86,20 @@ public final class EncryptedFileSystem extends FilterFileSystem {
         boolean renamed = fs.rename(src, dst);
 
         if (renamed) {
-            try {
-                keyStore.remove(src.toString());
-            } catch (Exception e) {
-                log.warn("Unable to remove KeyMaterial for file: {}", src);
-            }
+            tryRemoveKey(src);
+        } else {
+            tryRemoveKey(dst);
         }
 
         return renamed;
+    }
+
+    private void tryRemoveKey(Path path) {
+        try {
+            keyStore.remove(path.toString());
+        } catch (Exception e) {
+            log.warn("Unable to remove KeyMaterial for file: {}", path);
+        }
     }
 
     @VisibleForTesting

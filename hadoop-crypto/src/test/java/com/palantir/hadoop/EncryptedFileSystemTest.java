@@ -198,15 +198,23 @@ public final class EncryptedFileSystemTest {
 
         assertFalse(renamed);
         verify(mockKeyStore, never()).remove(path.toString());
+        verify(mockKeyStore).remove(newPath.toString());
     }
 
     @Test
-    public void testRename_failedRemoveIsIgnored() throws IOException {
-        doThrow(new IllegalArgumentException()).when(mockKeyStore).remove(newPath.toString());
+    public void testRename_successfulRenameFailedRemoveIsIgnored() throws IOException {
+        when(mockFs.rename(path, newPath)).thenReturn(true);
+        doThrow(new IllegalArgumentException()).when(mockKeyStore).remove(anyString());
 
-        boolean renamed = mockedEfs.rename(path, newPath);
+        assertTrue(mockedEfs.rename(path, newPath));
+    }
 
-        assertTrue(renamed);
+    @Test
+    public void testRename_failedRenameFailedRemoveIsIgnored() throws IOException {
+        when(mockFs.rename(path, newPath)).thenReturn(false);
+        doThrow(new IllegalArgumentException()).when(mockKeyStore).remove(anyString());
+
+        assertFalse(mockedEfs.rename(path, newPath));
     }
 
     @Test
