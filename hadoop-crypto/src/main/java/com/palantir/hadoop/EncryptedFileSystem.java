@@ -30,6 +30,8 @@ import org.apache.hadoop.fs.FilterFileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.util.Progressable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A {@link FileSystem} wrapper that encrypts and decrypts the streams from the underlying {@link FileSystem}. The
@@ -40,6 +42,7 @@ import org.apache.hadoop.util.Progressable;
  */
 public final class EncryptedFileSystem extends FilterFileSystem {
 
+    private static final Logger log = LoggerFactory.getLogger(EncryptedFileSystem.class);
     private static final String DEFAULT_CIPHER_ALGORITHM = AesCtrCipher.ALGORITHM;
     public static final String CIPHER_ALGORITHM_KEY = "fs.cipher";
 
@@ -74,6 +77,23 @@ public final class EncryptedFileSystem extends FilterFileSystem {
         keyStore.put(path.toString(), cipher.getKeyMaterial());
 
         return os;
+    }
+
+    @Override
+    public boolean rename(Path src, Path dst) throws IOException {
+        KeyMaterial keyMaterial = keyStore.get(src.toString());
+        keyStore.put(dst.toString(), keyMaterial);
+        boolean renamed = fs.rename(src, dst);
+
+        if (renamed) {
+            try {
+                keyStore.remove(src.toString());
+            } catch (Exception e) {
+                log.warn("Unable to remove KeyMaterial for file: {}", src);
+            }
+        }
+
+        return renamed;
     }
 
     @VisibleForTesting

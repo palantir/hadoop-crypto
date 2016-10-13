@@ -17,6 +17,7 @@
 package com.palantir.hadoop;
 
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
@@ -42,6 +43,7 @@ public final class FileKeyStorageStrategyTest {
     private KeyMaterial keyMaterial;
     private FileSystem fs;
     private KeyPair pair;
+    private String path;
 
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
@@ -55,11 +57,11 @@ public final class FileKeyStorageStrategyTest {
         keyMaterial = AesCtrCipher.generateKeyMaterial();
         fs = FileSystem.get(new URI("file:///"), new Configuration());
         keyStore = new FileKeyStorageStrategy(fs, pair);
+        path = folder.newFile().getAbsolutePath();
     }
 
     @Test
     public void testStoreKeyMaterial() throws IllegalArgumentException, IOException {
-        String path = folder.newFile().getAbsolutePath();
         keyStore.put(path, keyMaterial);
         KeyMaterial readKeyMaterial = keyStore.get(path);
 
@@ -68,11 +70,18 @@ public final class FileKeyStorageStrategyTest {
     }
 
     @Test
+    public void testDeleteKeyMaterial() throws IOException {
+        keyStore.put(path, keyMaterial);
+        keyStore.remove(path);
+
+        assertFalse(fs.exists(new Path(path + FileKeyStorageStrategy.EXTENSION)));
+    }
+
+    @Test
     public void testMissingPrivateKey() throws IOException {
         FileKeyStorageStrategy strategy = new FileKeyStorageStrategy(fs, pair.getPublic());
 
         // Put still succeeds with only the public key
-        String path = folder.newFile().getAbsolutePath();
         strategy.put(path, keyMaterial);
 
         expectedException.expect(IllegalArgumentException.class);

@@ -18,9 +18,15 @@ package com.palantir.hadoop;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -51,6 +57,12 @@ public final class EncryptedFileSystemTest {
     private EncryptedFileSystem efs;
     private FileSystem delegateFs;
     private Path path;
+    private Path newPath;
+    private InMemoryKeyStorageStrategy keyStore;
+    private KeyMaterial mockKeyMaterial;
+    private FileSystem mockFs;
+    private KeyStorageStrategy mockKeyStore;
+    private EncryptedFileSystem mockedEfs;
 
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
@@ -59,16 +71,26 @@ public final class EncryptedFileSystemTest {
     public void before()
             throws NoSuchAlgorithmException, NoSuchProviderException, IOException, URISyntaxException {
         delegateFs = FileSystem.get(new URI(folder.getRoot().getAbsolutePath()), new Configuration());
-        efs = new EncryptedFileSystem(delegateFs, new InMemoryKeyStorageStrategy());
+        keyStore = new InMemoryKeyStorageStrategy();
+        efs = new EncryptedFileSystem(delegateFs, keyStore);
         path = new Path(folder.newFile().getAbsolutePath());
+        newPath = path.suffix("renamed");
+
+        mockKeyMaterial = mock(KeyMaterial.class);
+        mockFs = mock(FileSystem.class);
+        mockKeyStore = mock(KeyStorageStrategy.class);
+        mockedEfs = new EncryptedFileSystem(mockFs, mockKeyStore);
+
+        // Mock a successful rename operation
+        when(mockFs.getConf()).thenReturn(new Configuration());
+        when(mockFs.rename(path, newPath)).thenReturn(true);
+        when(mockKeyStore.get(anyString())).thenReturn(mockKeyMaterial);
     }
 
     @Test
     public void testDelegateStreamIsClosed() throws IOException {
-        FileSystem mockFs = mock(FileSystem.class);
         EncryptedFileSystem fs = new EncryptedFileSystem(mockFs, new InMemoryKeyStorageStrategy());
 
-        when(mockFs.getConf()).thenReturn(new Configuration());
         fs.create(path); // populate key store
 
         FSDataInputStream is = mock(FSDataInputStream.class);
@@ -78,7 +100,7 @@ public final class EncryptedFileSystemTest {
         myIs.close();
         fs.close();
 
-        verify(is, times(1)).close();
+        verify(is).close();
     }
 
     @Test
@@ -123,6 +145,68 @@ public final class EncryptedFileSystemTest {
 
         byte[] actualReadData = Arrays.copyOfRange(data, seekPos, MB);
         assertThat(actualReadData, is(readData));
+    }
+
+    @Test
+    public void testRename_successful() throws IOException {
+        OutputStream os = efs.create(path);
+        os.write(0x00);
+        os.close();
+
+        KeyMaterial keyMaterial = keyStore.get(path.toString());
+
+        efs.rename(path, newPath);
+
+        assertFalse(efs.exists(path));
+        assertTrue(efs.exists(newPath));
+
+        assertThat(keyStore.get(path.toString()), is(nullValue()));
+        assertThat(keyStore.get(newPath.toString()), is(keyMaterial));
+    }
+
+    @Test
+    public void testRename_failedGet() throws IOException {
+        doThrow(new IllegalArgumentException()).when(mockKeyStore).get(path.toString());
+
+        try {
+            mockedEfs.rename(path, newPath);
+            fail();
+        } catch (Exception e) {
+            verify(mockFs, never()).rename(path, newPath);
+            verify(mockKeyStore, never()).remove(path.toString());
+        }
+    }
+
+    @Test
+    public void testRename_failedPut() throws IOException {
+        doThrow(new IllegalArgumentException()).when(mockKeyStore).put(newPath.toString(), mockKeyMaterial);
+
+        try {
+            mockedEfs.rename(path, newPath);
+            fail();
+        } catch (Exception e) {
+            verify(mockFs, never()).rename(path, newPath);
+            verify(mockKeyStore, never()).remove(path.toString());
+        }
+    }
+
+    @Test
+    public void testRename_failedRename() throws IOException {
+        when(mockFs.rename(path, newPath)).thenReturn(false);
+
+        boolean renamed = mockedEfs.rename(path, newPath);
+
+        assertFalse(renamed);
+        verify(mockKeyStore, never()).remove(path.toString());
+    }
+
+    @Test
+    public void testRename_failedRemoveIsIgnored() throws IOException {
+        doThrow(new IllegalArgumentException()).when(mockKeyStore).remove(newPath.toString());
+
+        boolean renamed = mockedEfs.rename(path, newPath);
+
+        assertTrue(renamed);
     }
 
     @Test

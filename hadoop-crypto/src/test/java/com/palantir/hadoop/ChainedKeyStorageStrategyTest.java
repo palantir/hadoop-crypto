@@ -97,4 +97,14 @@ public final class ChainedKeyStorageStrategyTest {
         assertThat(chained.get(key), is(keyMaterial));
     }
 
+    @Test
+    public void testAllDeletesCalled() {
+        chained.remove(key);
+
+        InOrder inOrder = inOrder(successfulStrategy, failingStrategy);
+        inOrder.verify(successfulStrategy).remove(key);
+        inOrder.verify(failingStrategy).remove(key);
+        verifyNoMoreInteractions(successfulStrategy, failingStrategy);
+    }
+
 }
