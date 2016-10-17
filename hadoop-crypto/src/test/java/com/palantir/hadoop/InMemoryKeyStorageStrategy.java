@@ -35,4 +35,9 @@ public final class InMemoryKeyStorageStrategy implements KeyStorageStrategy {
         return store.get(fileKey);
     }
 
+    @Override
+    public void remove(String fileKey) {
+        store.remove(fileKey);
+    }
+
 }

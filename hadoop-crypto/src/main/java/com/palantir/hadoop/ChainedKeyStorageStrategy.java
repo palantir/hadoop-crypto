@@ -65,6 +65,13 @@ public final class ChainedKeyStorageStrategy implements KeyStorageStrategy {
                 Collections2.transform(strategies, NameFunc.INSTANCE)));
     }
 
+    @Override
+    public void remove(String fileKey) {
+        for (KeyStorageStrategy strategy : strategies) {
+            strategy.remove(fileKey);
+        }
+    }
+
     private enum NameFunc implements Function<Object, String> {
         INSTANCE;
 

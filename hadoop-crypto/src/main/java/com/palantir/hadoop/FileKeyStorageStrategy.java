@@ -75,6 +75,15 @@ public final class FileKeyStorageStrategy implements KeyStorageStrategy {
         }
     }
 
+    @Override
+    public void remove(String fileKey) {
+        try {
+            fs.delete(getKeyPath(fileKey), false);
+        } catch (IOException e) {
+            throw Throwables.propagate(e);
+        }
+    }
+
     private static Path getKeyPath(String fileKey) {
         return new Path(fileKey + EXTENSION);
     }
