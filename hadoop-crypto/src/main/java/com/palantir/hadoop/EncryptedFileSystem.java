@@ -81,6 +81,8 @@ public final class EncryptedFileSystem extends FilterFileSystem {
 
     @Override
     public boolean rename(Path src, Path dst) throws IOException {
+        // Copy key material first so the encrypted file always has key material in the key store even if the
+        // put or rename fails
         KeyMaterial keyMaterial = keyStore.get(src.toString());
         keyStore.put(dst.toString(), keyMaterial);
         boolean renamed = fs.rename(src, dst);
