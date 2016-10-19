@@ -107,11 +107,11 @@ Hadoop Configuration Properties
 
 | Key                   | Value                                           | Default
 |-----------------------|-------------------------------------------------|--------
-|`fs.cipher`            | The cipher used to wrap the underlying streams. | Default: `AES/CTR/NoPadding`
+|`fs.cipher`            | The cipher used to wrap the underlying streams. | `AES/CTR/NoPadding`
 |`fs.e[FS-scheme].impl` | Must be set to `com.palantir.hadoop.ConfigurableEncryptedFileSystem`
 |`fs.efs.key.public`    | Base64 encoded X509 public key
 |`fs.efs.key.private`   | Base64 encoded PKCS8 private key
-|`fs.efs.key.algorithm` | Public/private key pair algorithm               | Default: `RSA`
+|`fs.efs.key.algorithm` | Public/private key pair algorithm               | `RSA`
 
 License
 -------
