@@ -23,11 +23,11 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
 
-public final class KeyPairs {
+public final class TestKeyPairs {
 
     public static final int DEFAULT_KEYSIZE = 1024;
 
-    private KeyPairs() {}
+    private TestKeyPairs() {}
 
     public static KeyPair generateKeyPair() {
         return generateKeyPair(DEFAULT_KEYSIZE);

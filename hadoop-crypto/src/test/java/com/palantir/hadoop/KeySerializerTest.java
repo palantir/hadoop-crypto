@@ -36,7 +36,7 @@ public abstract class KeySerializerTest {
 
     @Test
     public final void testIncorrectVersion() {
-        keyPair = KeyPairs.generateKeyPair();
+        keyPair = TestKeyPairs.generateKeyPair();
         KeyMaterial keyMaterial = KeyMaterials.generateKeyMaterial(KEY_ALG, KEY_SIZE, IV_SIZE);
 
         byte[] wrapped = getSerializer().wrap(keyMaterial, keyPair.getPublic());
@@ -60,7 +60,7 @@ public abstract class KeySerializerTest {
     }
 
     final void testWrapAndUnwrap(int symmetricKeySize, int wrappingKeySize) {
-        keyPair = KeyPairs.generateKeyPair(wrappingKeySize);
+        keyPair = TestKeyPairs.generateKeyPair(wrappingKeySize);
         KeyMaterial keyMaterial = KeyMaterials.generateKeyMaterial(KEY_ALG, symmetricKeySize, IV_SIZE);
 
         byte[] wrapped = getSerializer().wrap(keyMaterial, keyPair.getPublic());

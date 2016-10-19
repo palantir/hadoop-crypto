@@ -38,7 +38,7 @@ public final class KeyMaterialsTest {
 
     @Before
     public void before() throws NoSuchAlgorithmException, NoSuchProviderException {
-        keyPair = KeyPairs.generateKeyPair();
+        keyPair = TestKeyPairs.generateKeyPair();
         SecretKey secretKey = KeyMaterials.generateKey(KEY_ALG, KEY_SIZE);
         byte[] iv = KeyMaterials.generateIv(IV_SIZE);
         keyMaterial = KeyMaterial.of(secretKey, iv);
