@@ -55,9 +55,11 @@ Add hadoop-crypto-all.jar to the classpath of the cli (ex: share/hadoop/common).
 ```
 
 ##### Commands
+``` bash
 ./bin/hadoop dfs -put file.txt /tmp/file.txt
 ./bin/hadoop dfs -ls /tmp
 ./bin/hadoop dfs -cat /tmp/file.txt
+```
 
 Programatic Example
 -------------------
