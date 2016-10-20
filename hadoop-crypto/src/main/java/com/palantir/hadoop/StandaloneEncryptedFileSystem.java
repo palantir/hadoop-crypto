@@ -18,11 +18,16 @@ package com.palantir.hadoop;
 
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
 import java.io.IOException;
 import java.net.URI;
 import java.security.KeyPair;
+import java.util.Arrays;
+import java.util.Collection;
 import javax.ws.rs.core.UriBuilder;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FilterFileSystem;
 import org.apache.hadoop.fs.Path;
@@ -80,6 +85,19 @@ public final class StandaloneEncryptedFileSystem extends FilterFileSystem {
     @Override
     public URI getUri() {
         return setUriSchemeFunc(encryptedScheme).apply(fs.getUri());
+    }
+
+    @Override
+    // TODO(jellis): consider moving logic related to FileKeyStorageStrategy into a separate FileSystem
+    public FileStatus[] listStatus(Path path) throws IOException {
+        Collection<FileStatus> files = Collections2.filter(Arrays.asList(fs.listStatus(path)),
+                new Predicate<FileStatus>() {
+                    @Override
+                    public boolean apply(FileStatus input) {
+                        return !input.getPath().toString().endsWith(FileKeyStorageStrategy.EXTENSION);
+                    }
+                });
+        return files.toArray(new FileStatus[files.size()]);
     }
 
     private static KeyPair getKeyPair(Configuration conf) {

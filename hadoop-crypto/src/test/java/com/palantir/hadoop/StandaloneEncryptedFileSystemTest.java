@@ -16,6 +16,7 @@
 
 package com.palantir.hadoop;
 
+import static org.hamcrest.Matchers.arrayContaining;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
@@ -30,6 +31,7 @@ import java.security.KeyPair;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.net.util.Base64;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.junit.Before;
@@ -165,6 +167,20 @@ public final class StandaloneEncryptedFileSystemTest {
 
         expectedException.expect(RuntimeException.class);
         efs.open(path);
+    }
+
+    @Test
+    public void testListStatus_keyMaterialFilesFiltered() throws IOException {
+        OutputStream os = efs.create(path);
+        os.write(0x00);
+        os.close();
+
+        FileStatus[] fileStatus = efs.listStatus(path);
+        FileStatus[] fileStatuses = efs.listStatus(path.getParent());
+        FileStatus expectedStatus = fileStatus[0];
+
+        assertThat(fileStatus.length, is(1));
+        assertThat(fileStatuses, arrayContaining(expectedStatus));
     }
 
     private static Configuration getBaseConf() {
