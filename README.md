@@ -34,10 +34,10 @@ public key, and private key must be configured in the core-site.xml as well.
 Add hadoop-crypto-all.jar to the classpath of the cli (ex: share/hadoop/common).
 
 ##### core-site.xml
-```
+```xml
 <configuration>
     <property>
-        <name>fs.efile.impl</name> <--! others: fs.es3a.impl or fs.ehdfs.impl -->
+        <name>fs.efile.impl</name> <!-- others: fs.es3a.impl or fs.ehdfs.impl -->
         <value>com.palantir.hadoop.ConfigurableEncryptedFileSystem</value>
     </property>
 
