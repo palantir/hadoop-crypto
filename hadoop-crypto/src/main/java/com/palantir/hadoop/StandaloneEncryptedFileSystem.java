@@ -50,6 +50,12 @@ public final class StandaloneEncryptedFileSystem extends FilterFileSystem {
      */
     private static final String SCHEME = "";
     private static final String DEFAULT_ALGORITHM = "RSA";
+    private static final Predicate<FileStatus> NOT_KEY_MATERIAL = new Predicate<FileStatus>() {
+        @Override
+        public boolean apply(FileStatus status) {
+            return !status.getPath().toString().endsWith(FileKeyStorageStrategy.EXTENSION);
+        }
+    };
 
     /**
      * Key mapping to a base64 encoded X509 public key.
@@ -65,7 +71,6 @@ public final class StandaloneEncryptedFileSystem extends FilterFileSystem {
      * Key mapping to the public/private key algorithm (ex: RSA).
      */
     public static final String KEY_ALGORITHM_CONF = "fs.efs.key.algorithm";
-
     private String encryptedScheme;
 
     @Override
@@ -90,13 +95,7 @@ public final class StandaloneEncryptedFileSystem extends FilterFileSystem {
     @Override
     // TODO(jellis): consider moving logic related to FileKeyStorageStrategy into a separate FileSystem
     public FileStatus[] listStatus(Path path) throws IOException {
-        Collection<FileStatus> files = Collections2.filter(Arrays.asList(fs.listStatus(path)),
-                new Predicate<FileStatus>() {
-                    @Override
-                    public boolean apply(FileStatus input) {
-                        return !input.getPath().toString().endsWith(FileKeyStorageStrategy.EXTENSION);
-                    }
-                });
+        Collection<FileStatus> files = Collections2.filter(Arrays.asList(fs.listStatus(path)), NOT_KEY_MATERIAL);
         return files.toArray(new FileStatus[files.size()]);
     }
 
