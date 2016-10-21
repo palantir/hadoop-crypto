@@ -30,14 +30,14 @@ import org.apache.hadoop.fs.Path;
 /**
  * A {@link FileSystem} that transparently encrypts and decrypts the streams of an underlying FileSystem and stores
  * encapsulated/wrapped encryption keys alongside the encrypted data in the same FileSystem as the encrypted data (see
- * {@link FileKeyStorageStrategy}). Unlike the {@link EncryptedFileSystem}, the ConfigurableEncryptedFileSystem is
+ * {@link FileKeyStorageStrategy}). Unlike the {@link EncryptedFileSystem}, the StandaloneEncryptedFileSystem is
  * initialized using a {@link Configuration} and can be used as a standalone FileSystem (like {@code s3a://, hdfs://,
  * etc.}).
  * <p>
  * This FileSystem requires the first character of the scheme of any URI or Path to be `e` and the remainder of the
  * scheme to be that of a backing FileSystem that can be instantiated using {@link FileSystem#get}.
  */
-public final class ConfigurableEncryptedFileSystem extends FilterFileSystem {
+public final class StandaloneEncryptedFileSystem extends FilterFileSystem {
 
     /**
      * Scheme is defined at runtime as `e[FS-scheme]`. This FileSystem can never be instantiated without
