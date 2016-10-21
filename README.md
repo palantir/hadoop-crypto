@@ -47,7 +47,7 @@ openssl pkcs8 -topk8 -inform pem -in rsa.key -outform pem -nocrypt | grep -v PRI
 <configuration>
     <property>
         <name>fs.efile.impl</name> <!-- others: fs.es3a.impl or fs.ehdfs.impl -->
-        <value>com.palantir.hadoop.ConfigurableEncryptedFileSystem</value>
+        <value>com.palantir.hadoop.StandaloneEncryptedFileSystem</value>
     </property>
 
     <property>
@@ -117,7 +117,7 @@ Hadoop Configuration Properties
 | Key                   | Value                                           | Default
 |-----------------------|-------------------------------------------------|--------
 |`fs.cipher`            | The cipher used to wrap the underlying streams. | `AES/CTR/NoPadding`
-|`fs.e[FS-scheme].impl` | Must be set to `com.palantir.hadoop.ConfigurableEncryptedFileSystem`
+|`fs.e[FS-scheme].impl` | Must be set to `com.palantir.hadoop.StandaloneEncryptedFileSystem`
 |`fs.efs.key.public`    | Base64 encoded X509 public key
 |`fs.efs.key.private`   | Base64 encoded PKCS8 private key
 |`fs.efs.key.algorithm` | Public/private key pair algorithm               | `RSA`

@@ -38,7 +38,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 
-public final class ConfigurableEncryptedFileSystemTest {
+public final class StandaloneEncryptedFileSystemTest {
 
     private static final URI EFS_URI = URI.create("efile:///");
 
@@ -57,9 +57,9 @@ public final class ConfigurableEncryptedFileSystemTest {
     public void before() throws IOException {
         KeyPair keyPair = TestKeyPairs.generateKeyPair();
         conf = getBaseConf();
-        conf.set(ConfigurableEncryptedFileSystem.PUBLIC_KEY_CONF,
+        conf.set(StandaloneEncryptedFileSystem.PUBLIC_KEY_CONF,
                 Base64.encodeBase64String(keyPair.getPublic().getEncoded()));
-        conf.set(ConfigurableEncryptedFileSystem.PRIVATE_KEY_CONF,
+        conf.set(StandaloneEncryptedFileSystem.PRIVATE_KEY_CONF,
                 Base64.encodeBase64String(keyPair.getPrivate().getEncoded()));
 
         efs = FileSystem.newInstance(EFS_URI, conf);
@@ -103,7 +103,7 @@ public final class ConfigurableEncryptedFileSystemTest {
         byte[] dataBytes = data.getBytes(StandardCharsets.UTF_8);
         byte[] readData = new byte[data.length()];
 
-        conf.unset(ConfigurableEncryptedFileSystem.PRIVATE_KEY_CONF);
+        conf.unset(StandaloneEncryptedFileSystem.PRIVATE_KEY_CONF);
         FileSystem efsPublic = FileSystem.newInstance(EFS_URI, conf);
 
         // Write encrypted data
@@ -129,14 +129,14 @@ public final class ConfigurableEncryptedFileSystemTest {
     public void testNoPublicKey() throws IOException {
         expectedException.expect(NullPointerException.class);
         expectedException.expectMessage(String.format("Public Key must be configured for key %s",
-                ConfigurableEncryptedFileSystem.PUBLIC_KEY_CONF));
+                StandaloneEncryptedFileSystem.PUBLIC_KEY_CONF));
         FileSystem.newInstance(EFS_URI, getBaseConf());
     }
 
     @Test
     public void testBackingFsInvalid() throws IOException {
         conf = getBaseConf();
-        conf.set("fs.nope.impl", ConfigurableEncryptedFileSystem.class.getCanonicalName());
+        conf.set("fs.nope.impl", StandaloneEncryptedFileSystem.class.getCanonicalName());
 
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("URI scheme must begin with 'e' but received: nope");
@@ -169,7 +169,7 @@ public final class ConfigurableEncryptedFileSystemTest {
 
     private static Configuration getBaseConf() {
         Configuration conf = new Configuration();
-        conf.set("fs.efile.impl", ConfigurableEncryptedFileSystem.class.getCanonicalName());
+        conf.set("fs.efile.impl", StandaloneEncryptedFileSystem.class.getCanonicalName());
         return conf;
     }
 
