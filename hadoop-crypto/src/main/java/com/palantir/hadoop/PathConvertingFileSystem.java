@@ -80,6 +80,11 @@ public final class PathConvertingFileSystem extends FileSystem {
     }
 
     @Override
+    public Path makeQualified(Path path) {
+        return from(delegate.makeQualified(to(path)));
+    }
+
+    @Override
     public FileStatus[] listStatus(Path path) throws IOException {
         FileStatus[] fileStatuses = delegate.listStatus(to(path));
         for (int i = 0; i < fileStatuses.length; i++) {

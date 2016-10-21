@@ -121,6 +121,14 @@ public final class PathConvertingFileSystemTest {
     }
 
     @Test
+    public void makeQualified() {
+        when(delegate.makeQualified(DELEGATE_PATH)).thenReturn(DELEGATE_PATH);
+        Path path = convertingFs.makeQualified(PATH);
+
+        assertThat(path, is(RETURN_PATH));
+    }
+
+    @Test
     public void listStatus() throws Exception {
         when(delegate.listStatus(DELEGATE_PATH)).thenReturn(new FileStatus[] {fileStatus(DELEGATE_PATH)});
         FileStatus[] fileStatuses = convertingFs.listStatus(PATH);
