@@ -103,11 +103,20 @@ public final class FsCipherInputStream extends FSInputStream {
     // NOTE(jellis): may want to implement the other read methods depending on performance
     @Override
     public int read() throws IOException {
-        int ret = decryptedStream.read();
-        if (ret != -1) {
+        int bytesRead = decryptedStream.read();
+        if (bytesRead != -1) {
             decryptedStreamPos++;
         }
-        return ret;
+        return bytesRead;
+    }
+
+    @Override
+    public int read(byte[] buffer, int offset, int length) throws IOException {
+        int bytesRead = decryptedStream.read(buffer, offset, length);
+        if (bytesRead != -1) {
+            decryptedStreamPos += bytesRead;
+        }
+        return bytesRead;
     }
 
     @Override
