@@ -122,5 +122,6 @@ public final class FsCipherInputStream extends FSInputStream {
     @Override
     public void close() throws IOException {
         delegate.close();
+        decryptedStream.close();
     }
 }
