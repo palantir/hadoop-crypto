@@ -159,4 +159,20 @@ public abstract class AbstractFsCipherInputStreamTest {
         assertThat(val, is(data[0]));
     }
 
+    @Test
+    public final void testBulkRead() throws IOException {
+        long startPos = cis.getPos();
+        byte[] buffer = new byte[NUM_BYTES];
+        int offset = 0;
+        int read;
+        while ((read = cis.read(buffer, offset, buffer.length)) != -1) {
+            offset += read;
+        }
+
+        assertThat(cis.getPos(), is(startPos + buffer.length));
+        assertThat(buffer, is(data));
+        assertThat(offset, is(NUM_BYTES));
+        cis.close();
+    }
+
 }
