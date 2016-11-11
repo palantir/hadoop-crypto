@@ -121,6 +121,9 @@ public final class FsCipherInputStream extends FSInputStream {
     @Override
     public void close() throws IOException {
         delegate.close();
-        decryptedStream.close();
+        // TODO (davids) really this should close decryptedStream, but https://bugs.openjdk.java.net/browse/JDK-8064546
+        // causes "java.io.IOException: javax.crypto.BadPaddingException: Given final block not properly padded" and
+        // is not fixed until Java 7u85 (not publicly available) and Java 8u51.
+        // decryptedStream.close();
     }
 }
