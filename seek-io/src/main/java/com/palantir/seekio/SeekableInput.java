@@ -41,9 +41,4 @@ public interface SeekableInput extends Closeable {
      */
     int read(byte[] bytes, int offset, int length) throws IOException;
 
-    /**
-     * @see java.io.InputStream#read()
-     */
-    int read() throws IOException;
-
 }
