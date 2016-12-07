@@ -20,6 +20,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
+import com.palantir.crypto.KeyStorageStrategy;
 import java.io.IOException;
 import java.net.URI;
 import java.security.KeyPair;

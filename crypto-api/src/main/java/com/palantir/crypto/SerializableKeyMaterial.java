@@ -14,27 +14,36 @@
  * limitations under the License.
  */
 
-package com.palantir.hadoop;
+package com.palantir.crypto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import javax.crypto.SecretKey;
 import org.immutables.value.Value;
 
-// This class is not Jackson serializable due to SecretKey
+/**
+ * A Jackson-serializable wrapper for {@link KeyMaterial}s. This is needed because the {@link SecretKey} member of
+ * KeyMaterial is not serializable by Jackson.
+ */
 @Value.Immutable
 @Value.Style(visibility = Value.Style.ImplementationVisibility.PACKAGE, jdkOnly = true)
-public abstract class KeyMaterial {
+@JsonSerialize(as = ImmutableSerializableKeyMaterial.class)
+@JsonDeserialize(as = ImmutableSerializableKeyMaterial.class)
+@JsonIgnoreProperties(ignoreUnknown = true)
+public abstract class SerializableKeyMaterial {
 
     @Value.Parameter
-    public abstract SecretKey getSecretKey();
+    public abstract String getAlgorithm();
 
-    /**
-     * Initialization vector.
-     */
+    @Value.Parameter
+    public abstract byte[] getEncodedKey();
+
     @Value.Parameter
     public abstract byte[] getIv();
 
-    public static KeyMaterial of(SecretKey secretKey, byte[] iv) {
-        return ImmutableKeyMaterial.of(secretKey, iv);
+    public static SerializableKeyMaterial of(String algorithm, byte[] encodedKey, byte[] iv) {
+        return ImmutableSerializableKeyMaterial.of(algorithm, encodedKey, iv);
     }
 
 }

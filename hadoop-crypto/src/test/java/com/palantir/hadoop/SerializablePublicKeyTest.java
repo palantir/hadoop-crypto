@@ -19,6 +19,7 @@ package com.palantir.hadoop;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
+import com.palantir.crypto.SerializablePublicKey;
 import java.security.KeyPair;
 import java.security.PublicKey;
 import org.junit.Test;

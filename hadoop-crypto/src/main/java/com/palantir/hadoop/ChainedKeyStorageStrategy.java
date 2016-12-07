@@ -19,6 +19,8 @@ package com.palantir.hadoop;
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
+import com.palantir.crypto.KeyMaterial;
+import com.palantir.crypto.KeyStorageStrategy;
 import java.util.Arrays;
 import java.util.List;
 import org.slf4j.Logger;

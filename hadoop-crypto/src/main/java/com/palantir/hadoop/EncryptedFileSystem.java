@@ -17,6 +17,8 @@
 package com.palantir.hadoop;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.palantir.crypto.KeyMaterial;
+import com.palantir.crypto.KeyStorageStrategy;
 import com.palantir.hadoop.cipher.AesCtrCipher;
 import com.palantir.hadoop.cipher.FsCipherInputStream;
 import com.palantir.hadoop.cipher.FsCipherOutputStream;

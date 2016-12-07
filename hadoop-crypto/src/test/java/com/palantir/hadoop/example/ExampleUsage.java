@@ -21,9 +21,9 @@ import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
+import com.palantir.crypto.KeyStorageStrategy;
 import com.palantir.hadoop.EncryptedFileSystem;
 import com.palantir.hadoop.FileKeyStorageStrategy;
-import com.palantir.hadoop.KeyStorageStrategy;
 import com.palantir.hadoop.TestKeyPairs;
 import java.io.IOException;
 import java.io.InputStream;

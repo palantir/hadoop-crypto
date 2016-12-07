@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.palantir.hadoop;
+package com.palantir.crypto;
 
 import java.security.PrivateKey;
 import java.security.PublicKey;
