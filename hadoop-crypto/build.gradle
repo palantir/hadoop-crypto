@@ -4,7 +4,7 @@ apply plugin: 'com.github.johnrengelman.shadow'
 sourceCompatibility = '1.7'
 
 dependencies {
-    compile project(":crypto-api")
+    compile project(":crypto-serialization")
     compile "com.fasterxml.jackson.core:jackson-databind"
     compile "org.apache.hadoop:hadoop-common"
 
