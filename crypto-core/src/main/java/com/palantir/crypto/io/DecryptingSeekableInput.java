@@ -27,7 +27,7 @@ import java.io.InputStream;
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
 
-public final class DecryptingInputStream implements SeekableInput {
+public final class DecryptingSeekableInput implements SeekableInput {
 
     private final SeekableInput delegate;
     private final SeekableCipher seekableCipher;
@@ -36,12 +36,12 @@ public final class DecryptingInputStream implements SeekableInput {
     private CipherInputStream decryptedStream;
     private long decryptedStreamPos;
 
-    public DecryptingInputStream(SeekableInput delegate, SeekableCipher cipher) {
+    public DecryptingSeekableInput(SeekableInput delegate, SeekableCipher cipher) {
         this(delegate, cipher, new CipherStreamSupplierImpl());
     }
 
     @VisibleForTesting
-    DecryptingInputStream(SeekableInput delegate, SeekableCipher cipher, CipherStreamSupplier supplier) {
+    DecryptingSeekableInput(SeekableInput delegate, SeekableCipher cipher, CipherStreamSupplier supplier) {
         this.delegate = delegate;
         this.seekableCipher = cipher;
         this.supplier = supplier;

@@ -17,7 +17,7 @@
 package com.palantir.hadoop.cipher;
 
 import com.palantir.crypto.cipher.SeekableCipher;
-import com.palantir.crypto.io.DecryptingInputStream;
+import com.palantir.crypto.io.DecryptingSeekableInput;
 import com.palantir.crypto.io.DefaultSeekableInputStream;
 import com.palantir.seekio.SeekableInput;
 import java.io.IOException;
@@ -33,7 +33,7 @@ public final class FsCipherInputStream extends FSInputStream {
 
     public FsCipherInputStream(FSDataInputStream delegate, SeekableCipher cipher) {
         this.delegate = new DefaultSeekableInputStream(
-                new DecryptingInputStream(new FsSeekableInput(delegate), cipher));
+                new DecryptingSeekableInput(new FsSeekableInput(delegate), cipher));
     }
 
     @Override
