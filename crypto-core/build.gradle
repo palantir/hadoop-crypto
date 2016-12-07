@@ -5,6 +5,7 @@ sourceCompatibility = '1.7'
 
 dependencies {
     compile project(':crypto-serialization')
+    compile project(':seek-io')
 
     compile "org.slf4j:slf4j-api"
     compile "com.fasterxml.jackson.core:jackson-databind"
