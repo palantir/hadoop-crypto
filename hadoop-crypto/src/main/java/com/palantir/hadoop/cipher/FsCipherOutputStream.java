@@ -17,6 +17,9 @@
 package com.palantir.hadoop.cipher;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.palantir.crypto.cipher.CipherStreamSupplier;
+import com.palantir.crypto.cipher.CipherStreamSupplierImpl;
+import com.palantir.crypto.cipher.SeekableCipher;
 import java.io.FilterOutputStream;
 import javax.crypto.Cipher;
 import org.apache.hadoop.fs.FSDataOutputStream;

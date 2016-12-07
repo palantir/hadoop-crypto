@@ -14,23 +14,24 @@
  * limitations under the License.
  */
 
-package com.palantir.hadoop;
+package com.palantir.crypto.cipher;
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
+import java.io.InputStream;
+import java.io.OutputStream;
+import javax.crypto.Cipher;
+import javax.crypto.CipherInputStream;
+import javax.crypto.CipherOutputStream;
 
-import com.palantir.crypto.SerializablePublicKey;
-import java.security.KeyPair;
-import java.security.PublicKey;
-import org.junit.Test;
+public final class CipherStreamSupplierImpl implements CipherStreamSupplier {
 
-public final class SerializablePublicKeyTest {
+    @Override
+    public  CipherInputStream getInputStream(InputStream is, Cipher cipher) {
+        return new CipherInputStream(is, cipher);
+    }
 
-    @Test
-    public void testDeserialization() {
-        KeyPair keyPair = TestKeyPairs.generateKeyPair();
-        PublicKey publicKey = keyPair.getPublic();
-        assertThat(SerializablePublicKey.of(publicKey).deserialize(), is(publicKey));
+    @Override
+    public CipherOutputStream getOutputStream(OutputStream os, Cipher cipher) {
+        return new CipherOutputStream(os, cipher);
     }
 
 }

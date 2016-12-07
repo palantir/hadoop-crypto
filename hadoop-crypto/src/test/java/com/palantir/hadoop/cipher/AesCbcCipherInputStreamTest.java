@@ -17,6 +17,8 @@
 package com.palantir.hadoop.cipher;
 
 import com.palantir.crypto.KeyMaterial;
+import com.palantir.crypto.cipher.AesCbcCipher;
+import com.palantir.crypto.cipher.SeekableCipher;
 
 public final class AesCbcCipherInputStreamTest extends AbstractFsCipherInputStreamTest {
 

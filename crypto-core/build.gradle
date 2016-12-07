@@ -1,0 +1,16 @@
+apply from: "${rootDir}/gradle/publish.gradle"
+apply from: "${rootDir}/gradle/immutables-processors.gradle"
+
+sourceCompatibility = '1.7'
+
+dependencies {
+    compile project(':crypto-serialization')
+
+    compile "org.slf4j:slf4j-api"
+    compile "com.fasterxml.jackson.core:jackson-databind"
+    compile "com.google.guava:guava"
+
+    testCompile "junit:junit"
+    testCompile "org.hamcrest:hamcrest-all"
+    testCompile "org.mockito:mockito-core"
+}

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.palantir.hadoop.cipher;
+package com.palantir.crypto.cipher;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;

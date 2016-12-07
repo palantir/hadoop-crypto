@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.palantir.hadoop.cipher;
+package com.palantir.crypto.cipher;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
