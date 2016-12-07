@@ -21,6 +21,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
+import com.palantir.crypto.KeyMaterial;
 import com.palantir.hadoop.cipher.AesCtrCipher;
 import java.io.IOException;
 import java.net.URI;

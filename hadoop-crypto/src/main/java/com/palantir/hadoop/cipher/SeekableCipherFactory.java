@@ -16,7 +16,7 @@
 
 package com.palantir.hadoop.cipher;
 
-import com.palantir.hadoop.KeyMaterial;
+import com.palantir.crypto.KeyMaterial;
 
 /**
  * Constructs the proper {@link SeekableCipher} for a given {@code cipherAlgorithm} string. The {@link KeyMaterial} will

@@ -17,6 +17,8 @@
 package com.palantir.hadoop;
 
 import com.google.common.collect.Maps;
+import com.palantir.crypto.KeyMaterial;
+import com.palantir.crypto.KeyStorageStrategy;
 import java.util.Map;
 
 public final class InMemoryKeyStorageStrategy implements KeyStorageStrategy {

@@ -14,20 +14,24 @@
  * limitations under the License.
  */
 
-package com.palantir.hadoop.cipher;
+package com.palantir.crypto;
 
-import com.palantir.crypto.KeyMaterial;
+import com.google.common.collect.ImmutableSet;
+import java.util.Set;
+import org.junit.Test;
 
-public final class AesCbcCipherTest extends AbstractSeekableCipherTest {
+public final class KeySerializerV2Test extends KeySerializerTest {
 
     @Override
-    KeyMaterial generateKeyMaterial() {
-        return AesCbcCipher.generateKeyMaterial();
+    public KeySerializer getSerializer() {
+        return KeySerializerV2.INSTANCE;
     }
 
-    @Override
-    SeekableCipher getCipher(KeyMaterial initKeyMaterial) {
-        return new AesCbcCipher(initKeyMaterial);
+    @Test
+    public void testWrapAndUnwrap() {
+        Set<Integer> symmetricKeySizes = ImmutableSet.of(128, 256);
+        Set<Integer> wrappingKeySizes = ImmutableSet.of(1024, 2048);
+        testWrapAndUnwrap(symmetricKeySizes, wrappingKeySizes);
     }
 
 }

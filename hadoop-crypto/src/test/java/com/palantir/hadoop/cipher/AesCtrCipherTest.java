@@ -20,7 +20,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
 import com.google.common.collect.Maps;
-import com.palantir.hadoop.KeyMaterial;
+import com.palantir.crypto.KeyMaterial;
 import java.util.Arrays;
 import java.util.Map;
 import javax.crypto.BadPaddingException;

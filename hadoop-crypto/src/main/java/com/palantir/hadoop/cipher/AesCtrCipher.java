@@ -18,8 +18,8 @@ package com.palantir.hadoop.cipher;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
-import com.palantir.hadoop.KeyMaterial;
-import com.palantir.hadoop.KeyMaterials;
+import com.palantir.crypto.KeyMaterial;
+import com.palantir.crypto.KeyMaterials;
 import java.math.BigInteger;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;

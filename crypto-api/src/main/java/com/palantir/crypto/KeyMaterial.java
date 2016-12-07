@@ -14,24 +14,27 @@
  * limitations under the License.
  */
 
-package com.palantir.hadoop;
+package com.palantir.crypto;
 
-import com.google.common.collect.ImmutableSet;
-import java.util.Set;
-import org.junit.Test;
+import javax.crypto.SecretKey;
+import org.immutables.value.Value;
 
-public final class KeySerializerV2Test extends KeySerializerTest {
+// This class is not Jackson serializable due to SecretKey
+@Value.Immutable
+@Value.Style(visibility = Value.Style.ImplementationVisibility.PACKAGE, jdkOnly = true)
+public abstract class KeyMaterial {
 
-    @Override
-    public KeySerializer getSerializer() {
-        return KeySerializerV2.INSTANCE;
-    }
+    @Value.Parameter
+    public abstract SecretKey getSecretKey();
 
-    @Test
-    public void testWrapAndUnwrap() {
-        Set<Integer> symmetricKeySizes = ImmutableSet.of(128, 256);
-        Set<Integer> wrappingKeySizes = ImmutableSet.of(1024, 2048);
-        testWrapAndUnwrap(symmetricKeySizes, wrappingKeySizes);
+    /**
+     * Initialization vector.
+     */
+    @Value.Parameter
+    public abstract byte[] getIv();
+
+    public static KeyMaterial of(SecretKey secretKey, byte[] iv) {
+        return ImmutableKeyMaterial.of(secretKey, iv);
     }
 
 }

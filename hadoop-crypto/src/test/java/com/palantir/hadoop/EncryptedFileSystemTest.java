@@ -33,6 +33,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
+import com.palantir.crypto.KeyMaterial;
+import com.palantir.crypto.KeyStorageStrategy;
 import com.palantir.hadoop.cipher.AesCtrCipher;
 import java.io.IOException;
 import java.io.InputStream;

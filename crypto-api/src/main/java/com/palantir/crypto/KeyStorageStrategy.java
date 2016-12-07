@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.palantir.hadoop;
+package com.palantir.crypto;
 
 /**
  * The strategy used to store the per file {@link KeyMaterial} used for encryption operations.

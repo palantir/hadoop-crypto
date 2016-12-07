@@ -16,7 +16,7 @@
 
 package com.palantir.hadoop.cipher;
 
-import com.palantir.hadoop.KeyMaterial;
+import com.palantir.crypto.KeyMaterial;
 import javax.crypto.Cipher;
 
 /**
