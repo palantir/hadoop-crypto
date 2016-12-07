@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-package com.palantir.hadoop.cipher;
+package com.palantir.crypto.cipher;
 
 import com.palantir.crypto.KeyMaterial;
 import javax.crypto.Cipher;
 
 /**
- * Provides access to a {@link Cipher} with the ability to {@link #seek} the Cipher. It is recommended that {@link
- * FsCipherInputStream} and {@link FsCipherOutputStream} be used for encryption and decryption operations as seeking
- * {@link SeekableCipher}s to arbitrary positions can be complicated.
+ * Provides access to a {@link Cipher} with the ability to {@link #seek} the Cipher.
+ * // TODO(jellis): add note about using SeekableCipher streams instead of this directly
  */
 public interface SeekableCipher {
 

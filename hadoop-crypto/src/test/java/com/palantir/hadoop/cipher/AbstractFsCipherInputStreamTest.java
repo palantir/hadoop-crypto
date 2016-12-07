@@ -19,6 +19,9 @@ package com.palantir.hadoop.cipher;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
+import com.palantir.crypto.cipher.CipherStreamSupplier;
+import com.palantir.crypto.cipher.CipherStreamSupplierImpl;
+import com.palantir.crypto.cipher.SeekableCipher;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;

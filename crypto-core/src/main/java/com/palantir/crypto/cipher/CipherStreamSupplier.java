@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.palantir.hadoop.cipher;
+package com.palantir.crypto.cipher;
 
 import java.io.InputStream;
 import java.io.OutputStream;
