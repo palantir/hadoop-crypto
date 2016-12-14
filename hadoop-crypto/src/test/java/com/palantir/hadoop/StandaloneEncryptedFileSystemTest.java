@@ -22,6 +22,7 @@ import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
+import com.google.common.io.BaseEncoding;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -29,7 +30,6 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyPair;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.net.util.Base64;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
@@ -60,9 +60,9 @@ public final class StandaloneEncryptedFileSystemTest {
         KeyPair keyPair = TestKeyPairs.generateKeyPair();
         conf = getBaseConf();
         conf.set(StandaloneEncryptedFileSystem.PUBLIC_KEY_CONF,
-                Base64.encodeBase64String(keyPair.getPublic().getEncoded()));
+                BaseEncoding.base64().encode(keyPair.getPublic().getEncoded()));
         conf.set(StandaloneEncryptedFileSystem.PRIVATE_KEY_CONF,
-                Base64.encodeBase64String(keyPair.getPrivate().getEncoded()));
+                BaseEncoding.base64().encode(keyPair.getPrivate().getEncoded()));
 
         efs = FileSystem.newInstance(EFS_URI, conf);
         rawFs = FileSystem.newInstance(URI.create("file:///"), conf);
