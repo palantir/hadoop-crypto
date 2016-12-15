@@ -59,7 +59,7 @@ public final class DecryptingSeekableInput implements SeekableInput {
             // short-circuit if no work to do
             return;
         }
-        // TODO the object allocation here has non-zero cost, for frequent skipping it may be cheaper to eat
+        // TODO(markelliot) the object allocation here has non-zero cost, for frequent skipping it may be cheaper to eat
         // and throw away bytes between the current position and a positive next position
 
         int blockSize = seekableCipher.getBlockSize();
