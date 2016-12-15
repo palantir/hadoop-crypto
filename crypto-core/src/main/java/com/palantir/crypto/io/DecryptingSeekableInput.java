@@ -23,13 +23,12 @@ import com.palantir.crypto.cipher.CipherStreamSupplierImpl;
 import com.palantir.crypto.cipher.SeekableCipher;
 import com.palantir.seekio.SeekableInput;
 import java.io.IOException;
-import java.io.InputStream;
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
 
 public final class DecryptingSeekableInput implements SeekableInput {
 
-    private final SeekableInput delegate;
+    private final DefaultSeekableInputStream delegate;
     private final SeekableCipher seekableCipher;
     private final CipherStreamSupplier supplier;
 
@@ -41,11 +40,11 @@ public final class DecryptingSeekableInput implements SeekableInput {
     }
 
     @VisibleForTesting
-    DecryptingSeekableInput(SeekableInput delegate, SeekableCipher cipher, CipherStreamSupplier supplier) {
-        this.delegate = delegate;
+    DecryptingSeekableInput(SeekableInput input, SeekableCipher cipher, CipherStreamSupplier supplier) {
+        this.delegate = new DefaultSeekableInputStream(input);
         this.seekableCipher = cipher;
         this.supplier = supplier;
-        decryptedStream = supplier.getInputStream(wrap(delegate), cipher.initCipher(Cipher.DECRYPT_MODE));
+        decryptedStream = supplier.getInputStream(delegate, cipher.initCipher(Cipher.DECRYPT_MODE));
         decryptedStreamPos = 0L;
     }
 
@@ -56,6 +55,13 @@ public final class DecryptingSeekableInput implements SeekableInput {
      */
     @Override
     public void seek(long pos) throws IOException {
+        if (pos == getPos()) {
+            // short-circuit if no work to do
+            return;
+        }
+        // TODO the object allocation here has non-zero cost, for frequent skipping it may be cheaper to eat
+        // and throw away bytes between the current position and a positive next position
+
         int blockSize = seekableCipher.getBlockSize();
 
         // If pos is in the first block then seek to 0 and skip pos bytes
@@ -76,7 +82,7 @@ public final class DecryptingSeekableInput implements SeekableInput {
         delegate.seek(prevBlockOffset);
 
         // Need a new cipher stream since seeking the stream and cipher invalidate the cipher stream's buffer
-        decryptedStream = supplier.getInputStream(wrap(delegate), cipher);
+        decryptedStream = supplier.getInputStream(delegate, cipher);
 
         // Skip to the byte offset in the block where 'pos' is located
         ByteStreams.skipFully(decryptedStream, bytesToSkip);
@@ -104,13 +110,6 @@ public final class DecryptingSeekableInput implements SeekableInput {
         // causes "java.io.IOException: javax.crypto.BadPaddingException: Given final block not properly padded" and
         // is not fixed until Java 7u85 (not publicly available) and Java 8u51.
         // decryptedStream.close();
-    }
-
-    /**
-     * Convenience method for converting {@link SeekableInput} into a {@link InputStream}.
-     */
-    private static InputStream wrap(SeekableInput input) {
-        return new DefaultSeekableInputStream(input);
     }
 
 }
