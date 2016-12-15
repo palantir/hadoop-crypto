@@ -7,11 +7,11 @@ machine:
 
 dependencies:
   override:
-    - ./gradlew resolveConfigurations
+    - ./gradlew --parallel resolveConfigurations
 
 test:
   override:
-    - ./gradlew build
+    - ./gradlew --parallel build
 
 deployment:
   release:
