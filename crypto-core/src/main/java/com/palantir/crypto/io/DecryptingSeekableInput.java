@@ -78,6 +78,10 @@ public final class DecryptingSeekableInput implements SeekableInput {
 
         int blockSize = seekableCipher.getBlockSize();
 
+        // TODO (markelliot) (#34) not all SeekableCipher implementations require reading the previous blocks, we can
+        // read and decrypt less (i.e. do less work) if we were able to switch this calculation into the right mode by
+        // SeekableCipher implementation
+
         // If pos is in the first block then seek to 0 and skip pos bytes
         // else seek to block n - 1 where block n is the block containing the byte at offset pos
         // in order to initialize the Cipher with the previous encrypted block
