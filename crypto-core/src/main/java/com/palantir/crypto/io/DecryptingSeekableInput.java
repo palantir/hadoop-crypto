@@ -31,6 +31,7 @@ public final class DecryptingSeekableInput implements SeekableInput {
     private final DefaultSeekableInputStream delegate;
     private final SeekableCipher seekableCipher;
     private final CipherStreamSupplier supplier;
+    private final long skipThreshold;
 
     private CipherInputStream decryptedStream;
     private long decryptedStreamPos;
@@ -44,6 +45,11 @@ public final class DecryptingSeekableInput implements SeekableInput {
         this.delegate = new DefaultSeekableInputStream(input);
         this.seekableCipher = cipher;
         this.supplier = supplier;
+
+        // this bound could be tightened just 2x block size, but we pad a bit because reading and decrypting a few
+        // extra bytes is likely to be less costly than object allocations and work associated with a forward seek
+        this.skipThreshold = seekableCipher.getBlockSize() * 4;
+
         decryptedStream = supplier.getInputStream(delegate, cipher.initCipher(Cipher.DECRYPT_MODE));
         decryptedStreamPos = 0L;
     }
@@ -55,20 +61,32 @@ public final class DecryptingSeekableInput implements SeekableInput {
      */
     @Override
     public void seek(long pos) throws IOException {
-        if (pos == getPos()) {
+        if (pos == decryptedStreamPos) {
             // short-circuit if no work to do
             return;
         }
-        // TODO(markelliot) the object allocation here has non-zero cost, for frequent skipping it may be cheaper to eat
-        // and throw away bytes between the current position and a positive next position
+
+        // read forward within a small range to prevent forward seeks in this stream causing reverse seeks in the
+        // underlying stream
+        long jump = pos - decryptedStreamPos;
+        if (0 < jump && jump < skipThreshold) {
+            ByteStreams.skipFully(decryptedStream, jump);
+            decryptedStreamPos = pos;
+            return;
+        }
 
         int blockSize = seekableCipher.getBlockSize();
+
+        // TODO (markelliot) (#34) not all SeekableCipher implementations require reading the previous blocks, we can
+        // read and decrypt less (i.e. do less work) if we were able to switch this calculation into the right mode by
+        // SeekableCipher implementation
 
         // If pos is in the first block then seek to 0 and skip pos bytes
         // else seek to block n - 1 where block n is the block containing the byte at offset pos
         // in order to initialize the Cipher with the previous encrypted block
         final long prevBlock;
         final int bytesToSkip;
+
         if (pos < blockSize) {
             prevBlock = 0;
             bytesToSkip = (int) pos;
