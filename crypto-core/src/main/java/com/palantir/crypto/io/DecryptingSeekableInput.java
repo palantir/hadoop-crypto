@@ -32,8 +32,12 @@ public final class DecryptingSeekableInput implements SeekableInput {
     private final SeekableCipher seekableCipher;
     private final CipherStreamSupplier supplier;
 
-    private CipherInputStream decryptedStream;
-    private long decryptedStreamPos;
+    // block info
+    private long blockIndex = -1;
+    private long currentBlockStartRow = 0;
+    private CipherInputStream currentBlockDecryptionStream;
+
+    private long decryptedStreamPos = -1;
 
     public DecryptingSeekableInput(SeekableInput delegate, SeekableCipher cipher) {
         this(delegate, cipher, new CipherStreamSupplierImpl());
@@ -44,8 +48,6 @@ public final class DecryptingSeekableInput implements SeekableInput {
         this.delegate = new DefaultSeekableInputStream(input);
         this.seekableCipher = cipher;
         this.supplier = supplier;
-        decryptedStream = supplier.getInputStream(delegate, cipher.initCipher(Cipher.DECRYPT_MODE));
-        decryptedStreamPos = 0L;
     }
 
     /**
@@ -55,37 +57,29 @@ public final class DecryptingSeekableInput implements SeekableInput {
      */
     @Override
     public void seek(long pos) throws IOException {
-        if (pos == getPos()) {
+        if (pos == decryptedStreamPos) {
             // short-circuit if no work to do
             return;
         }
-        // TODO(markelliot) the object allocation here has non-zero cost, for frequent skipping it may be cheaper to eat
-        // and throw away bytes between the current position and a positive next position
 
-        int blockSize = seekableCipher.getBlockSize();
+        long newBlockIndex = pos / seekableCipher.getBlockSize();
 
-        // If pos is in the first block then seek to 0 and skip pos bytes
-        // else seek to block n - 1 where block n is the block containing the byte at offset pos
-        // in order to initialize the Cipher with the previous encrypted block
-        final long prevBlock;
-        final int bytesToSkip;
-        if (pos < blockSize) {
-            prevBlock = 0;
-            bytesToSkip = (int) pos;
-        } else {
-            prevBlock = pos / blockSize - 1;
-            bytesToSkip = (int) (pos % blockSize + blockSize);
+        // if we're at a new block or we tried to move backwards within the block
+        if (newBlockIndex != blockIndex || pos < decryptedStreamPos) {
+            blockIndex = newBlockIndex;
+
+            currentBlockStartRow = blockIndex * seekableCipher.getBlockSize();
+
+            Cipher cipher = seekableCipher.seek(currentBlockStartRow);
+            delegate.seek(currentBlockStartRow);
+
+            currentBlockDecryptionStream = supplier.getInputStream(delegate, cipher);
         }
 
-        long prevBlockOffset = prevBlock * blockSize;
-        Cipher cipher = seekableCipher.seek(prevBlockOffset);
-        delegate.seek(prevBlockOffset);
-
-        // Need a new cipher stream since seeking the stream and cipher invalidate the cipher stream's buffer
-        decryptedStream = supplier.getInputStream(delegate, cipher);
-
         // Skip to the byte offset in the block where 'pos' is located
-        ByteStreams.skipFully(decryptedStream, bytesToSkip);
+        int toSkip = (int) (pos - currentBlockStartRow);
+        ByteStreams.skipFully(currentBlockDecryptionStream, toSkip);
+
         decryptedStreamPos = pos;
     }
 
@@ -96,7 +90,7 @@ public final class DecryptingSeekableInput implements SeekableInput {
 
     @Override
     public int read(byte[] buffer, int offset, int length) throws IOException {
-        int bytesRead = decryptedStream.read(buffer, offset, length);
+        int bytesRead = currentBlockDecryptionStream.read(buffer, offset, length);
         if (bytesRead != -1) {
             decryptedStreamPos += bytesRead;
         }
