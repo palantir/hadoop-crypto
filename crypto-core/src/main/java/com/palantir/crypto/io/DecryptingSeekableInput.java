@@ -46,10 +46,8 @@ public final class DecryptingSeekableInput implements SeekableInput {
         this.seekableCipher = cipher;
         this.supplier = supplier;
 
-        // we could choose a tighter bound here of 2x block size, which would prevent a forward-seek of the decrypting
-        // input from requesting a backwards seek in the underlying SeekableInput, but we add a bit of extra buffer
-        // since even forward seeks have work and allocation cost, and simply reading a small number of bytes is likely
-        // to be more time-cost effective
+        // this bound could be tightened just 2x block size, but we pad a bit because reading and decrypting a few
+        // extra bytes is likely to be less costly than object allocations and work associated with a forward seek
         this.skipThreshold = seekableCipher.getBlockSize() * 4;
 
         decryptedStream = supplier.getInputStream(delegate, cipher.initCipher(Cipher.DECRYPT_MODE));
@@ -68,7 +66,8 @@ public final class DecryptingSeekableInput implements SeekableInput {
             return;
         }
 
-        // reading forward a small amount still likely to be less costly than an actual seek
+        // read forward within a small range to prevent forward seeks in this stream causing reverse seeks in the
+        // underlying stream
         long jump = pos - decryptedStreamPos;
         if (0 < jump && jump < skipThreshold) {
             ByteStreams.skipFully(decryptedStream, jump);
