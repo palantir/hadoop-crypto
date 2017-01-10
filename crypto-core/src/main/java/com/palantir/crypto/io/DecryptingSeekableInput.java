@@ -28,6 +28,9 @@ import javax.crypto.CipherInputStream;
 
 public final class DecryptingSeekableInput implements SeekableInput {
 
+    /** Size of the {@link CipherInputStream} internal buffer. */
+    private static final int CIPHER_INPUT_STREAM_BUFFER_SIZE = 512;
+
     private final DefaultSeekableInputStream delegate;
     private final SeekableCipher seekableCipher;
     private final CipherStreamSupplier supplier;
@@ -46,9 +49,13 @@ public final class DecryptingSeekableInput implements SeekableInput {
         this.seekableCipher = cipher;
         this.supplier = supplier;
 
-        // this bound could be tightened just 2x block size, but we pad a bit because reading and decrypting a few
-        // extra bytes is likely to be less costly than object allocations and work associated with a forward seek
-        this.skipThreshold = seekableCipher.getBlockSize() * 4;
+        /* small forward seeks can generate reverse seeks in some circumstances:
+         *  1. seeking within the current block or the next block causes reading of the previous block (negative seek).
+         *  2. CipherInputStream consumes CIPHER_INPUT_STREAM_BUFFER_SIZE bytes of the underlying stream, seeking
+         *     more than a block ahead but less than this buffer results in needing to move the underlying stream
+         *     backwards.
+         */
+        this.skipThreshold = Math.max(seekableCipher.getBlockSize() * 2, CIPHER_INPUT_STREAM_BUFFER_SIZE);
 
         decryptedStream = supplier.getInputStream(delegate, cipher.initCipher(Cipher.DECRYPT_MODE));
         decryptedStreamPos = 0L;
