@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Palantir Technologies, Inc. All rights reserved.
+ * Copyright 2017 Palantir Technologies, Inc. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,11 @@
  * limitations under the License.
  */
 
-package com.palantir.hadoop2;
+package com.palantir.crypto2;
 
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
-import com.palantir.crypto2.KeyMaterial;
-import com.palantir.crypto2.KeyStorageStrategy;
 import java.util.Arrays;
 import java.util.List;
 import org.slf4j.Logger;
