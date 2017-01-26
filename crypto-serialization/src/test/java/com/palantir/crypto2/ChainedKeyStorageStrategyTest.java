@@ -24,9 +24,6 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import com.google.common.collect.ImmutableList;
-import com.palantir.crypto2.ChainedKeyStorageStrategy;
-import com.palantir.crypto2.KeyMaterial;
-import com.palantir.crypto2.KeyStorageStrategy;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
