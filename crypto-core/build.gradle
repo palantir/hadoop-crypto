@@ -5,11 +5,11 @@ sourceCompatibility = '1.7'
 
 dependencies {
     compile project(':crypto-serialization')
-    compile project(':seek-io')
 
-    compile "org.slf4j:slf4j-api"
     compile "com.fasterxml.jackson.core:jackson-databind"
     compile "com.google.guava:guava"
+    compile "com.palantir.seek-io:seek-io"
+    compile "org.slf4j:slf4j-api"
 
     testCompile "junit:junit"
     testCompile "org.hamcrest:hamcrest-all"
