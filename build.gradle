@@ -52,10 +52,6 @@ subprojects {
 
     repositories {
         jcenter()
-        maven {
-            // TODO(jellis): figure out why seek-io and hadoop-crypto aren't mirrored to jcenter
-            url 'https://palantir.bintray.com/releases'
-        }
     }
 
     sourceCompatibility = 1.7
