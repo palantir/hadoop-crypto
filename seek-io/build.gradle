@@ -1,3 +1,0 @@
-apply from: "${rootDir}/gradle/publish.gradle"
-
-sourceCompatibility = '1.7'
