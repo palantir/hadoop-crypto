@@ -1,8 +1,6 @@
 apply from: "${rootDir}/gradle/publish.gradle"
 apply plugin: 'com.github.johnrengelman.shadow'
 
-sourceCompatibility = '1.7'
-
 dependencies {
     compile project(":crypto-core")
     compile "com.fasterxml.jackson.core:jackson-databind"

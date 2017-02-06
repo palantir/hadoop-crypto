@@ -1,6 +1,6 @@
 com.fasterxml.jackson.*:jackson-* = 2.6.1
 com.google.guava:guava = 18.0
-com.palantir.seek-io:seek-io = 0.1.0
+com.palantir.seek-io:seek-io = 1.0.0
 junit:junit = 4.12
 org.apache.hadoop:hadoop-common = 2.7.3
 org.hamcrest:hamcrest-* = 1.3

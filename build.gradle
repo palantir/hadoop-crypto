@@ -54,7 +54,7 @@ subprojects {
         jcenter()
     }
 
-    sourceCompatibility = 1.7
+    sourceCompatibility = 1.8
 
     tasks.withType(Javadoc) {
         // suppress Javadoc doclint warnings in Java 8+
