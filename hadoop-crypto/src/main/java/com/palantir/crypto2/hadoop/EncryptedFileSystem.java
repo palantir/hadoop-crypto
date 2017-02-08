@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Palantir Technologies, Inc. All rights reserved.
+ * Copyright 2017 Palantir Technologies, Inc. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.palantir.hadoop2;
+package com.palantir.crypto2.hadoop;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.palantir.crypto2.KeyMaterial;
@@ -22,8 +22,8 @@ import com.palantir.crypto2.KeyStorageStrategy;
 import com.palantir.crypto2.cipher.AesCtrCipher;
 import com.palantir.crypto2.cipher.SeekableCipher;
 import com.palantir.crypto2.cipher.SeekableCipherFactory;
-import com.palantir.hadoop2.cipher.FsCipherInputStream;
-import com.palantir.hadoop2.cipher.FsCipherOutputStream;
+import com.palantir.crypto2.hadoop.cipher.FsCipherInputStream;
+import com.palantir.crypto2.hadoop.cipher.FsCipherOutputStream;
 import java.io.IOException;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FSDataOutputStream;
