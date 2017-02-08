@@ -68,16 +68,9 @@ public final class KeyMaterials {
         return KeyMaterial.of(key, iv);
     }
 
-    public static SerializableKeyMaterial serialize(KeyMaterial keyMaterial) {
-        SecretKey key = keyMaterial.getSecretKey();
-        return SerializableKeyMaterial.of(key.getAlgorithm(), key.getEncoded(), keyMaterial.getIv());
-    }
-
-    public static KeyMaterial deserialize(SerializableKeyMaterial keyMaterial) {
-        String algorithm = keyMaterial.getAlgorithm();
-        byte[] encodedKey = keyMaterial.getEncodedKey();
-        byte[] iv = keyMaterial.getIv();
-        return KeyMaterial.of(new SecretKeySpec(encodedKey, algorithm), iv);
+    public static KeyMaterial from(String keyAlgorithm, byte[] encodedKey, byte[] iv) {
+        SecretKeySpec secretKey = new SecretKeySpec(encodedKey, keyAlgorithm);
+        return KeyMaterial.of(secretKey, iv);
     }
 
     public static byte[] wrap(KeyMaterial keyMaterial, PublicKey key) {

@@ -17,6 +17,7 @@
 package com.palantir.crypto2.cipher;
 
 import com.palantir.crypto2.KeyMaterial;
+import javax.crypto.spec.SecretKeySpec;
 
 /**
  * Constructs the proper {@link SeekableCipher} for a given {@code cipherAlgorithm} string. The {@link KeyMaterial} will
@@ -36,6 +37,11 @@ public final class SeekableCipherFactory {
                 throw new IllegalArgumentException(
                         String.format("No known SeekableCipher with algorithm: %s", cipherAlgorithm));
         }
+    }
+
+    public static SeekableCipher getCipher(String cipherAlgorithm, byte[] encodedKey, byte[] iv) {
+        SecretKeySpec secretKey = new SecretKeySpec(encodedKey, cipherAlgorithm);
+        return getCipher(cipherAlgorithm, KeyMaterial.of(secretKey, iv));
     }
 
     public static SeekableCipher getCipher(String cipherAlgorithm, KeyMaterial keyMaterial) {
