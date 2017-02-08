@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Palantir Technologies, Inc. All rights reserved.
+ * Copyright 2017 Palantir Technologies, Inc. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.palantir.hadoop2.example;
+package com.palantir.crypto2.hadoop.example;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
@@ -22,9 +22,9 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import com.palantir.crypto2.KeyStorageStrategy;
-import com.palantir.hadoop2.EncryptedFileSystem;
-import com.palantir.hadoop2.FileKeyStorageStrategy;
-import com.palantir.hadoop2.TestKeyPairs;
+import com.palantir.crypto2.hadoop.EncryptedFileSystem;
+import com.palantir.crypto2.hadoop.FileKeyStorageStrategy;
+import com.palantir.crypto2.hadoop.TestKeyPairs;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;

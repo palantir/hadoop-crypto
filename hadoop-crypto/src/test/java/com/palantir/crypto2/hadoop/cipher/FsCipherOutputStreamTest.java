@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Palantir Technologies, Inc. All rights reserved.
+ * Copyright 2017 Palantir Technologies, Inc. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.palantir.hadoop2.cipher;
+package com.palantir.crypto2.hadoop.cipher;
 
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.mock;
