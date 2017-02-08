@@ -21,6 +21,7 @@ import com.palantir.crypto2.cipher.CipherStreamSupplier;
 import com.palantir.crypto2.cipher.CipherStreamSupplierImpl;
 import com.palantir.crypto2.cipher.SeekableCipher;
 import java.io.FilterOutputStream;
+import java.io.IOException;
 import javax.crypto.Cipher;
 import org.apache.hadoop.fs.FSDataOutputStream;
 
@@ -37,6 +38,16 @@ public class FsCipherOutputStream extends FilterOutputStream {
     FsCipherOutputStream(FSDataOutputStream delegate, SeekableCipher cipher,
             CipherStreamSupplier supplier) {
         super(supplier.getOutputStream(delegate, cipher.initCipher(Cipher.ENCRYPT_MODE)));
+    }
+
+    @Override
+    public void write(byte[] bytes, int off, int len) throws IOException {
+        out.write(bytes, off, len);
+    }
+
+    @Override
+    public void write(byte[] bytes) throws IOException {
+        out.write(bytes);
     }
 
 }

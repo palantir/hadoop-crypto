@@ -24,6 +24,7 @@ import static org.mockito.Mockito.when;
 import com.palantir.crypto2.cipher.CipherStreamSupplier;
 import com.palantir.crypto2.cipher.SeekableCipher;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -36,6 +37,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 public final class FsCipherOutputStreamTest {
+
+    private static final byte[] bytes = "bytes".getBytes(StandardCharsets.UTF_8);
 
     private FSDataOutputStream os;
     private Cipher initCipher;
@@ -70,6 +73,18 @@ public final class FsCipherOutputStreamTest {
     public void testWrite() throws IOException {
         scos.write(0);
         verify(cos).write(0);
+    }
+
+    @Test
+    public void testWrite_callsWriteWithLength() throws IOException {
+        scos.write(bytes, 0, bytes.length);
+        verify(cos).write(bytes, 0, bytes.length);
+    }
+
+    @Test
+    public void testWrite_callsBatchWrite() throws IOException {
+        scos.write(bytes);
+        verify(cos).write(bytes);
     }
 
 }
