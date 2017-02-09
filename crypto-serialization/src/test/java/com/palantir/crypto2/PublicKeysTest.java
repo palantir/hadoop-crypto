@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Palantir Technologies, Inc. All rights reserved.
+ * Copyright 2017 Palantir Technologies, Inc. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,17 +19,16 @@ package com.palantir.crypto2;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
-import java.security.KeyPair;
 import java.security.PublicKey;
 import org.junit.Test;
 
-public final class SerializablePublicKeyTest {
+public final class PublicKeysTest {
 
     @Test
-    public void testDeserialization() {
-        KeyPair keyPair = TestKeyPairs.generateKeyPair();
-        PublicKey publicKey = keyPair.getPublic();
-        assertThat(SerializablePublicKey.of(publicKey).deserialize(), is(publicKey));
+    public void testFrom_generatesEquivalent() {
+        PublicKey expectedKey = TestKeyPairs.generateKeyPair().getPublic();
+        PublicKey actualKey = PublicKeys.from(expectedKey.getAlgorithm(), expectedKey.getEncoded());
+        assertThat(actualKey, is(expectedKey));
     }
 
 }

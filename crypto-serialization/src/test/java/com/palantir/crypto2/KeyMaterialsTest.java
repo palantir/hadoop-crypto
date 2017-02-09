@@ -102,8 +102,11 @@ public final class KeyMaterialsTest {
 
     @Test
     public void testSerializeDeserialize() {
-        SerializableKeyMaterial skm = KeyMaterials.serialize(keyMaterial);
-        assertThat(KeyMaterials.deserialize(skm), is(keyMaterial));
+        SecretKey secretKey = keyMaterial.getSecretKey();
+        String algorithm = secretKey.getAlgorithm();
+        byte[] encoded = secretKey.getEncoded();
+        byte[] iv = keyMaterial.getIv();
+        assertThat(KeyMaterials.from(algorithm, encoded, iv), is(keyMaterial));
     }
 
 }
