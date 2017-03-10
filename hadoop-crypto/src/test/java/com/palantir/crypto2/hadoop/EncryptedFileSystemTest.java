@@ -266,4 +266,67 @@ public final class EncryptedFileSystemTest {
         assertThat(efs.getCipherAlgorithm(), is(cipherAlg));
     }
 
+    @Test
+    public void testDelete_successful() throws IOException {
+        testDeleteFile(false);
+    }
+
+    @Test
+    public void testDelete_recusiveDeleteOnFile() throws IOException {
+        testDeleteFile(true);
+    }
+
+    @Test
+    public void testDelete_recursiveDeleteOnDir() throws IOException {
+        OutputStream os = efs.create(path);
+        os.write(0x00);
+        os.close();
+
+        Path folderPath = new Path(folder.getRoot().getAbsolutePath());
+        assertTrue(efs.delete(folderPath, true));
+
+        assertFalse(efs.exists(path));
+    }
+
+    @Test
+    public void testDelete_nonRecursiveDeleteOnDir() throws IOException {
+        OutputStream os = efs.create(path);
+        os.write(0x00);
+        os.close();
+
+        Path folderPath = new Path(folder.getRoot().getAbsolutePath());
+        try {
+            efs.delete(folderPath, false);
+            fail();
+        } catch (IOException e) {
+            String expectedMessage = String.format("Directory %s is not empty", folderPath);
+            assertThat(e.getMessage(), is(expectedMessage));
+        }
+    }
+
+    @Test
+    public void testDelete_keyMaterialAlreadyDeleted() throws IOException {
+        OutputStream os = efs.create(path);
+        os.write(0x00);
+        os.close();
+
+        keyStore.remove(path.toString());
+        assertThat(keyStore.get(path.toString()), is(nullValue()));
+
+        assertTrue(efs.delete(path, false));
+
+        assertFalse(efs.exists(path));
+    }
+
+    private void testDeleteFile(boolean recursive) throws IOException {
+        OutputStream os = efs.create(path);
+        os.write(0x00);
+        os.close();
+
+        assertTrue(efs.delete(path, recursive));
+
+        assertFalse(efs.exists(path));
+        assertThat(keyStore.get(path.toString()), is(nullValue()));
+    }
+
 }

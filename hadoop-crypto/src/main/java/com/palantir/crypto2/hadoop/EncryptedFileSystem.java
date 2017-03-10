@@ -24,9 +24,11 @@ import com.palantir.crypto2.cipher.SeekableCipher;
 import com.palantir.crypto2.cipher.SeekableCipherFactory;
 import com.palantir.crypto2.hadoop.cipher.FsCipherInputStream;
 import com.palantir.crypto2.hadoop.cipher.FsCipherOutputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FSDataOutputStream;
+import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FilterFileSystem;
 import org.apache.hadoop.fs.Path;
@@ -96,6 +98,23 @@ public final class EncryptedFileSystem extends FilterFileSystem {
         }
 
         return renamed;
+    }
+
+    @Override
+    public boolean delete(Path path, boolean recursive) throws IOException {
+        FileStatus status;
+        try {
+            status = getFileStatus(path);
+        } catch (FileNotFoundException e) {
+            return false;
+        }
+
+        //Delete the key material if the path is a file
+        if (status.isFile()) {
+            keyStore.remove(path.toString());
+        }
+
+        return fs.delete(path, recursive);
     }
 
     private void tryRemoveKey(Path path) {
