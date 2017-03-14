@@ -100,9 +100,12 @@ public final class EncryptedFileSystem extends FilterFileSystem {
 
     @Override
     public boolean delete(Path path, boolean recursive) throws IOException {
-        if (!fs.delete(path, recursive)) {
-            return false;
-        }
+    	if (fs.exists(path)) {
+    		boolean deleted = fs.delete(path, recursive);
+    		if (!deleted) {
+    			return false;
+    		}
+    	}
         keyStore.remove(path.toString());
         return true;
     }
