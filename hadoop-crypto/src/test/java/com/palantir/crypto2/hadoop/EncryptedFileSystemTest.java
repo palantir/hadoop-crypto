@@ -289,6 +289,7 @@ public final class EncryptedFileSystemTest {
         assertTrue(efs.delete(folderPath, true));
 
         assertFalse(efs.exists(path));
+        assertThat(keyStore.get(path.toString()), is(nullValue()));
     }
 
     @Test
@@ -316,6 +317,7 @@ public final class EncryptedFileSystemTest {
     public void testDelete_fileAlreadyDeleted() throws IOException {
         delegateFs.delete(path, false);
 
+        assertThat(keyStore.get(path.toString()), is(not(nullValue())));
         assertFalse(efs.delete(path, false));
         assertThat(keyStore.get(path.toString()), is(nullValue()));
     }

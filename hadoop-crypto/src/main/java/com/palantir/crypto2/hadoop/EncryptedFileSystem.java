@@ -29,7 +29,9 @@ import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FilterFileSystem;
+import org.apache.hadoop.fs.LocatedFileStatus;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.RemoteIterator;
 import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.util.Progressable;
 import org.slf4j.Logger;
@@ -98,25 +100,39 @@ public final class EncryptedFileSystem extends FilterFileSystem {
         return renamed;
     }
 
-    @Override
-    public boolean delete(Path path, boolean recursive) throws IOException {
-        // Existence check allows for unused keys to be cleaned up
-        boolean exists = fs.exists(path);
-        boolean deleted = fs.delete(path, recursive);
-
-        if (deleted || !exists) {
-            keyStore.remove(path.toString());
-        }
-
-        return deleted;
-    }
-
     private void tryRemoveKey(Path path) {
         try {
             keyStore.remove(path.toString());
         } catch (Exception e) {
             log.warn("Unable to remove KeyMaterial for file: {}", path);
         }
+    }
+
+    @Override
+    public boolean delete(Path path, boolean recursive) throws IOException {
+        if (recursive) {
+            return recursiveDelete(path);
+        }
+        return nonRecursiveDelete(path);
+    }
+
+    private boolean recursiveDelete(Path path) throws IOException {
+        //List all files under the path recursively and delete their key material
+        RemoteIterator<LocatedFileStatus> statuses = fs.listFiles(path, true);
+        while (statuses.hasNext()) {
+            LocatedFileStatus status = statuses.next();
+            if (status.isFile()) {
+                Path filePath = Path.getPathWithoutSchemeAndAuthority(status.getPath());
+                keyStore.remove(filePath.toString());
+            }
+        }
+
+        return fs.delete(path, true);
+    }
+
+    private boolean nonRecursiveDelete(Path path) throws IOException {
+        keyStore.remove(path.toString());
+        return fs.delete(path, false);
     }
 
     @VisibleForTesting
