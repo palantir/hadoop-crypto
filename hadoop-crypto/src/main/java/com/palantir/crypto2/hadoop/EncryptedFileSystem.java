@@ -29,9 +29,7 @@ import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FilterFileSystem;
-import org.apache.hadoop.fs.LocatedFileStatus;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.fs.RemoteIterator;
 import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.util.Progressable;
 import org.slf4j.Logger;
@@ -111,26 +109,8 @@ public final class EncryptedFileSystem extends FilterFileSystem {
     @Override
     public boolean delete(Path path, boolean recursive) throws IOException {
         if (recursive) {
-            return recursiveDelete(path);
+            throw new UnsupportedOperationException("EncryptedFileSystem does not support recursive deletes");
         }
-        return nonRecursiveDelete(path);
-    }
-
-    private boolean recursiveDelete(Path path) throws IOException {
-        //List all files under the path recursively and delete their key material
-        RemoteIterator<LocatedFileStatus> statuses = fs.listFiles(path, true);
-        while (statuses.hasNext()) {
-            LocatedFileStatus status = statuses.next();
-            if (status.isFile()) {
-                Path filePath = Path.getPathWithoutSchemeAndAuthority(status.getPath());
-                keyStore.remove(filePath.toString());
-            }
-        }
-
-        return fs.delete(path, true);
-    }
-
-    private boolean nonRecursiveDelete(Path path) throws IOException {
         keyStore.remove(path.toString());
         return fs.delete(path, false);
     }

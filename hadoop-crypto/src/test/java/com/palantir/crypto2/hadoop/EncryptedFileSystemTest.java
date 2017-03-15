@@ -268,28 +268,21 @@ public final class EncryptedFileSystemTest {
 
     @Test
     public void testDelete_successful() throws IOException {
-        testDeleteFile(false);
-    }
-
-    @Test
-    public void testDelete_recusiveDeleteOnFile() throws IOException {
-        testDeleteFile(true);
-    }
-
-    private void testDeleteFile(boolean recursive) throws IOException {
-        assertTrue(efs.delete(path, recursive));
+        assertTrue(efs.delete(path, false));
 
         assertFalse(efs.exists(path));
         assertThat(keyStore.get(path.toString()), is(nullValue()));
     }
 
     @Test
-    public void testDelete_recursiveDeleteOnDir() throws IOException {
+    public void testDelete_recursiveDelete() throws IOException {
         Path folderPath = new Path(folder.getRoot().getAbsolutePath());
-        assertTrue(efs.delete(folderPath, true));
-
-        assertFalse(efs.exists(path));
-        assertThat(keyStore.get(path.toString()), is(nullValue()));
+        try {
+            efs.delete(folderPath, true);
+            fail();
+        } catch (UnsupportedOperationException e) {
+            assertThat(e.getMessage(), is("EncryptedFileSystem does not support recursive deletes"));
+        }
     }
 
     @Test
