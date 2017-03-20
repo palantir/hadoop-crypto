@@ -82,6 +82,10 @@ public final class EncryptedFileSystemTest {
         path = new Path(folder.newFile().getAbsolutePath());
         newPath = path.suffix("renamed");
 
+        OutputStream os = efs.create(path);
+        os.write(0x00);
+        os.close();
+
         keyMaterial = AesCtrCipher.generateKeyMaterial();
         mockFs = mock(FileSystem.class);
         mockKeyStore = mock(KeyStorageStrategy.class);
@@ -181,10 +185,6 @@ public final class EncryptedFileSystemTest {
 
     @Test
     public void testRename_successful() throws IOException {
-        OutputStream os = efs.create(path);
-        os.write(0x00);
-        os.close();
-
         KeyMaterial actualKeyMaterial = keyStore.get(path.toString());
 
         efs.rename(path, newPath);
@@ -266,4 +266,52 @@ public final class EncryptedFileSystemTest {
         assertThat(efs.getCipherAlgorithm(), is(cipherAlg));
     }
 
+    @Test
+    public void testDelete_successful() throws IOException {
+        assertTrue(efs.delete(path, false));
+
+        assertFalse(efs.exists(path));
+        assertThat(keyStore.get(path.toString()), is(nullValue()));
+    }
+
+    @Test
+    public void testDelete_recursiveDelete() throws IOException {
+        Path folderPath = new Path(folder.getRoot().getAbsolutePath());
+        try {
+            efs.delete(folderPath, true);
+            fail();
+        } catch (UnsupportedOperationException e) {
+            assertThat(e.getMessage(), is("EncryptedFileSystem does not support recursive deletes"));
+        }
+    }
+
+    @Test
+    public void testDelete_nonRecursiveDeleteOnDir() throws IOException {
+        Path folderPath = new Path(folder.getRoot().getAbsolutePath());
+        try {
+            efs.delete(folderPath, false);
+            fail();
+        } catch (IOException e) {
+            assertThat(e.getMessage(), is(String.format("Directory %s is not empty", folderPath)));
+        }
+    }
+
+    @Test
+    public void testDelete_keyMaterialAlreadyDeleted() throws IOException {
+        keyStore.remove(path.toString());
+        assertThat(keyStore.get(path.toString()), is(nullValue()));
+
+        assertTrue(efs.delete(path, false));
+
+        assertFalse(efs.exists(path));
+    }
+
+    @Test
+    public void testDelete_fileAlreadyDeleted() throws IOException {
+        delegateFs.delete(path, false);
+
+        assertThat(keyStore.get(path.toString()), is(not(nullValue())));
+        assertFalse(efs.delete(path, false));
+        assertThat(keyStore.get(path.toString()), is(nullValue()));
+    }
 }

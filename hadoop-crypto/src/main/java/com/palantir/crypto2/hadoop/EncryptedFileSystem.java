@@ -106,6 +106,15 @@ public final class EncryptedFileSystem extends FilterFileSystem {
         }
     }
 
+    @Override
+    public boolean delete(Path path, boolean recursive) throws IOException {
+        if (recursive) {
+            throw new UnsupportedOperationException("EncryptedFileSystem does not support recursive deletes");
+        }
+        keyStore.remove(path.toString());
+        return fs.delete(path, false);
+    }
+
     @VisibleForTesting
     String getCipherAlgorithm() {
         return getConf().get(CIPHER_ALGORITHM_KEY, DEFAULT_CIPHER_ALGORITHM);
