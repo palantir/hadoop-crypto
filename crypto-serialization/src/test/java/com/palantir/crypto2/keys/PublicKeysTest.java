@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.palantir.crypto2;
+package com.palantir.crypto2.keys;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;

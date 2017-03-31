@@ -17,13 +17,13 @@
 package com.palantir.crypto2.hadoop;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.palantir.crypto2.KeyMaterial;
-import com.palantir.crypto2.KeyStorageStrategy;
 import com.palantir.crypto2.cipher.AesCtrCipher;
 import com.palantir.crypto2.cipher.SeekableCipher;
 import com.palantir.crypto2.cipher.SeekableCipherFactory;
 import com.palantir.crypto2.hadoop.cipher.FsCipherInputStream;
 import com.palantir.crypto2.hadoop.cipher.FsCipherOutputStream;
+import com.palantir.crypto2.keys.KeyMaterial;
+import com.palantir.crypto2.keys.KeyStorageStrategy;
 import java.io.IOException;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FSDataOutputStream;

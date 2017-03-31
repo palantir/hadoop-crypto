@@ -16,7 +16,7 @@
 
 package com.palantir.crypto2.cipher;
 
-import com.palantir.crypto2.KeyMaterial;
+import com.palantir.crypto2.keys.KeyMaterial;
 import javax.crypto.Cipher;
 
 /**

@@ -18,8 +18,8 @@ package com.palantir.crypto2.cipher;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
-import com.palantir.crypto2.KeyMaterial;
-import com.palantir.crypto2.KeyMaterials;
+import com.palantir.crypto2.keys.KeyMaterial;
+import com.palantir.crypto2.keys.serialization.KeyMaterials;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;

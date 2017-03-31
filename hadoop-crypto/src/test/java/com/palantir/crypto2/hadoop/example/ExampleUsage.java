@@ -21,10 +21,10 @@ import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-import com.palantir.crypto2.KeyStorageStrategy;
 import com.palantir.crypto2.hadoop.EncryptedFileSystem;
 import com.palantir.crypto2.hadoop.FileKeyStorageStrategy;
 import com.palantir.crypto2.hadoop.TestKeyPairs;
+import com.palantir.crypto2.keys.KeyStorageStrategy;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;

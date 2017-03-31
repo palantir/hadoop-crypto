@@ -21,7 +21,7 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
-import com.palantir.crypto2.KeyMaterial;
+import com.palantir.crypto2.keys.KeyMaterial;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
