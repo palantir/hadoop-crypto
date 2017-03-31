@@ -2,7 +2,7 @@ apply from: "${rootDir}/gradle/publish.gradle"
 apply from: "${rootDir}/gradle/immutables-processors.gradle"
 
 dependencies {
-    compile project(':crypto-serialization')
+    compile project(':crypto-keys')
 
     compile "com.fasterxml.jackson.core:jackson-databind"
     compile "com.google.guava:guava"

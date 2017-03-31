@@ -1,3 +1,3 @@
 include 'crypto-core'
-include 'crypto-serialization'
+include 'crypto-keys'
 include 'hadoop-crypto'
