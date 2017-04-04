@@ -48,6 +48,9 @@ public final class EncryptedFileSystem extends FilterFileSystem {
     private static final Logger log = LoggerFactory.getLogger(EncryptedFileSystem.class);
     private static final String DEFAULT_CIPHER_ALGORITHM = AesCtrCipher.ALGORITHM;
 
+    /**
+     * @deprecated use {@link #CIPHER_ALGORITHM_KEY}.
+     */
     @Deprecated
     public static final String DEPRECATED_CIPHER_ALGORITHM_KEY = "fs.cipher";
     public static final String CIPHER_ALGORITHM_KEY = "fs.efs.cipher";
