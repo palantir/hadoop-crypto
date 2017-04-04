@@ -25,7 +25,6 @@ import com.palantir.crypto2.cipher.SeekableCipher;
 import com.palantir.crypto2.cipher.SeekableCipherFactory;
 import com.palantir.crypto2.io.ByteArraySeekableInput;
 import com.palantir.crypto2.io.DecryptingSeekableInput;
-import com.palantir.crypto2.keys.KeyMaterial;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -43,7 +42,7 @@ public final class ExampleUsage {
         Cipher encrypt = cipher.initCipher(Cipher.ENCRYPT_MODE);
 
         // Store this key material for future decryption
-        KeyMaterial keyMaterial = cipher.getKeyMaterial();
+        // KeyMaterial keyMaterial = cipher.getKeyMaterial();
 
         // Encrypt some bytes
         CipherOutputStream encryptedStream = new CipherOutputStream(os, encrypt);

@@ -26,7 +26,7 @@ ByteArrayOutputStream os = new ByteArrayOutputStream(bytes.length);
 Cipher encrypt = cipher.initCipher(Cipher.ENCRYPT_MODE);
 
 // Store this key material for future decryption
-KeyMaterial keyMaterial = cipher.getKeyMaterial();
+// KeyMaterial keyMaterial = cipher.getKeyMaterial();
 
 // Encrypt some bytes
 CipherOutputStream encryptedStream = new CipherOutputStream(os, encrypt);
