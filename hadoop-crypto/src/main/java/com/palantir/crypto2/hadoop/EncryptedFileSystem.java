@@ -25,6 +25,7 @@ import com.palantir.crypto2.hadoop.cipher.FsCipherOutputStream;
 import com.palantir.crypto2.keys.KeyMaterial;
 import com.palantir.crypto2.keys.KeyStorageStrategy;
 import java.io.IOException;
+import java.util.Optional;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
@@ -46,13 +47,18 @@ public final class EncryptedFileSystem extends FilterFileSystem {
 
     private static final Logger log = LoggerFactory.getLogger(EncryptedFileSystem.class);
     private static final String DEFAULT_CIPHER_ALGORITHM = AesCtrCipher.ALGORITHM;
-    public static final String CIPHER_ALGORITHM_KEY = "fs.cipher";
+
+    @Deprecated
+    public static final String DEPRECATED_CIPHER_ALGORITHM_KEY = "fs.cipher";
+    public static final String CIPHER_ALGORITHM_KEY = "fs.efs.cipher";
 
     private final KeyStorageStrategy keyStore;
+    private final String cipherAlgorithm;
 
     public EncryptedFileSystem(FileSystem fs, KeyStorageStrategy keyStore) {
         super(fs);
         this.keyStore = keyStore;
+        this.cipherAlgorithm = getCipherAlgorithm();
     }
 
     @Override
@@ -60,7 +66,7 @@ public final class EncryptedFileSystem extends FilterFileSystem {
         FSDataInputStream encryptedStream = fs.open(path, bufferSize);
 
         KeyMaterial keyMaterial = keyStore.get(path.toString());
-        SeekableCipher cipher = SeekableCipherFactory.getCipher(getCipherAlgorithm(), keyMaterial);
+        SeekableCipher cipher = SeekableCipherFactory.getCipher(cipherAlgorithm, keyMaterial);
 
         return new FSDataInputStream(new FsCipherInputStream(encryptedStream, cipher));
     }
@@ -72,7 +78,7 @@ public final class EncryptedFileSystem extends FilterFileSystem {
         FSDataOutputStream encryptedStream =
                 fs.create(path, permission, overwrite, bufferSize, replication, blockSize, progress);
 
-        SeekableCipher cipher = SeekableCipherFactory.getCipher(getCipherAlgorithm());
+        SeekableCipher cipher = SeekableCipherFactory.getCipher(cipherAlgorithm);
 
         // Ensure we can open the stream before storing keys that would be irrelevant
         FSDataOutputStream os = new FSDataOutputStream(new FsCipherOutputStream(encryptedStream, cipher), null);
@@ -117,7 +123,25 @@ public final class EncryptedFileSystem extends FilterFileSystem {
 
     @VisibleForTesting
     String getCipherAlgorithm() {
-        return getConf().get(CIPHER_ALGORITHM_KEY, DEFAULT_CIPHER_ALGORITHM);
+        Optional<String> cipher = Optional.ofNullable(getConf().get(CIPHER_ALGORITHM_KEY));
+        Optional<String> deprecatedCipher = Optional.ofNullable(getConf().get(DEPRECATED_CIPHER_ALGORITHM_KEY));
+
+        if (cipher.isPresent() && deprecatedCipher.isPresent()) {
+            if (!cipher.get().equals(deprecatedCipher.get())) {
+                throw new IllegalStateException(String.format("Two incompatible ciphers configured: '%s' and '%s'",
+                        cipher.get(), deprecatedCipher.get()));
+            }
+        }
+
+        return findFirst(cipher, deprecatedCipher).orElse(DEFAULT_CIPHER_ALGORITHM);
+    }
+
+    private static <T> Optional<T> findFirst(Optional<T> first, Optional<T> second) {
+        if (first.isPresent()) {
+            return first;
+        } else {
+            return second;
+        }
     }
 
 }
