@@ -1,6 +1,55 @@
 [![CircleCI Build Status](https://circleci.com/gh/palantir/hadoop-crypto/tree/develop.svg?style=shield)](https://circleci.com/gh/palantir/hadoop-crypto)
 [![Download](https://api.bintray.com/packages/palantir/releases/hadoop-crypto/images/download.svg)](https://bintray.com/palantir/releases/hadoop-crypto/_latestVersion)
 
+Seekable Crypto
+===============
+*Seekable Crypto* is a Java library that provides the ability to seek within
+`SeekableInput`s while decrypting the underlying contents along with some
+utilities for storing and generating the keys used to encrypt/decrypt the data
+streams. An implementation of the Hadoop FileSystem is also included that uses
+the Seekable Crypto library to provide a efficient and transparent client-side
+encryption.
+
+Supported Ciphers
+-----------------
+Currently AES/CTR/NoPadding and AES/CBC/PKCS5Padding are supported.
+
+Programatic Example
+-------------------
+
+```java
+byte[] bytes = "0123456789".getBytes(StandardCharsets.UTF_8);
+SeekableCipher cipher = SeekableCipherFactory.getCipher(AesCtrCipher.ALGORITHM);
+ByteArrayOutputStream os = new ByteArrayOutputStream(bytes.length);
+Cipher encrypt = cipher.initCipher(Cipher.ENCRYPT_MODE);
+
+// Store this key material for future decryption
+KeyMaterial keyMaterial = cipher.getKeyMaterial();
+
+// Encrypt some bytes
+CipherOutputStream encryptedStream = new CipherOutputStream(os, encrypt);
+encryptedStream.write(bytes);
+encryptedStream.close();
+byte[] encryptedBytes = os.toByteArray();
+
+// Bytes written to stream are encrypted
+assertThat(encryptedBytes, is(not(bytes)));
+
+ByteArraySeekableInput is = new ByteArraySeekableInput(encryptedBytes);
+DecryptingSeekableInput decryptedStream = new DecryptingSeekableInput(is, cipher);
+
+// Seek to the last byte in the decrypted stream and verify its decrypted value
+byte[] readBytes = new byte[bytes.length];
+decryptedStream.seek(bytes.length - 1);
+decryptedStream.read(readBytes, 0, 1);
+assertThat(readBytes[0], is(bytes[bytes.length - 1]));
+
+// Seek to the beginning of the decrypted stream and verify it's equal to the raw bytes
+decryptedStream.seek(0);
+decryptedStream.read(readBytes, 0, bytes.length);
+assertThat(readBytes, is(bytes));
+```
+
 Hadoop Crypto
 =============
 *Hadoop Crypto* is a library for per-file client-side encryption in Hadoop
