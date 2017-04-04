@@ -35,7 +35,6 @@ import org.junit.Test;
 
 public final class ExampleUsage {
 
-
     @Test
     public void decryptingSeekableInputExample() throws IOException {
         byte[] bytes = "0123456789".getBytes(StandardCharsets.UTF_8);
