@@ -17,6 +17,8 @@ Currently AES/CTR/NoPadding and AES/CBC/PKCS5Padding are supported.
 Programatic Example
 -------------------
 
+Source for examples can be found [here](crypto-core/src/test/java/com/palantir/crypto2/example/ExampleUsage.java)
+
 ```java
 byte[] bytes = "0123456789".getBytes(StandardCharsets.UTF_8);
 SeekableCipher cipher = SeekableCipherFactory.getCipher(AesCtrCipher.ALGORITHM);
