@@ -16,7 +16,6 @@
 
 package com.palantir.crypto2.hadoop;
 
-import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
@@ -27,6 +26,7 @@ import java.net.URI;
 import java.security.KeyPair;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.function.Function;
 import javax.ws.rs.core.UriBuilder;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
@@ -121,24 +121,16 @@ public final class StandaloneEncryptedFileSystem extends FilterFileSystem {
     }
 
     private static Function<Path, Path> setSchemeFunc(final String scheme) {
-        return new Function<Path, Path>() {
-            @Override
-            public Path apply(Path path) {
-                return new Path(setUriSchemeFunc(scheme).apply(path.toUri()));
-            }
-        };
+        return path -> new Path(setUriSchemeFunc(scheme).apply(path.toUri()));
     }
 
     private static Function<URI, URI> setUriSchemeFunc(final String scheme) {
-        return new Function<URI, URI>() {
-            @Override
-            public URI apply(URI uri) {
-                UriBuilder builder = UriBuilder.fromUri(uri);
-                if (uri.getScheme() != null) {
-                    builder.scheme(scheme);
-                }
-                return builder.build();
+        return uri -> {
+            UriBuilder builder = UriBuilder.fromUri(uri);
+            if (uri.getScheme() != null) {
+                builder.scheme(scheme);
             }
+            return builder.build();
         };
     }
 

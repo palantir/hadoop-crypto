@@ -16,7 +16,6 @@
 
 package com.palantir.crypto2.keys;
 
-import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
 import java.util.Arrays;
@@ -57,27 +56,18 @@ public final class ChainedKeyStorageStrategy implements KeyStorageStrategy {
             try {
                 return strategy.get(fileKey);
             } catch (Exception e) {
-                logger.info("Failed to get key material using {}", NameFunc.INSTANCE.apply(strategy), e);
+                logger.info("Failed to get key material using {}", strategy.getClass().getCanonicalName(), e);
             }
         }
         throw new InternalError(String.format(
                 "Unable to get key material using any of the provided strategies: %s",
-                Collections2.transform(strategies, NameFunc.INSTANCE)));
+                Collections2.transform(strategies, s -> s.getClass().getCanonicalName())));
     }
 
     @Override
     public void remove(String fileKey) {
         for (KeyStorageStrategy strategy : strategies) {
             strategy.remove(fileKey);
-        }
-    }
-
-    private enum NameFunc implements Function<Object, String> {
-        INSTANCE;
-
-        @Override
-        public String apply(Object obj) {
-            return obj.getClass().getCanonicalName();
         }
     }
 

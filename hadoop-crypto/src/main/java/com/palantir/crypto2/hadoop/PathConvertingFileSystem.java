@@ -16,9 +16,9 @@
 
 package com.palantir.crypto2.hadoop;
 
-import com.google.common.base.Function;
 import java.io.IOException;
 import java.net.URI;
+import java.util.function.Function;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileStatus;

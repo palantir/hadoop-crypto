@@ -23,7 +23,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.google.common.base.Function;
 import java.net.URI;
 import java.util.Arrays;
 import org.apache.hadoop.fs.FSDataInputStream;
@@ -46,30 +45,12 @@ public final class PathConvertingFileSystemTest {
     private FSDataOutputStream outputStream;
     private PathConvertingFileSystem convertingFs;
 
-    private enum DelegatePathFunc implements Function<Path, Path> {
-        INSTANCE;
-
-        @Override
-        public Path apply(Path input) {
-            return DELEGATE_PATH;
-        }
-    }
-
-    private enum ReturnPathFunc implements Function<Path, Path> {
-        INSTANCE;
-
-        @Override
-        public Path apply(Path input) {
-            return RETURN_PATH;
-        }
-    }
-
     @Before
     public void before() {
         delegate = mock(FileSystem.class);
         inputStream = mock(FSDataInputStream.class);
         outputStream = mock(FSDataOutputStream.class);
-        convertingFs = new PathConvertingFileSystem(delegate, DelegatePathFunc.INSTANCE, ReturnPathFunc.INSTANCE);
+        convertingFs = new PathConvertingFileSystem(delegate, p -> DELEGATE_PATH, p -> RETURN_PATH);
     }
 
     @Test
