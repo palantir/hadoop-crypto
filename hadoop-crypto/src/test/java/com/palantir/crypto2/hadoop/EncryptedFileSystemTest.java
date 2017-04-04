@@ -280,7 +280,7 @@ public final class EncryptedFileSystemTest {
     }
 
     @Test
-    public void testGetCipherAlgorithm_bothConfigured() throws IOException, URISyntaxException {
+    public void testGetCipherAlgorithm_bothConfiguredDifferently() throws IOException, URISyntaxException {
         String cipherAlg = "cipherAlg";
         String deprecatedCipherAlg = "deprecatedCipherAlg";
 
@@ -296,6 +296,19 @@ public final class EncryptedFileSystemTest {
             assertThat(e.getMessage(),
                     is("Two incompatible ciphers configured: 'cipherAlg' and 'deprecatedCipherAlg'"));
         }
+    }
+
+    @Test
+    public void testGetCipherAlgorithm_bothConfigured() throws IOException, URISyntaxException {
+        String cipherAlg = "cipherAlg";
+
+        Configuration conf = new Configuration();
+        conf.set(EncryptedFileSystem.CIPHER_ALGORITHM_KEY, cipherAlg);
+        conf.set(EncryptedFileSystem.DEPRECATED_CIPHER_ALGORITHM_KEY, cipherAlg);
+        delegateFs = FileSystem.newInstance(new URI(folder.getRoot().getAbsolutePath()), conf);
+        efs = new EncryptedFileSystem(delegateFs, new InMemoryKeyStorageStrategy());
+
+        assertThat(efs.getCipherAlgorithm(), is(cipherAlg));
     }
 
     @Test
