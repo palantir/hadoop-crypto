@@ -33,9 +33,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-import com.palantir.crypto2.KeyMaterial;
-import com.palantir.crypto2.KeyStorageStrategy;
 import com.palantir.crypto2.cipher.AesCtrCipher;
+import com.palantir.crypto2.keys.KeyMaterial;
+import com.palantir.crypto2.keys.KeyStorageStrategy;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;

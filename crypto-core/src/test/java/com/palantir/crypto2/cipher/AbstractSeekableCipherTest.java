@@ -21,7 +21,7 @@ import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
-import com.palantir.crypto2.KeyMaterial;
+import com.palantir.crypto2.keys.KeyMaterial;
 import java.util.Arrays;
 import java.util.Random;
 import javax.crypto.BadPaddingException;

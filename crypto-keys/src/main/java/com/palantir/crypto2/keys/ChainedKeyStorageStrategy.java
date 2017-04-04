@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.palantir.crypto2;
+package com.palantir.crypto2.keys;
 
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;

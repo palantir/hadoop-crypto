@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Palantir Technologies, Inc. All rights reserved.
+ * Copyright 2017 Palantir Technologies, Inc. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,19 @@
  * limitations under the License.
  */
 
-package com.palantir.crypto2;
+package com.palantir.crypto2.keys.serialization;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
+import com.palantir.crypto2.keys.KeyMaterial;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
+import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -38,22 +41,23 @@ import javax.crypto.SecretKey;
  * <pre>
  *  +--------------------------------------------------------------------------------------------------------------+
  *  | version | cipher algorithm length | cipher algorithm | wrapped key length | wrapped key | iv length |   iv   |
- *  |   byte  |           byte          |       byte[]     |         byte       |    byte[]   |    byte   | byte[] |
+ *  |   byte  |           int           |       byte[]     |         int        |    byte[]   |    int    | byte[] |
  *  +--------------------------------------------------------------------------------------------------------------+
  * </pre>
  *
- * @deprecated this serialization format does not work if {@code algorithm, key, or iv} are longer than 255 bytes. Use
- * {@link KeySerializerV2} instead.
+ * {@link KeySerializerV1} incorrectly wrote the length values for the algorithm, wrapped key, and iv as bytes rather
+ * than ints which meant certain {@link KeyMaterial} couldn't be properly serialized/deserialized when {@link KeyPair}s
+ * of certain lengths were used.
  */
-@Deprecated
-enum KeySerializerV1 implements KeySerializer {
+enum KeySerializerV2 implements KeySerializer {
     INSTANCE;
 
-    static final int VERSION = 1;
+    static final int VERSION = 2;
 
     @Override
     public byte[] wrap(KeyMaterial keyMaterial, PublicKey key) {
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+        DataOutputStream stream = new DataOutputStream(byteStream);
         Cipher keyWrappingCipher = KeySerializers.getCipher(Cipher.WRAP_MODE, key);
         SecretKey secretKey = keyMaterial.getSecretKey();
 
@@ -61,19 +65,19 @@ enum KeySerializerV1 implements KeySerializer {
             stream.write(VERSION);
 
             String keyAlgorithm = secretKey.getAlgorithm();
-            stream.write(keyAlgorithm.length());
+            stream.writeInt(keyAlgorithm.length());
             stream.write(keyAlgorithm.getBytes(StandardCharsets.UTF_8));
 
             byte[] encryptedKey = keyWrappingCipher.wrap(secretKey);
-            stream.write(encryptedKey.length);
+            stream.writeInt(encryptedKey.length);
             stream.write(encryptedKey);
 
             byte[] iv = keyMaterial.getIv();
-            stream.write(iv.length);
+            stream.writeInt(iv.length);
             stream.write(iv);
 
             stream.close();
-            return stream.toByteArray();
+            return byteStream.toByteArray();
         } catch (IOException | InvalidKeyException | IllegalBlockSizeException e) {
             throw Throwables.propagate(e);
         }
@@ -89,15 +93,15 @@ enum KeySerializerV1 implements KeySerializer {
             Preconditions.checkArgument(VERSION == version,
                     "Invalid serialization format version. Expected %s but found %s", VERSION, version);
 
-            int algorithmLength = stream.read();
+            int algorithmLength = stream.readInt();
             byte[] algorithmBytes = new byte[algorithmLength];
             stream.readFully(algorithmBytes);
 
-            int keyLength = stream.read();
+            int keyLength = stream.readInt();
             byte[] secretKeyBytes = new byte[keyLength];
             stream.readFully(secretKeyBytes);
 
-            int ivLength = stream.read();
+            int ivLength = stream.readInt();
             byte[] iv = new byte[ivLength];
             stream.readFully(iv);
 

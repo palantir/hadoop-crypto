@@ -21,8 +21,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-import com.palantir.crypto2.KeyMaterial;
 import com.palantir.crypto2.cipher.AesCtrCipher;
+import com.palantir.crypto2.keys.KeyMaterial;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
