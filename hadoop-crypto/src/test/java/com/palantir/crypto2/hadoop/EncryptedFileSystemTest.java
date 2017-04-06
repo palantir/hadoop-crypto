@@ -89,12 +89,13 @@ public final class EncryptedFileSystemTest {
         keyMaterial = AesCtrCipher.generateKeyMaterial();
         mockFs = mock(FileSystem.class);
         mockKeyStore = mock(KeyStorageStrategy.class);
-        mockedEfs = new EncryptedFileSystem(mockFs, mockKeyStore);
 
         // Mock a successful rename operation
         when(mockFs.getConf()).thenReturn(new Configuration());
         when(mockFs.rename(any(Path.class), any(Path.class))).thenReturn(true);
         when(mockKeyStore.get(anyString())).thenReturn(keyMaterial);
+
+        mockedEfs = new EncryptedFileSystem(mockFs, mockKeyStore);
     }
 
     @Test
@@ -260,6 +261,50 @@ public final class EncryptedFileSystemTest {
 
         Configuration conf = new Configuration();
         conf.set(EncryptedFileSystem.CIPHER_ALGORITHM_KEY, cipherAlg);
+        delegateFs = FileSystem.newInstance(new URI(folder.getRoot().getAbsolutePath()), conf);
+        efs = new EncryptedFileSystem(delegateFs, new InMemoryKeyStorageStrategy());
+
+        assertThat(efs.getCipherAlgorithm(), is(cipherAlg));
+    }
+
+    @Test
+    public void testGetCipherAlgorithm_deprecated() throws IOException, URISyntaxException {
+        String cipherAlg = "cipherAlg";
+
+        Configuration conf = new Configuration();
+        conf.set(EncryptedFileSystem.DEPRECATED_CIPHER_ALGORITHM_KEY, cipherAlg);
+        delegateFs = FileSystem.newInstance(new URI(folder.getRoot().getAbsolutePath()), conf);
+        efs = new EncryptedFileSystem(delegateFs, new InMemoryKeyStorageStrategy());
+
+        assertThat(efs.getCipherAlgorithm(), is(cipherAlg));
+    }
+
+    @Test
+    public void testGetCipherAlgorithm_bothConfiguredDifferently() throws IOException, URISyntaxException {
+        String cipherAlg = "cipherAlg";
+        String deprecatedCipherAlg = "deprecatedCipherAlg";
+
+        Configuration conf = new Configuration();
+        conf.set(EncryptedFileSystem.CIPHER_ALGORITHM_KEY, cipherAlg);
+        conf.set(EncryptedFileSystem.DEPRECATED_CIPHER_ALGORITHM_KEY, deprecatedCipherAlg);
+        delegateFs = FileSystem.newInstance(new URI(folder.getRoot().getAbsolutePath()), conf);
+
+        try {
+            efs = new EncryptedFileSystem(delegateFs, new InMemoryKeyStorageStrategy());
+            fail();
+        } catch (IllegalStateException e) {
+            assertThat(e.getMessage(),
+                    is("Two incompatible ciphers configured: 'cipherAlg' and 'deprecatedCipherAlg'"));
+        }
+    }
+
+    @Test
+    public void testGetCipherAlgorithm_bothConfigured() throws IOException, URISyntaxException {
+        String cipherAlg = "cipherAlg";
+
+        Configuration conf = new Configuration();
+        conf.set(EncryptedFileSystem.CIPHER_ALGORITHM_KEY, cipherAlg);
+        conf.set(EncryptedFileSystem.DEPRECATED_CIPHER_ALGORITHM_KEY, cipherAlg);
         delegateFs = FileSystem.newInstance(new URI(folder.getRoot().getAbsolutePath()), conf);
         efs = new EncryptedFileSystem(delegateFs, new InMemoryKeyStorageStrategy());
 
