@@ -16,7 +16,6 @@
 
 package com.palantir.crypto2.hadoop;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 import com.palantir.crypto2.keys.KeyMaterial;
@@ -28,6 +27,7 @@ import java.io.OutputStream;
 import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.util.Optional;
 import javax.crypto.SecretKey;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.fs.FileSystem;
@@ -48,13 +48,13 @@ public final class FileKeyStorageStrategy implements KeyStorageStrategy {
     public FileKeyStorageStrategy(FileSystem fs, KeyPair keyPair) {
         this.fs = fs;
         this.publicKey = keyPair.getPublic();
-        this.privateKey = Optional.fromNullable(keyPair.getPrivate());
+        this.privateKey = Optional.ofNullable(keyPair.getPrivate());
     }
 
     public FileKeyStorageStrategy(FileSystem fs, PublicKey publicKey) {
         this.fs = fs;
         this.publicKey = publicKey;
-        this.privateKey = Optional.absent();
+        this.privateKey = Optional.empty();
     }
 
     @Override

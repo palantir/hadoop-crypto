@@ -16,9 +16,7 @@
 
 package com.palantir.crypto2.keys;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Throwables;
-import com.google.common.io.BaseEncoding;
 import java.security.GeneralSecurityException;
 import java.security.KeyFactory;
 import java.security.KeyPair;
@@ -26,6 +24,8 @@ import java.security.PrivateKey;
 import java.security.spec.KeySpec;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.Base64;
+import java.util.Optional;
 
 public final class KeyPairs {
 
@@ -41,15 +41,15 @@ public final class KeyPairs {
         try {
             KeyFactory keyFactory = KeyFactory.getInstance(algorithm);
             // Private key is only required for decryption, can be null
-            Optional<PrivateKey> privateKey = Optional.absent();
+            Optional<PrivateKey> privateKey = Optional.empty();
             if (privateKeyString != null) {
-                KeySpec privateKs = new PKCS8EncodedKeySpec(BaseEncoding.base64().decode(privateKeyString));
+                KeySpec privateKs = new PKCS8EncodedKeySpec(Base64.getDecoder().decode(privateKeyString));
                 privateKey = Optional.of(keyFactory.generatePrivate(privateKs));
             }
 
-            KeySpec publicKs = new X509EncodedKeySpec(BaseEncoding.base64().decode(publicKeyString));
+            KeySpec publicKs = new X509EncodedKeySpec(Base64.getDecoder().decode(publicKeyString));
 
-            return new KeyPair(keyFactory.generatePublic(publicKs), privateKey.orNull());
+            return new KeyPair(keyFactory.generatePublic(publicKs), privateKey.orElse(null));
         } catch (GeneralSecurityException e) {
             throw Throwables.propagate(e);
         }
