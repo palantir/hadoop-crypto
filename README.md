@@ -7,8 +7,8 @@ Seekable Crypto
 `SeekableInput`s while decrypting the underlying contents along with some
 utilities for storing and generating the keys used to encrypt/decrypt the data
 streams. An implementation of the Hadoop FileSystem is also included that uses
-the Seekable Crypto library to provide a efficient and transparent client-side
-encryption.
+the Seekable Crypto library to provide efficient and transparent client-side
+encryption for Hadoop filesystems.
 
 Supported Ciphers
 -----------------
