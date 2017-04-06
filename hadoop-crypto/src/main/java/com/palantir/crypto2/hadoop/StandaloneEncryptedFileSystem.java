@@ -120,6 +120,11 @@ public final class StandaloneEncryptedFileSystem extends FilterFileSystem {
         return new PathConvertingFileSystem(backingFs, setSchemeFunc(backingScheme), setSchemeFunc(encryptedScheme));
     }
 
+    @Override
+    public boolean exists(Path path) throws IOException {
+        return fs.exists(path);
+    }
+
     private static Function<Path, Path> setSchemeFunc(final String scheme) {
         return new Function<Path, Path>() {
             @Override
