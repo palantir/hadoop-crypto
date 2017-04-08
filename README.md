@@ -12,7 +12,7 @@ encryption for Hadoop filesystems.
 
 Supported Ciphers
 -----------------
-Currently AES/CTR/NoPadding and AES/CBC/PKCS5Padding are supported.
+Currently `AES/CTR/NoPadding` and `AES/CBC/PKCS5Padding` are supported.
 
 Programatic Example
 -------------------
