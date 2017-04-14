@@ -23,8 +23,9 @@ import static org.junit.Assert.assertThat;
 import com.palantir.crypto2.cipher.AesCtrCipher;
 import com.palantir.crypto2.cipher.SeekableCipher;
 import com.palantir.crypto2.cipher.SeekableCipherFactory;
-import com.palantir.crypto2.io.ByteArraySeekableInput;
 import com.palantir.crypto2.io.DecryptingSeekableInput;
+import com.palantir.seekio.InMemorySeekableDataInput;
+import com.palantir.seekio.SeekableInput;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -53,7 +54,7 @@ public final class ExampleUsage {
         // Bytes written to stream are encrypted
         assertThat(encryptedBytes, is(not(bytes)));
 
-        ByteArraySeekableInput is = new ByteArraySeekableInput(encryptedBytes);
+        SeekableInput is = new InMemorySeekableDataInput(encryptedBytes);
         DecryptingSeekableInput decryptedStream = new DecryptingSeekableInput(is, cipher);
 
         // Seek to the last byte in the decrypted stream and verify its decrypted value
