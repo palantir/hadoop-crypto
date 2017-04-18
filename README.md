@@ -37,7 +37,7 @@ byte[] encryptedBytes = os.toByteArray();
 // Bytes written to stream are encrypted
 assertThat(encryptedBytes, is(not(bytes)));
 
-ByteArraySeekableInput is = new ByteArraySeekableInput(encryptedBytes);
+SeekableInput is = new InMemorySeekableDataInput(encryptedBytes);
 DecryptingSeekableInput decryptedStream = new DecryptingSeekableInput(is, cipher);
 
 // Seek to the last byte in the decrypted stream and verify its decrypted value
