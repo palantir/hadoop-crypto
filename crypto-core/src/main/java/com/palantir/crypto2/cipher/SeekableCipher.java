@@ -34,9 +34,9 @@ public interface SeekableCipher {
     CryptoCipher initCipher(int opmode);
 
     /**
-     * The returned {@link Cipher} is initialized such that future operations will encrypt/decrypt correctly for the
-     * given byte offset {@code pos} into the plaintext data. Certain Ciphers have special requirements and restrictions
-     * on how and where they are able to be seeked to.
+     * The returned {@link CryptoCipher} is initialized such that future operations will encrypt/decrypt correctly for
+     * the given byte offset {@code pos} into the plaintext data. Certain ciphers have special requirements and
+     * restrictions on how and to where they are able to be seeked.
      */
     CryptoCipher seek(long pos);
 
