@@ -41,10 +41,10 @@ public class FsCipherOutputStream extends FilterOutputStream {
         super(initCipherAndGetOutputStream(delegate, cipher, supplier));
     }
 
-    private static CryptoOutputStream initCipherAndGetOutputStream(FSDataOutputStream delegate, SeekableCipher cipher,
-            CipherStreamSupplier supplier) {
-        cipher.initCipher(Cipher.ENCRYPT_MODE);
-        return supplier.getOutputStream(delegate, cipher);
+    private static CryptoOutputStream initCipherAndGetOutputStream(FSDataOutputStream delegate,
+            SeekableCipher seekableCipher, CipherStreamSupplier supplier) {
+        seekableCipher.initCipher(Cipher.ENCRYPT_MODE);
+        return supplier.getOutputStream(delegate, seekableCipher);
     }
 
     @Override
