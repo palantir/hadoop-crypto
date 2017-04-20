@@ -47,4 +47,14 @@ public interface SeekableCipher {
      */
     int getBlockSize();
 
+    /**
+     * Returns the algorithm used by the underlying {@link Cipher} for encryption and decryption.
+     */
+    String getAlgorithm();
+
+    /**
+     * Returns the initialization vector for the block that the underlying {@link Cipher} will encrypt or decrypt next.
+     */
+    byte[] getCurrIv();
+
 }

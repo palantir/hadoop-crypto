@@ -46,11 +46,13 @@ public final class AesCtrCipher implements SeekableCipher {
     private final KeyMaterial keyMaterial;
     private final SecretKey key;
     private final byte[] initIv;
+    private byte[] currIv;
     private int currentOpmode;
 
     public AesCtrCipher(KeyMaterial keyMaterial) {
         this.key = keyMaterial.getSecretKey();
         this.initIv = keyMaterial.getIv();
+        this.currIv=initIv;
         this.keyMaterial = keyMaterial;
     }
 
@@ -84,9 +86,9 @@ public final class AesCtrCipher implements SeekableCipher {
         if (ivBytes.length >= IV_SIZE) {
             newIv = new IvParameterSpec(ivBytes, ivBytes.length - IV_SIZE, IV_SIZE);
         } else {
-            final byte[] tmpIv = new byte[IV_SIZE];
-            System.arraycopy(ivBytes, 0, tmpIv, IV_SIZE - ivBytes.length, ivBytes.length);
-            newIv = new IvParameterSpec(tmpIv);
+            currIv = new byte[IV_SIZE];
+            System.arraycopy(ivBytes, 0, currIv, IV_SIZE - ivBytes.length, ivBytes.length);
+            newIv = new IvParameterSpec(currIv);
         }
 
         Cipher cipher = getInstance();
@@ -115,6 +117,12 @@ public final class AesCtrCipher implements SeekableCipher {
     public int getBlockSize() {
         return BLOCK_SIZE;
     }
+
+    @Override
+    public String getAlgorithm() { return ALGORITHM; }
+
+    @Override
+    public byte[] getCurrIv() { return currIv; }
 
     public static KeyMaterial generateKeyMaterial() {
         return KeyMaterials.generateKeyMaterial(KEY_ALGORITHM, KEY_SIZE, IV_SIZE);

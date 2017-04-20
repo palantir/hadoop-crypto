@@ -8,6 +8,7 @@ dependencies {
     compile "com.google.guava:guava"
     compile "com.palantir.seek-io:seek-io"
     compile "org.slf4j:slf4j-api"
+    compile "org.apache.commons:commons-crypto"
 
     testCompile "junit:junit"
     testCompile "org.hamcrest:hamcrest-all"

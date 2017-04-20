@@ -45,10 +45,12 @@ public final class AesCbcCipher implements SeekableCipher {
     private final KeyMaterial keyMaterial;
     private final SecretKey key;
     private final byte[] initIv;
+    private byte[] currIv;
     private int currentOpmode;
 
     public AesCbcCipher(KeyMaterial keyMaterial) {
         this.initIv = keyMaterial.getIv();
+        this.currIv=initIv;
         this.key = keyMaterial.getSecretKey();
         this.keyMaterial = keyMaterial;
     }
@@ -89,6 +91,12 @@ public final class AesCbcCipher implements SeekableCipher {
     public int getBlockSize() {
         return BLOCK_SIZE;
     }
+
+    @Override
+    public String getAlgorithm() { return ALGORITHM; }
+
+    @Override
+    public byte[] getCurrIv() { return currIv; }
 
     public static KeyMaterial generateKeyMaterial() {
         return KeyMaterials.generateKeyMaterial(KEY_ALGORITHM, KEY_SIZE, IV_SIZE);
