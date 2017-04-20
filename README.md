@@ -37,7 +37,7 @@ byte[] encryptedBytes = os.toByteArray();
 // Bytes written to stream are encrypted
 assertThat(encryptedBytes, is(not(bytes)));
 
-ByteArraySeekableInput is = new ByteArraySeekableInput(encryptedBytes);
+SeekableInput is = new InMemorySeekableDataInput(encryptedBytes);
 DecryptingSeekableInput decryptedStream = new DecryptingSeekableInput(is, cipher);
 
 // Seek to the last byte in the decrypted stream and verify its decrypted value
@@ -128,10 +128,13 @@ Source for examples can be found [here](hadoop-crypto/src/test/java/com/palantir
 ### Initialization
 
 ```java
-KeyPair pair = KeyPairs.generateKeyPair(); // Long lived KeyPair that must be saved
+// Get a local FileSystem
 FileSystem fs = FileSystem.get(new URI("file:///"), new Configuration());
+
+// Initialize EFS with random public/private key pair
+KeyPair pair = TestKeyPairs.generateKeyPair();
 KeyStorageStrategy keyStore = new FileKeyStorageStrategy(fs, pair);
-FileSystem efs = new EncryptedFileSystem(fs, keyStore);
+EncryptedFileSystem efs = new EncryptedFileSystem(fs, keyStore);
 ```
 
 ### Writing data using EFS

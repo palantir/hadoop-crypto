@@ -26,6 +26,7 @@ import com.palantir.crypto2.cipher.AesCbcCipher;
 import com.palantir.crypto2.cipher.AesCtrCipher;
 import com.palantir.crypto2.cipher.SeekableCipher;
 import com.palantir.crypto2.cipher.SeekableCipherFactory;
+import com.palantir.seekio.InMemorySeekableDataInput;
 import com.palantir.seekio.SeekableInput;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -72,7 +73,7 @@ public final class DecryptingSeekableInputTest {
             CipherOutputStream cos = new CipherOutputStream(os, seekableCipher.initCipher(Cipher.ENCRYPT_MODE));
             cos.write(data);
             cos.close();
-            cis = new DecryptingSeekableInput(new ByteArraySeekableInput(os.toByteArray()), seekableCipher);
+            cis = new DecryptingSeekableInput(new InMemorySeekableDataInput(os.toByteArray()), seekableCipher);
         } catch (IOException e) {
             throw Throwables.propagate(e);
         }
