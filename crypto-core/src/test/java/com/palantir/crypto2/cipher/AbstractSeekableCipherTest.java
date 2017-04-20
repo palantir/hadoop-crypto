@@ -75,7 +75,6 @@ public abstract class AbstractSeekableCipherTest {
         testEncryptDecrypt(encryptCipher, decryptCipher);
     }
 
-
     @Test
     public final void testSeek() throws BadPaddingException, IllegalBlockSizeException, ShortBufferException {
         int blockSize = seekableCipher.getBlockSize();
