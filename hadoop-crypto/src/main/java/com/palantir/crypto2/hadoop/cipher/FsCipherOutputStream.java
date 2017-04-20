@@ -31,14 +31,14 @@ import org.apache.hadoop.fs.FSDataOutputStream;
  */
 public class FsCipherOutputStream extends FilterOutputStream {
 
-    public FsCipherOutputStream(FSDataOutputStream delegate, SeekableCipher cipher) {
-        this(delegate, cipher, new CipherStreamSupplierImpl());
+    public FsCipherOutputStream(FSDataOutputStream delegate, SeekableCipher seekableCipher) {
+        this(delegate, seekableCipher, new CipherStreamSupplierImpl());
     }
 
     @VisibleForTesting
-    FsCipherOutputStream(FSDataOutputStream delegate, SeekableCipher cipher,
+    FsCipherOutputStream(FSDataOutputStream delegate, SeekableCipher seekableCipher,
             CipherStreamSupplier supplier) {
-        super(initCipherAndGetOutputStream(delegate, cipher, supplier));
+        super(initCipherAndGetOutputStream(delegate, seekableCipher, supplier));
     }
 
     private static CryptoOutputStream initCipherAndGetOutputStream(FSDataOutputStream delegate,
