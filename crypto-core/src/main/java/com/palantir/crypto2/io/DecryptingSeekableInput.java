@@ -24,13 +24,12 @@ import com.palantir.crypto2.cipher.SeekableCipher;
 import com.palantir.seekio.SeekableInput;
 import java.io.IOException;
 import javax.crypto.Cipher;
-import javax.crypto.CipherInputStream;
 import org.apache.commons.crypto.stream.CryptoInputStream;
 
 public final class DecryptingSeekableInput implements SeekableInput {
 
-    /** Size of the {@link CipherInputStream} internal buffer. */
-    private static final int CIPHER_INPUT_STREAM_BUFFER_SIZE = 512;
+    /** Size of the {@link CryptoInputStream} internal buffer. */
+    private static final int CRYPTO_INPUT_STREAM_BUFFER_SIZE = 8192;
 
     private final DefaultSeekableInputStream delegate;
     private final SeekableCipher seekableCipher;
@@ -52,11 +51,11 @@ public final class DecryptingSeekableInput implements SeekableInput {
 
         /* small forward seeks can generate reverse seeks in some circumstances:
          *  1. seeking within the current block or the next block causes reading of the previous block (negative seek).
-         *  2. CipherInputStream consumes CIPHER_INPUT_STREAM_BUFFER_SIZE bytes of the underlying stream, seeking
+         *  2. CryptoInputStream consumes CRYPTO_INPUT_STREAM_BUFFER_SIZE bytes of the underlying stream, seeking
          *     more than a block ahead but less than this buffer results in needing to move the underlying stream
          *     backwards.
          */
-        this.skipThreshold = Math.max(seekableCipher.getBlockSize() * 2, CIPHER_INPUT_STREAM_BUFFER_SIZE);
+        this.skipThreshold = Math.max(seekableCipher.getBlockSize() * 2, CRYPTO_INPUT_STREAM_BUFFER_SIZE);
 
         cipher.initCipher(Cipher.DECRYPT_MODE);
         decryptedStream = supplier.getInputStream(delegate, cipher);

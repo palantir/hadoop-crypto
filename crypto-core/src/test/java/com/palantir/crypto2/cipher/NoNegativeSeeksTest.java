@@ -21,12 +21,10 @@ import static org.junit.Assert.fail;
 import com.palantir.crypto2.io.DecryptingSeekableInput;
 import com.palantir.seekio.SeekableInput;
 import java.io.IOException;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public final class NoNegativeSeeksTest {
 
-    @Ignore // TODO (srand) Get this test passing before merging this PR.
     @Test
     public void testDecryptingSeekableInput_doesNotSeekNegatively() throws IOException {
         for (int increment = 16; increment < 2048; increment += 16) {
