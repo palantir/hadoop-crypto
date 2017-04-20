@@ -20,23 +20,20 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 import com.palantir.crypto2.keys.KeyMaterial;
 import com.palantir.crypto2.keys.serialization.KeyMaterials;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
+import java.security.GeneralSecurityException;
 import javax.crypto.Cipher;
-import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
+import org.apache.commons.crypto.cipher.CryptoCipher;
+import org.apache.commons.crypto.cipher.CryptoCipherFactory;
 
 /**
- * An extention of the 'AES/CBC/PKCS5Padding' {@link Cipher} implementation which allows seeking of the cipher in
+ * An extention of the 'AES/CBC/PKCS5Padding' {@link CryptoCipher} implementation which allows seeking of the cipher in
  * constant time. This is the same Cipher used by the original implementation of the hadoop-s3e-adapter.
  */
 public final class AesCbcCipher implements SeekableCipher {
 
     public static final String ALGORITHM = "AES/CBC/PKCS5Padding";
-    private static final String PROVIDER = "SunJCE";
     private static final String KEY_ALGORITHM = "AES";
     private static final int KEY_SIZE = 256;
     private static final int BLOCK_SIZE = 16;
@@ -50,19 +47,19 @@ public final class AesCbcCipher implements SeekableCipher {
 
     public AesCbcCipher(KeyMaterial keyMaterial) {
         this.initIv = keyMaterial.getIv();
-        this.currIv=initIv;
+        this.currIv = initIv;
         this.key = keyMaterial.getSecretKey();
         this.keyMaterial = keyMaterial;
     }
 
     @Override
-    public Cipher initCipher(int opmode) {
+    public CryptoCipher initCipher(int opmode) {
         this.currentOpmode = opmode;
         try {
-            Cipher cipher = getInstance();
+            CryptoCipher cipher = CryptoCipherFactory.getCryptoCipher(ALGORITHM);
             cipher.init(opmode, key, new IvParameterSpec(initIv));
             return cipher;
-        } catch (InvalidKeyException | InvalidAlgorithmParameterException e) {
+        } catch (GeneralSecurityException e) {
             throw Throwables.propagate(e);
         }
     }
@@ -73,7 +70,7 @@ public final class AesCbcCipher implements SeekableCipher {
      * regardless of position.
      */
     @Override
-    public Cipher seek(long pos) {
+    public CryptoCipher seek(long pos) {
         Preconditions.checkState(currentOpmode == Cipher.DECRYPT_MODE || currentOpmode == Cipher.ENCRYPT_MODE,
                 "Cipher not initialized");
         Preconditions.checkArgument(pos >= 0, "Cannot seek to negative position: %s", pos);
@@ -93,21 +90,17 @@ public final class AesCbcCipher implements SeekableCipher {
     }
 
     @Override
-    public String getAlgorithm() { return ALGORITHM; }
+    public String getAlgorithm() {
+        return ALGORITHM;
+    }
 
     @Override
-    public byte[] getCurrIv() { return currIv; }
+    public IvParameterSpec getCurrIv() {
+        return new IvParameterSpec(currIv);
+    }
 
     public static KeyMaterial generateKeyMaterial() {
         return KeyMaterials.generateKeyMaterial(KEY_ALGORITHM, KEY_SIZE, IV_SIZE);
-    }
-
-    private Cipher getInstance() {
-        try {
-            return Cipher.getInstance(ALGORITHM, PROVIDER);
-        } catch (NoSuchAlgorithmException | NoSuchProviderException | NoSuchPaddingException e) {
-            throw Throwables.propagate(e);
-        }
     }
 
 }

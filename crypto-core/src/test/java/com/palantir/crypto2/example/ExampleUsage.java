@@ -29,8 +29,9 @@ import com.palantir.seekio.SeekableInput;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Properties;
 import javax.crypto.Cipher;
-import javax.crypto.CipherOutputStream;
+import org.apache.commons.crypto.stream.CryptoOutputStream;
 import org.junit.Test;
 
 public final class ExampleUsage {
@@ -38,15 +39,19 @@ public final class ExampleUsage {
     @Test
     public void decryptingSeekableInputExample() throws IOException {
         byte[] bytes = "0123456789".getBytes(StandardCharsets.UTF_8);
-        SeekableCipher cipher = SeekableCipherFactory.getCipher(AesCtrCipher.ALGORITHM);
+        SeekableCipher seekableCipher = SeekableCipherFactory.getCipher(AesCtrCipher.ALGORITHM);
         ByteArrayOutputStream os = new ByteArrayOutputStream(bytes.length);
-        Cipher encrypt = cipher.initCipher(Cipher.ENCRYPT_MODE);
+        seekableCipher.initCipher(Cipher.ENCRYPT_MODE);
 
         // Store this key material for future decryption
         // KeyMaterial keyMaterial = cipher.getKeyMaterial();
 
         // Encrypt some bytes
-        CipherOutputStream encryptedStream = new CipherOutputStream(os, encrypt);
+        CryptoOutputStream encryptedStream = new CryptoOutputStream(seekableCipher.getAlgorithm(),
+                new Properties(),
+                os,
+                seekableCipher.getKeyMaterial().getSecretKey(),
+                seekableCipher.getCurrIv());
         encryptedStream.write(bytes);
         encryptedStream.close();
         byte[] encryptedBytes = os.toByteArray();
@@ -55,7 +60,7 @@ public final class ExampleUsage {
         assertThat(encryptedBytes, is(not(bytes)));
 
         SeekableInput is = new InMemorySeekableDataInput(encryptedBytes);
-        DecryptingSeekableInput decryptedStream = new DecryptingSeekableInput(is, cipher);
+        DecryptingSeekableInput decryptedStream = new DecryptingSeekableInput(is, seekableCipher);
 
         // Seek to the last byte in the decrypted stream and verify its decrypted value
         byte[] readBytes = new byte[bytes.length];

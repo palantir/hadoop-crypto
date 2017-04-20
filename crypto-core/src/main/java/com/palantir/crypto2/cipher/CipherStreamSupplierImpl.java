@@ -21,33 +21,32 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Properties;
-import javax.crypto.spec.IvParameterSpec;
 import org.apache.commons.crypto.stream.CryptoInputStream;
 import org.apache.commons.crypto.stream.CryptoOutputStream;
 
 public final class CipherStreamSupplierImpl implements CipherStreamSupplier {
 
     @Override
-    public CryptoInputStream getInputStream(InputStream is, SeekableCipher cipher) {
+    public CryptoInputStream getInputStream(InputStream is, SeekableCipher seekableCipher) {
         try {
-            return new CryptoInputStream(cipher.getAlgorithm(),
+            return new CryptoInputStream(seekableCipher.getAlgorithm(),
                     new Properties(),
                     is,
-                    cipher.getKeyMaterial().getSecretKey(),
-                    new IvParameterSpec(cipher.getKeyMaterial().getIv()));
+                    seekableCipher.getKeyMaterial().getSecretKey(),
+                    seekableCipher.getCurrIv());
         } catch (IOException e) {
             throw Throwables.propagate(e);
         }
     }
 
     @Override
-    public CryptoOutputStream getOutputStream(OutputStream os, SeekableCipher cipher) {
+    public CryptoOutputStream getOutputStream(OutputStream os, SeekableCipher seekableCipher) {
         try {
-            return new CryptoOutputStream(cipher.getAlgorithm(),
+            return new CryptoOutputStream(seekableCipher.getAlgorithm(),
                     new Properties(),
                     os,
-                    cipher.getKeyMaterial().getSecretKey(),
-                    new IvParameterSpec(cipher.getKeyMaterial().getIv()));
+                    seekableCipher.getKeyMaterial().getSecretKey(),
+                    seekableCipher.getCurrIv());
         } catch (IOException e) {
             throw Throwables.propagate(e);
         }

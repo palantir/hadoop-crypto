@@ -18,24 +18,27 @@ package com.palantir.crypto2.cipher;
 
 import com.palantir.crypto2.keys.KeyMaterial;
 import javax.crypto.Cipher;
+import javax.crypto.spec.IvParameterSpec;
+import org.apache.commons.crypto.cipher.CryptoCipher;
 
 /**
- * Provides access to a {@link Cipher} with the ability to {@link #seek} the Cipher.
+ * Provides access to a {@link CryptoCipher} with the ability to {@link #seek} the Cipher.
  * // TODO(jellis): add note about using SeekableCipher streams instead of this directly
  */
 public interface SeekableCipher {
 
     /**
-     * Initialize the underlying {@link Cipher} to either {@link Cipher#ENCRYPT_MODE} or {@link Cipher#DECRYPT_MODE}.
+     * Initialize the underlying {@link CryptoCipher} to either {@link Cipher#ENCRYPT_MODE} or
+     * {@link Cipher#DECRYPT_MODE}.
      */
-    Cipher initCipher(int opmode);
+    CryptoCipher initCipher(int opmode);
 
     /**
      * The returned {@link Cipher} is initialized such that future operations will encrypt/decrypt correctly for the
      * given byte offset {@code pos} into the plaintext data. Certain Ciphers have special requirements and restrictions
      * on how and where they are able to be seeked to.
      */
-    Cipher seek(long pos);
+    CryptoCipher seek(long pos);
 
     /**
      * Returns the {@link KeyMaterial} being used by this {@link SeekableCipher} for cryptographic operations.
@@ -43,18 +46,19 @@ public interface SeekableCipher {
     KeyMaterial getKeyMaterial();
 
     /**
-     * Returns the underlying {@link Cipher}'s block size.
+     * Returns the underlying {@link CryptoCipher}'s block size.
      */
     int getBlockSize();
 
     /**
-     * Returns the algorithm used by the underlying {@link Cipher} for encryption and decryption.
+     * Returns the algorithm used by the underlying {@link CryptoCipher} for encryption and decryption.
      */
     String getAlgorithm();
 
     /**
-     * Returns the initialization vector for the block that the underlying {@link Cipher} will encrypt or decrypt next.
+     * Returns the initialization vector for the block that the underlying {@link CryptoCipher} will encrypt or decrypt
+     * next.
      */
-    byte[] getCurrIv();
+    IvParameterSpec getCurrIv();
 
 }
