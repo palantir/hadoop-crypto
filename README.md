@@ -59,7 +59,7 @@ Seekable Crypto uses the Apache
 [Openssl](https://www.openssl.org/) native cryptography libraries if they are available.
 If these libraries are not available, then the Java Cryptography Extension is used instead.
 
-To use the Openssl native libraries, included them in the `LD_LIBARY_PATH` variable of
+To use the Openssl native libraries, include them in the `LD_LIBARY_PATH` variable of
 your application's environment. Java applications can also use the `java.library.path`
 Java property.
 
