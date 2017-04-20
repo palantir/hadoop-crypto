@@ -22,16 +22,18 @@ import com.palantir.crypto2.keys.KeyMaterial;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.SecureRandom;
 import java.util.Map;
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
+import org.apache.commons.crypto.random.CryptoRandom;
+import org.apache.commons.crypto.random.CryptoRandomFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,6 +45,15 @@ public final class KeyMaterials {
 
     private static final Logger log = LoggerFactory.getLogger(KeyMaterials.class);
     private static final Map<Integer, ? extends KeySerializer> SERIALIZERS = KeySerializers.getSerializers();
+    private static final CryptoRandom random = getRandom();
+
+    private static CryptoRandom getRandom() {
+        try {
+            return CryptoRandomFactory.getCryptoRandom();
+        } catch (GeneralSecurityException e) {
+            throw Throwables.propagate(e);
+        }
+    }
 
     private KeyMaterials() {}
 
@@ -58,8 +69,7 @@ public final class KeyMaterials {
 
     public static byte[] generateIv(int ivSize) {
         byte[] iv = new byte[ivSize];
-        SecureRandom rng = new SecureRandom();
-        rng.nextBytes(iv);
+        random.nextBytes(iv);
         return iv;
     }
 

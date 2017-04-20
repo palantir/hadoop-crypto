@@ -42,12 +42,12 @@ public final class AesCbcCipher implements SeekableCipher {
     private final KeyMaterial keyMaterial;
     private final SecretKey key;
     private final byte[] initIv;
-    private byte[] currIv;
+    private IvParameterSpec currIvParameterSpec;
     private int currentOpmode;
 
     public AesCbcCipher(KeyMaterial keyMaterial) {
         this.initIv = keyMaterial.getIv();
-        this.currIv = initIv;
+        this.currIvParameterSpec = new IvParameterSpec(initIv);
         this.key = keyMaterial.getSecretKey();
         this.keyMaterial = keyMaterial;
     }
@@ -96,7 +96,7 @@ public final class AesCbcCipher implements SeekableCipher {
 
     @Override
     public IvParameterSpec getCurrIv() {
-        return new IvParameterSpec(currIv);
+        return currIvParameterSpec;
     }
 
     public static KeyMaterial generateKeyMaterial() {

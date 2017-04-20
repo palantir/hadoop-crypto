@@ -44,13 +44,13 @@ public final class AesCtrCipher implements SeekableCipher {
     private final KeyMaterial keyMaterial;
     private final SecretKey key;
     private final byte[] initIv;
-    private byte[] currIv;
+    private IvParameterSpec currIvParameterSpec;
     private int currentOpmode;
 
     public AesCtrCipher(KeyMaterial keyMaterial) {
         this.key = keyMaterial.getSecretKey();
         this.initIv = keyMaterial.getIv();
-        this.currIv = initIv;
+        this.currIvParameterSpec = new IvParameterSpec(initIv);
         this.keyMaterial = keyMaterial;
     }
 
@@ -80,20 +80,18 @@ public final class AesCtrCipher implements SeekableCipher {
         byte[] ivBytes = ivBuffer.toByteArray();
 
         // Ensure the iv is exactly BLOCK_SIZE bytes in length
-        final IvParameterSpec newIv;
         if (ivBytes.length >= IV_SIZE) {
-            currIv = ivBytes;
-            newIv = new IvParameterSpec(ivBytes, ivBytes.length - IV_SIZE, IV_SIZE);
+            currIvParameterSpec = new IvParameterSpec(ivBytes, ivBytes.length - IV_SIZE, IV_SIZE);
         } else {
-            currIv = new byte[IV_SIZE];
-            System.arraycopy(ivBytes, 0, currIv, IV_SIZE - ivBytes.length, ivBytes.length);
-            newIv = new IvParameterSpec(currIv);
+            final byte[] tmpIv = new byte[IV_SIZE];
+            System.arraycopy(ivBytes, 0, tmpIv, IV_SIZE - ivBytes.length, ivBytes.length);
+            currIvParameterSpec = new IvParameterSpec(tmpIv);
         }
 
         // Init the cipher with the new iv
         try {
             CryptoCipher cipher = CryptoCipherFactory.getCryptoCipher(ALGORITHM);
-            cipher.init(currentOpmode, key, newIv);
+            cipher.init(currentOpmode, key, currIvParameterSpec);
 
             // Skip to the byte offset in the block where 'pos' is located
             int bytesToSkip = (int) (pos % BLOCK_SIZE);
@@ -122,7 +120,7 @@ public final class AesCtrCipher implements SeekableCipher {
 
     @Override
     public IvParameterSpec getCurrIv() {
-        return new IvParameterSpec(currIv);
+        return currIvParameterSpec;
     }
 
     public static KeyMaterial generateKeyMaterial() {
