@@ -13,4 +13,6 @@ dependencies {
     testCompile "junit:junit"
     testCompile "org.hamcrest:hamcrest-all"
     testCompile "org.mockito:mockito-core"
+    testCompile "org.openjdk.jmh:jmh-core"
+    testCompile "org.openjdk.jmh:jmh-generator-annprocess"
 }

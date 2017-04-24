@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.palantir.crypto2.hadoop.benchmarks;
+package com.palantir.crypto2.benchmarks;
 
 import com.palantir.seekio.SeekableInput;
 import java.io.IOException;
