@@ -63,7 +63,8 @@ public class CipherImplCompatibilityTest {
         DecryptingSeekableInput decryptedStream = new DecryptingSeekableInput(is, seekableCipher);
 
         byte[] decryptedBytes = new byte[bytes.length];
-        decryptedStream.read(decryptedBytes, 0, encryptedBytes.length);
+        int read = decryptedStream.read(decryptedBytes, 0, encryptedBytes.length);
+        assertThat(read, is(bytes.length));
         assertThat(bytes, is(decryptedBytes));
     }
 
@@ -96,7 +97,8 @@ public class CipherImplCompatibilityTest {
 
         CipherInputStream is = new CipherInputStream(new ByteArrayInputStream(encryptedBytes), decryptCipher);
         byte[] decryptedBytes = new byte[bytes.length];
-        is.read(decryptedBytes, 0, encryptedBytes.length);
+        int read = is.read(decryptedBytes, 0, encryptedBytes.length);
+        assertThat(read, is(bytes.length));
         assertThat(bytes, is(decryptedBytes));
     }
 }
