@@ -54,13 +54,15 @@ public class BenchmarkReadWrite {
     private static final int MB = 1024 * 1024;
 
     @State(Scope.Benchmark)
-    public static class MyState {
-        public SeekableCipher cipher;
-        public byte[] rawBytes;
-        public SeekableInputChannel encryptedInputChannel;
-        public SeekableInput encryptedBytes;
-        public Properties properties;
-        public KeyMaterial keyMaterial;
+    @SuppressWarnings("VisibilityModifier")
+    public static class TestState {
+
+        private SeekableCipher cipher;
+        private byte[] rawBytes;
+        private SeekableInputChannel encryptedInputChannel;
+        private SeekableInput encryptedBytes;
+        private Properties properties;
+        private KeyMaterial keyMaterial;
 
         @Setup
         public void setup() throws IOException {
@@ -79,7 +81,8 @@ public class BenchmarkReadWrite {
             encryptedBytes = new InMemorySeekableDataInput(Files.readAllBytes(file));
 
             properties = new Properties();
-            properties.setProperty(CryptoCipherFactory.CLASSES_KEY, CryptoCipherFactory.CipherProvider.OPENSSL.getClassName());
+            properties.setProperty(CryptoCipherFactory.CLASSES_KEY,
+                    CryptoCipherFactory.CipherProvider.OPENSSL.getClassName());
 
             keyMaterial = AesCtrCipher.generateKeyMaterial();
         }
@@ -90,7 +93,7 @@ public class BenchmarkReadWrite {
     @Threads(value = 1)
     @Warmup(iterations = 0)
     @BenchmarkMode(value = Mode.SingleShotTime)
-    public byte[] fileRead(MyState state) throws IOException {
+    public byte[] fileRead(TestState state) throws IOException {
         return readFully(state.encryptedInputChannel);
     }
 
@@ -98,7 +101,7 @@ public class BenchmarkReadWrite {
     @Threads(value = 1)
     @Warmup(iterations = 0)
     @BenchmarkMode(value = Mode.SingleShotTime)
-    public byte[] javaFileRead(MyState state) throws IOException {
+    public byte[] javaFileRead(TestState state) throws IOException {
         return readFully(new DecryptingSeekableInput(state.encryptedInputChannel, state.cipher));
     }
 
@@ -106,7 +109,7 @@ public class BenchmarkReadWrite {
     @Threads(value = 1)
     @Warmup(iterations = 0)
     @BenchmarkMode(value = Mode.SingleShotTime)
-    public byte[] apacheFileRead(MyState state) throws IOException {
+    public byte[] apacheFileRead(TestState state) throws IOException {
         return readFully(getApacheCryptoStream(state, state.encryptedInputChannel));
     }
 
@@ -114,7 +117,7 @@ public class BenchmarkReadWrite {
     @Threads(value = 1)
     @Warmup(iterations = 0)
     @BenchmarkMode(value = Mode.SingleShotTime)
-    public byte[] memRead(MyState state) throws IOException {
+    public byte[] memRead(TestState state) throws IOException {
         return readFully(state.encryptedBytes);
     }
 
@@ -122,7 +125,7 @@ public class BenchmarkReadWrite {
     @Threads(value = 1)
     @Warmup(iterations = 0)
     @BenchmarkMode(value = Mode.SingleShotTime)
-    public byte[] javaMemRead(MyState state) throws IOException {
+    public byte[] javaMemRead(TestState state) throws IOException {
         return readFully(new DecryptingSeekableInput(state.encryptedBytes, state.cipher));
     }
 
@@ -130,11 +133,11 @@ public class BenchmarkReadWrite {
     @Threads(value = 1)
     @Warmup(iterations = 0)
     @BenchmarkMode(value = Mode.SingleShotTime)
-    public byte[] apacheMemRead(MyState state) throws IOException {
+    public byte[] apacheMemRead(TestState state) throws IOException {
         return readFully(getApacheCryptoStream(state, state.encryptedBytes));
     }
 
-    private static CryptoInputStream getApacheCryptoStream(MyState state, SeekableInput input)
+    private static CryptoInputStream getApacheCryptoStream(TestState state, SeekableInput input)
             throws IOException {
         DefaultSeekableInputStream is = new DefaultSeekableInputStream(input);
         SecretKey key = state.keyMaterial.getSecretKey();
