@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Palantir Technologies, Inc. All rights reserved.
+ * Copyright 2017 Palantir Technologies, Inc. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -120,8 +120,8 @@ public final class DecryptingSeekableInput implements SeekableInput {
     }
 
     @Override
-    public int read(byte[] buffer, int offset, int length) throws IOException {
-        int bytesRead = decryptedStream.read(buffer, offset, length);
+    public int read(byte[] bytes, int offset, int length) throws IOException {
+        int bytesRead = decryptedStream.read(bytes, offset, length);
         if (bytesRead != -1) {
             decryptedStreamPos += bytesRead;
         }
