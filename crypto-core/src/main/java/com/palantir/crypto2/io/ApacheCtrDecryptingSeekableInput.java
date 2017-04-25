@@ -35,12 +35,8 @@ public final class ApacheCtrDecryptingSeekableInput extends CtrCryptoInputStream
 
     private static final String ALGORITHM = "AES/CTR/NoPadding";
     private static final int BUFFER_SIZE = 8192;
-    private static final Properties PROPS;
-
-    static {
-        // Force OpenSSL for AES-NI support
-        PROPS = initializeProps();
-    }
+    // Force OpenSSL for AES-NI support
+    private static final Properties PROPS = initializeProps();
 
     private ApacheCtrDecryptingSeekableInput(SeekableInput input, KeyMaterial keyMaterial) throws IOException {
         super(new InputAdapter(input), Utils.getCipherInstance(ALGORITHM, PROPS), BUFFER_SIZE,
