@@ -28,32 +28,19 @@ public final class CounterMode {
     private CounterMode() {}
 
     /**
-     * Returns the block that contains the byte at the given position.
+     * Computes the initialization vector that should be used when decrypting {@code blockNumber}.
      */
-    public static long blockOffset(long position) {
-        return position / BLOCK_SIZE;
-    }
-
-    /**
-     * Returns the number of bytes that
-     * @param position
-     * @return
-     */
-    public static int bytesToSkip(long position) {
-        return Math.toIntExact(position % BLOCK_SIZE);
-    }
-
-    public static IvParameterSpec computeIv(byte[] initIv, long blockOffset) {
-        Preconditions.checkArgument(blockOffset >= 0, "Cannot seek to negative position: %s", blockOffset);
+    public static IvParameterSpec computeIv(byte[] initIv, long blockNumber) {
+        Preconditions.checkArgument(blockNumber >= 0, "Cannot seek to negative position: %s", blockNumber);
 
         // Compute the block that the byte 'pos' is located in
-        BigInteger block = BigInteger.valueOf(blockOffset);
+        BigInteger block = BigInteger.valueOf(blockNumber);
 
         // Compute the iv for the block to start decrypting. initIv needs to be treated as an unsigned int
         BigInteger ivBuffer = new BigInteger(1, initIv).add(block);
         byte[] ivBytes = ivBuffer.toByteArray();
 
-        // Ensure the iv is exactly BLOCK_SIZE bytes in length
+        // Ensure the iv is exactly IV_SIZE bytes in length
         final IvParameterSpec newIv;
         if (ivBytes.length >= IV_SIZE) {
             newIv = new IvParameterSpec(ivBytes, ivBytes.length - IV_SIZE, IV_SIZE);

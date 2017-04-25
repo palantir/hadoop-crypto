@@ -69,7 +69,7 @@ public final class AesCtrCipher implements SeekableCipher {
                 "Cipher not initialized");
         Preconditions.checkArgument(pos >= 0, "Cannot seek to negative position: %s", pos);
 
-        long block = CounterMode.blockOffset(pos);
+        long block = pos / CounterMode.BLOCK_SIZE;
         IvParameterSpec iv = CounterMode.computeIv(initIv, block);
 
         Cipher cipher = getInstance();
