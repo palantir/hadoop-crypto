@@ -42,7 +42,7 @@ public class CipherImplCompatibilityTest {
 
         byte[] bytes = "0123456789".getBytes(StandardCharsets.UTF_8);
         SeekableCipher seekableCipher = SeekableCipherFactory.getCipher(AesCtrCipher.ALGORITHM);
-        seekableCipher.initCipher(Cipher.DECRYPT_MODE);
+        seekableCipher.setOpMode(Cipher.DECRYPT_MODE);
 
         // Encrypt using the javax.crypto library
         Cipher encryptCipher = Cipher.getInstance(AesCtrCipher.ALGORITHM);
@@ -74,7 +74,7 @@ public class CipherImplCompatibilityTest {
         byte[] bytes = "0123456789".getBytes(StandardCharsets.UTF_8);
         SeekableCipher seekableCipher = SeekableCipherFactory.getCipher(AesCtrCipher.ALGORITHM);
         ByteArrayOutputStream os = new ByteArrayOutputStream(bytes.length);
-        seekableCipher.initCipher(Cipher.ENCRYPT_MODE);
+        seekableCipher.setOpMode(Cipher.ENCRYPT_MODE);
 
         // Encrypt using the commons-crypto library
         CryptoOutputStream encryptedStream = new CryptoOutputStream(AesCtrCipher.ALGORITHM,

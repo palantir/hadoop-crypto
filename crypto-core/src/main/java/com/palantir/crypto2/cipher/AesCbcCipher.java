@@ -19,12 +19,10 @@ package com.palantir.crypto2.cipher;
 import com.google.common.base.Preconditions;
 import com.palantir.crypto2.keys.KeyMaterial;
 import com.palantir.crypto2.keys.serialization.KeyMaterials;
-import java.security.GeneralSecurityException;
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import org.apache.commons.crypto.cipher.CryptoCipher;
-import org.apache.commons.crypto.cipher.CryptoCipherFactory;
 
 /**
  * An extention of the 'AES/CBC/PKCS5Padding' {@link CryptoCipher} implementation which allows seeking of the cipher in
@@ -52,30 +50,21 @@ public final class AesCbcCipher implements SeekableCipher {
     }
 
     @Override
-    public CryptoCipher initCipher(int opmode) {
+    public void setOpMode(int opmode) {
         this.currentOpmode = opmode;
-        try {
-            CryptoCipher cipher = CryptoCipherFactory.getCryptoCipher(ALGORITHM);
-            cipher.init(opmode, key, new IvParameterSpec(initIv));
-            return cipher;
-        } catch (GeneralSecurityException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     /**
-     * Seeking the AES/CBC {@link Cipher} requires initializing its IV with the previous block of encrypted data and
-     * therefore cannot be done by the Cipher alone, which is why seeking returns a Cipher initialized the same way
-     * regardless of position.
+     * Seeking the AES/CBC {@link CryptoCipher} requires initializing its IV with the previous block of encrypted data,
+     * and therefore cannot be done by the cipher alone. Therefore we do not update currIvParameterSpec here.
      */
     @Override
-    public CryptoCipher seek(long pos) {
+    public void updateIvForNewPosition(long pos) {
         Preconditions.checkState(currentOpmode == Cipher.DECRYPT_MODE || currentOpmode == Cipher.ENCRYPT_MODE,
                 "Cipher not initialized");
         Preconditions.checkArgument(pos >= 0, "Cannot seek to negative position: %s", pos);
         Preconditions.checkArgument(pos % BLOCK_SIZE == 0,
                 "Can only seek AES/CBC cipher to block offset positions every %s bytes", BLOCK_SIZE);
-        return initCipher(currentOpmode);
     }
 
     @Override

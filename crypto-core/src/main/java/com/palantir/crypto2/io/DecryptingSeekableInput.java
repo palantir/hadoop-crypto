@@ -57,7 +57,7 @@ public final class DecryptingSeekableInput implements SeekableInput {
          */
         this.skipThreshold = Math.max(seekableCipher.getBlockSize() * 2, CRYPTO_INPUT_STREAM_BUFFER_SIZE);
 
-        cipher.initCipher(Cipher.DECRYPT_MODE);
+        cipher.setOpMode(Cipher.DECRYPT_MODE);
         decryptedStream = supplier.getInputStream(delegate, cipher);
         decryptedStreamPos = 0L;
     }
@@ -104,7 +104,7 @@ public final class DecryptingSeekableInput implements SeekableInput {
         }
 
         long prevBlockOffset = prevBlock * blockSize;
-        seekableCipher.seek(prevBlockOffset);
+        seekableCipher.updateIvForNewPosition(prevBlockOffset);
         delegate.seek(prevBlockOffset);
 
         // Need a new cipher stream since seeking the stream and cipher invalidate the cipher stream's buffer

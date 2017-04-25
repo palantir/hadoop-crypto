@@ -41,7 +41,7 @@ public final class ExampleUsage {
         byte[] bytes = "0123456789".getBytes(StandardCharsets.UTF_8);
         SeekableCipher seekableCipher = SeekableCipherFactory.getCipher(AesCtrCipher.ALGORITHM);
         ByteArrayOutputStream os = new ByteArrayOutputStream(bytes.length);
-        seekableCipher.initCipher(Cipher.ENCRYPT_MODE);
+        seekableCipher.setOpMode(Cipher.ENCRYPT_MODE);
 
         // Store this key material for future decryption
         // KeyMaterial keyMaterial = cipher.getKeyMaterial();

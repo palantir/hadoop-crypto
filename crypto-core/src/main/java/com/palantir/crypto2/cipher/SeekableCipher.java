@@ -20,25 +20,28 @@ import com.palantir.crypto2.keys.KeyMaterial;
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import org.apache.commons.crypto.cipher.CryptoCipher;
+import org.apache.commons.crypto.stream.CryptoInputStream;
+import org.apache.commons.crypto.stream.CryptoOutputStream;
 
 /**
- * Provides access to a {@link CryptoCipher} with the ability to {@link #seek} the Cipher.
+ * Provides information used to construct a {@link CryptoCipher}, along with the ability to update that
+ * information when seeking to a different location in a {@link CryptoInputStream} or {@link CryptoOutputStream}.
  * // TODO(jellis): add note about using SeekableCipher streams instead of this directly
  */
 public interface SeekableCipher {
 
     /**
-     * Initialize the underlying {@link CryptoCipher} to either {@link Cipher#ENCRYPT_MODE} or
-     * {@link Cipher#DECRYPT_MODE}.
+     * Sets whether a {@link CryptoCipher} constructed using this SeekableCipher will be initialized to
+     * {@link Cipher#ENCRYPT_MODE} or to {@link Cipher#DECRYPT_MODE}.
      */
-    CryptoCipher initCipher(int opmode);
+    void setOpMode(int opmode);
 
     /**
      * The returned {@link CryptoCipher} is initialized such that future operations will encrypt/decrypt correctly for
      * the given byte offset {@code pos} into the plaintext data. Certain ciphers have special requirements and
      * restrictions on how and to where they are able to be seeked.
      */
-    CryptoCipher seek(long pos);
+    void updateIvForNewPosition(long pos);
 
     /**
      * Returns the {@link KeyMaterial} being used by this {@link SeekableCipher} for cryptographic operations.

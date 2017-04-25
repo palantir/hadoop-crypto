@@ -71,7 +71,7 @@ public final class DecryptingSeekableInputTest {
     public DecryptingSeekableInputTest(String algorithm) {
         try {
             seekableCipher = SeekableCipherFactory.getCipher(algorithm);
-            seekableCipher.initCipher(Cipher.ENCRYPT_MODE);
+            seekableCipher.setOpMode(Cipher.ENCRYPT_MODE);
             ByteArrayOutputStream os = new ByteArrayOutputStream();
             CryptoOutputStream cos = new CryptoOutputStream(algorithm,
                     new Properties(),

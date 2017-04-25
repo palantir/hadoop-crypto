@@ -22,6 +22,9 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 import com.palantir.crypto2.keys.KeyMaterial;
+import java.security.GeneralSecurityException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
 import java.util.Arrays;
 import java.util.Random;
 import javax.crypto.BadPaddingException;
@@ -29,6 +32,7 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.ShortBufferException;
 import org.apache.commons.crypto.cipher.CryptoCipher;
+import org.apache.commons.crypto.cipher.CryptoCipherFactory;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -48,12 +52,25 @@ public abstract class AbstractSeekableCipherTest {
 
     abstract String getAlgorithm();
 
+    private void initCipherUsingSeekableCipher(int mode, CryptoCipher cipher) throws InvalidKeyException,
+            InvalidAlgorithmParameterException {
+        cipher.init(mode,
+                seekableCipher.getKeyMaterial().getSecretKey(),
+                seekableCipher.getCurrIv());
+    }
+
     @Before
-    public final void before() {
+    public final void before() throws GeneralSecurityException {
         keyMaterial = generateKeyMaterial();
         seekableCipher = getCipher(keyMaterial);
-        encryptCipher = seekableCipher.initCipher(Cipher.ENCRYPT_MODE);
-        decryptCipher = seekableCipher.initCipher(Cipher.DECRYPT_MODE);
+
+        seekableCipher.setOpMode(Cipher.ENCRYPT_MODE);
+        encryptCipher = CryptoCipherFactory.getCryptoCipher(getAlgorithm());
+        initCipherUsingSeekableCipher(Cipher.ENCRYPT_MODE, encryptCipher);
+
+        seekableCipher.setOpMode(Cipher.DECRYPT_MODE);
+        decryptCipher = CryptoCipherFactory.getCryptoCipher(getAlgorithm());
+        initCipherUsingSeekableCipher(Cipher.DECRYPT_MODE, decryptCipher);
     }
 
     @Test
@@ -63,20 +80,19 @@ public abstract class AbstractSeekableCipherTest {
     }
 
     @Test
-    public final void testEncryptDecrypt_seekMaxValue() throws BadPaddingException, IllegalBlockSizeException,
-            ShortBufferException {
+    public final void testEncryptDecrypt_seekMaxValue() throws GeneralSecurityException {
         long offset = Long.MAX_VALUE / seekableCipher.getBlockSize() * seekableCipher.getBlockSize();
 
-        seekableCipher.initCipher(Cipher.ENCRYPT_MODE);
-        encryptCipher = seekableCipher.seek(offset);
-        seekableCipher.initCipher(Cipher.DECRYPT_MODE);
-        decryptCipher = seekableCipher.seek(offset);
+        seekableCipher.setOpMode(Cipher.ENCRYPT_MODE);
+        seekableCipher.updateIvForNewPosition(offset);
+        initCipherUsingSeekableCipher(Cipher.ENCRYPT_MODE, encryptCipher);
+        initCipherUsingSeekableCipher(Cipher.DECRYPT_MODE, decryptCipher);
 
         testEncryptDecrypt(encryptCipher, decryptCipher);
     }
 
     @Test
-    public final void testSeek() throws BadPaddingException, IllegalBlockSizeException, ShortBufferException {
+    public final void testSeek() throws GeneralSecurityException {
         int blockSize = seekableCipher.getBlockSize();
         byte[] data = new byte[blockSize * NUM_BLOCKS];
         byte val = 0x01;
@@ -92,8 +108,9 @@ public abstract class AbstractSeekableCipherTest {
         byte[] encryptedData = new byte[blockSize * (NUM_BLOCKS + 1)];
         encryptCipher.doFinal(data, 0, data.length, encryptedData, 0);
 
-        seekableCipher.initCipher(Cipher.DECRYPT_MODE);
-        decryptCipher = seekableCipher.seek(prevBlockOffset);
+        seekableCipher.setOpMode(Cipher.DECRYPT_MODE);
+        seekableCipher.updateIvForNewPosition(prevBlockOffset);
+        initCipherUsingSeekableCipher(Cipher.DECRYPT_MODE, decryptCipher);
 
         // Decrypt from block n - 1 to the end of the encrypted data
         byte[] lastBlocksData = new byte[blockSize * 3];
@@ -111,7 +128,7 @@ public abstract class AbstractSeekableCipherTest {
     public final void testSeek_seekNegativeValue() {
         long negPos = -1;
         try {
-            seekableCipher.seek(negPos);
+            seekableCipher.updateIvForNewPosition(negPos);
             fail();
         } catch (IllegalArgumentException e) {
             assertThat(e.getMessage(), is(String.format("Cannot seek to negative position: %d", negPos)));
@@ -121,7 +138,7 @@ public abstract class AbstractSeekableCipherTest {
     @Test
     public final void testSeek_notInitialized() {
         try {
-            getCipher(keyMaterial).seek(0);
+            getCipher(keyMaterial).updateIvForNewPosition(0);
             fail();
         } catch (IllegalStateException e) {
             assertThat(e.getMessage(), is("Cipher not initialized"));

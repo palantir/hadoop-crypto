@@ -20,12 +20,9 @@ import com.google.common.base.Preconditions;
 import com.palantir.crypto2.keys.KeyMaterial;
 import com.palantir.crypto2.keys.serialization.KeyMaterials;
 import java.math.BigInteger;
-import java.security.GeneralSecurityException;
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
-import org.apache.commons.crypto.cipher.CryptoCipher;
-import org.apache.commons.crypto.cipher.CryptoCipherFactory;
 
 /**
  * An extention of the 'AES/CTR/NoPadding' {@link Cipher} implementation which allows seeking of the cipher in constant
@@ -38,7 +35,6 @@ public final class AesCtrCipher implements SeekableCipher {
     static final int KEY_SIZE = 256;
     static final int BLOCK_SIZE = 16;
     static final int IV_SIZE = 16;
-    private static byte[] unusedSeekOutput = new byte[BLOCK_SIZE];
 
     private final KeyMaterial keyMaterial;
     private final SecretKey key;
@@ -54,19 +50,12 @@ public final class AesCtrCipher implements SeekableCipher {
     }
 
     @Override
-    public CryptoCipher initCipher(int opmode) {
+    public void setOpMode(int opmode) {
         this.currentOpmode = opmode;
-        try {
-            CryptoCipher cipher = CryptoCipherFactory.getCryptoCipher(ALGORITHM);
-            cipher.init(opmode, key, new IvParameterSpec(initIv));
-            return cipher;
-        } catch (GeneralSecurityException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     @Override
-    public CryptoCipher seek(long pos) {
+    public void updateIvForNewPosition(long pos) {
         Preconditions.checkState(currentOpmode == Cipher.DECRYPT_MODE || currentOpmode == Cipher.ENCRYPT_MODE,
                 "Cipher not initialized");
         Preconditions.checkArgument(pos >= 0, "Cannot seek to negative position: %s", pos);
@@ -86,24 +75,7 @@ public final class AesCtrCipher implements SeekableCipher {
             System.arraycopy(ivBytes, 0, tmpIv, IV_SIZE - ivBytes.length, ivBytes.length);
             currIvParameterSpec = new IvParameterSpec(tmpIv);
         }
-
-        // Init the cipher with the new iv
-        try {
-            CryptoCipher cipher = CryptoCipherFactory.getCryptoCipher(ALGORITHM);
-            cipher.init(currentOpmode, key, currIvParameterSpec);
-
-            // Skip to the byte offset in the block where 'pos' is located.
-            // Since we've initialized a new CryptoCipher, we only need to seek from the beginning of the block
-            // containing the target position to the target position itself. Therefore unusedSeekOutput is BLOCK_SIZE
-            // bytes in length, and the length of skip is the number of bytes from the beginning of the block to pos.
-            int bytesToSkip = (int) (pos % BLOCK_SIZE);
-            byte[] skip = new byte[bytesToSkip];
-            cipher.update(skip, 0 /* inputOffset */, bytesToSkip, unusedSeekOutput,
-                    0 /* outputOffset */);
-            return cipher;
-        } catch (GeneralSecurityException e) {
-            throw new RuntimeException(e);
-        }
+        return;
     }
 
     @Override

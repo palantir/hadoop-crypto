@@ -38,12 +38,12 @@ public class FsCipherOutputStream extends FilterOutputStream {
     @VisibleForTesting
     FsCipherOutputStream(FSDataOutputStream delegate, SeekableCipher seekableCipher,
             CipherStreamSupplier supplier) {
-        super(initCipherAndGetOutputStream(delegate, seekableCipher, supplier));
+        super(setOpModeAndGetOutputStream(delegate, seekableCipher, supplier));
     }
 
-    private static CryptoOutputStream initCipherAndGetOutputStream(FSDataOutputStream delegate,
+    private static CryptoOutputStream setOpModeAndGetOutputStream(FSDataOutputStream delegate,
             SeekableCipher seekableCipher, CipherStreamSupplier supplier) {
-        seekableCipher.initCipher(Cipher.ENCRYPT_MODE);
+        seekableCipher.setOpMode(Cipher.ENCRYPT_MODE);
         return supplier.getOutputStream(delegate, seekableCipher);
     }
 

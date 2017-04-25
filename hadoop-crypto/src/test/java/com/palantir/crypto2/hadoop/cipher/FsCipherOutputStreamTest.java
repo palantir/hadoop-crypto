@@ -16,7 +16,6 @@
 
 package com.palantir.crypto2.hadoop.cipher;
 
-import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -31,7 +30,6 @@ import java.security.NoSuchAlgorithmException;
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.ShortBufferException;
-import org.apache.commons.crypto.cipher.CryptoCipher;
 import org.apache.commons.crypto.stream.CryptoOutputStream;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.junit.Before;
@@ -42,7 +40,6 @@ public final class FsCipherOutputStreamTest {
     private static final byte[] bytes = "bytes".getBytes(StandardCharsets.UTF_8);
 
     private FSDataOutputStream os;
-    private CryptoCipher initCipher;
     private SeekableCipher seekableCipher;
     private CipherStreamSupplier supplier;
     private CryptoOutputStream cos;
@@ -52,13 +49,11 @@ public final class FsCipherOutputStreamTest {
     public void before()
             throws ShortBufferException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException,
             InvalidAlgorithmParameterException {
-        initCipher = mock(CryptoCipher.class);
         os = mock(FSDataOutputStream.class);
         cos = mock(CryptoOutputStream.class);
         seekableCipher = mock(SeekableCipher.class);
         supplier = mock(CipherStreamSupplier.class);
 
-        when(seekableCipher.initCipher(anyInt())).thenReturn(initCipher);
         when(supplier.getOutputStream(os, seekableCipher)).thenReturn(cos);
 
         scos = new FsCipherOutputStream(os, seekableCipher, supplier);
@@ -66,7 +61,7 @@ public final class FsCipherOutputStreamTest {
 
     @Test
     public void testInit() throws IOException {
-        verify(seekableCipher).initCipher(Cipher.ENCRYPT_MODE);
+        verify(seekableCipher).setOpMode(Cipher.ENCRYPT_MODE);
         verify(supplier).getOutputStream(os, seekableCipher);
     }
 

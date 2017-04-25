@@ -21,15 +21,16 @@ import static org.junit.Assert.assertThat;
 
 import com.google.common.collect.Maps;
 import com.palantir.crypto2.keys.KeyMaterial;
+import java.security.GeneralSecurityException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
 import java.util.Arrays;
 import java.util.Map;
-import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.ShortBufferException;
 import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.DatatypeConverter;
 import org.apache.commons.crypto.cipher.CryptoCipher;
+import org.apache.commons.crypto.cipher.CryptoCipherFactory;
 import org.junit.Test;
 
 public final class AesCtrCipherTest extends AbstractSeekableCipherTest {
@@ -45,6 +46,11 @@ public final class AesCtrCipherTest extends AbstractSeekableCipherTest {
         nistSamplePlainToCipherText.put("ae2d8a571e03ac9c9eb76fac45af8e51", "9806f66b7970fdff8617187bb9fffdff");
         nistSamplePlainToCipherText.put("30c81c46a35ce411e5fbc1191a0a52ef", "5ae4df3edbd5d35e5b4f09020db03eab");
         nistSamplePlainToCipherText.put("f69f2445df4f9b17ad2b417be66c3710", "1e031dda2fbe03d1792170a0f3009cee");
+    }
+
+    private void initCipherUsingSeekableCipher(int mode, CryptoCipher cipher, SeekableCipher seekableCipher)
+            throws InvalidKeyException, InvalidAlgorithmParameterException {
+        cipher.init(mode, seekableCipher.getKeyMaterial().getSecretKey(), seekableCipher.getCurrIv());
     }
 
     @Override
@@ -63,7 +69,7 @@ public final class AesCtrCipherTest extends AbstractSeekableCipherTest {
     }
 
     @Test
-    public void testNistEncrypt() throws ShortBufferException {
+    public void testNistEncrypt() throws GeneralSecurityException {
         int idx = 0;
         for (Map.Entry<String, String> entry : nistSamplePlainToCipherText.entrySet()) {
             testNistExample(Cipher.ENCRYPT_MODE, idx, entry.getKey(), entry.getValue());
@@ -72,7 +78,7 @@ public final class AesCtrCipherTest extends AbstractSeekableCipherTest {
     }
 
     @Test
-    public void testNistDecrypt() throws ShortBufferException {
+    public void testNistDecrypt() throws GeneralSecurityException {
         int idx = 0;
         for (Map.Entry<String, String> entry : nistSamplePlainToCipherText.entrySet()) {
             testNistExample(Cipher.DECRYPT_MODE, idx, entry.getValue(), entry.getKey());
@@ -80,7 +86,8 @@ public final class AesCtrCipherTest extends AbstractSeekableCipherTest {
         }
     }
 
-    public void testNistExample(int opmode, int blockNumber, String input, String output) throws ShortBufferException {
+    public void testNistExample(int opmode, int blockNumber, String input, String output) throws
+            GeneralSecurityException {
         byte[] key = DatatypeConverter.parseHexBinary(KEY);
         byte[] iv = DatatypeConverter.parseHexBinary(IV);
         byte[] inputBytes = DatatypeConverter.parseHexBinary(input);
@@ -88,8 +95,10 @@ public final class AesCtrCipherTest extends AbstractSeekableCipherTest {
 
         KeyMaterial keyMaterial = KeyMaterial.of(new SecretKeySpec(key, AesCtrCipher.KEY_ALGORITHM), iv);
         SeekableCipher seekableCipher = getCipher(keyMaterial);
-        seekableCipher.initCipher(opmode);
-        CryptoCipher cipher = seekableCipher.seek(blockNumber * (long) AesCtrCipher.BLOCK_SIZE);
+        seekableCipher.setOpMode(opmode);
+        seekableCipher.updateIvForNewPosition(blockNumber * (long) AesCtrCipher.BLOCK_SIZE);
+        CryptoCipher cipher = CryptoCipherFactory.getCryptoCipher(getAlgorithm());
+        initCipherUsingSeekableCipher(opmode, cipher, seekableCipher);
 
         byte[] finalBytes = new byte[outputBytes.length];
         cipher.update(inputBytes, 0, inputBytes.length, finalBytes, 0);
@@ -97,8 +106,7 @@ public final class AesCtrCipherTest extends AbstractSeekableCipherTest {
     }
 
     @Test
-    public void testEncryptDecrypt_ivIncrementedAsUnsignedInt() throws BadPaddingException, IllegalBlockSizeException,
-            ShortBufferException {
+    public void testEncryptDecrypt_ivIncrementedAsUnsignedInt() throws GeneralSecurityException {
 
         KeyMaterial keyMaterial = generateKeyMaterial();
         byte[] iv = keyMaterial.getIv();
@@ -107,10 +115,15 @@ public final class AesCtrCipherTest extends AbstractSeekableCipherTest {
 
         SeekableCipher seekableCipher = getCipher(maxIvKeyMaterial);
         // Encrypt without seeking so iv is not modified in seek method
-        CryptoCipher encryptCipher = seekableCipher.initCipher(Cipher.ENCRYPT_MODE);
-        seekableCipher.initCipher(Cipher.DECRYPT_MODE);
+        seekableCipher.setOpMode(Cipher.ENCRYPT_MODE);
+        CryptoCipher encryptCipher = CryptoCipherFactory.getCryptoCipher(getAlgorithm());
+        initCipherUsingSeekableCipher(Cipher.ENCRYPT_MODE, encryptCipher, seekableCipher);
+
         // Seek and decrypt so iv is modified by seek method
-        CryptoCipher decryptCipher = seekableCipher.seek(0);
+        seekableCipher.setOpMode(Cipher.DECRYPT_MODE);
+        seekableCipher.updateIvForNewPosition(0);
+        CryptoCipher decryptCipher = CryptoCipherFactory.getCryptoCipher(getAlgorithm());
+        initCipherUsingSeekableCipher(Cipher.DECRYPT_MODE, decryptCipher, seekableCipher);
 
         testEncryptDecrypt(encryptCipher, decryptCipher);
     }
@@ -126,8 +139,8 @@ public final class AesCtrCipherTest extends AbstractSeekableCipherTest {
         KeyMaterial keyMaterial = KeyMaterial.of(baseKeyMaterial.getSecretKey(), iv);
 
         SeekableCipher cipher = getCipher(keyMaterial);
-        cipher.initCipher(Cipher.ENCRYPT_MODE);
-        cipher.seek(100);
+        cipher.setOpMode(Cipher.ENCRYPT_MODE);
+        cipher.updateIvForNewPosition(100);
     }
 
     @Test
@@ -140,8 +153,8 @@ public final class AesCtrCipherTest extends AbstractSeekableCipherTest {
         KeyMaterial keyMaterial = KeyMaterial.of(baseKeyMaterial.getSecretKey(), iv);
 
         SeekableCipher cipher = getCipher(keyMaterial);
-        cipher.initCipher(Cipher.ENCRYPT_MODE);
-        cipher.seek(100);
+        cipher.setOpMode(Cipher.ENCRYPT_MODE);
+        cipher.updateIvForNewPosition(100);
     }
 
 }
