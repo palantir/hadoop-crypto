@@ -51,7 +51,7 @@ public final class KeyMaterials {
         try {
             return CryptoRandomFactory.getCryptoRandom();
         } catch (GeneralSecurityException e) {
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
 

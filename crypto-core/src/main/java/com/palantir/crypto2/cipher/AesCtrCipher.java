@@ -17,7 +17,6 @@
 package com.palantir.crypto2.cipher;
 
 import com.google.common.base.Preconditions;
-import com.google.common.base.Throwables;
 import com.palantir.crypto2.keys.KeyMaterial;
 import com.palantir.crypto2.keys.serialization.KeyMaterials;
 import java.math.BigInteger;
@@ -62,7 +61,7 @@ public final class AesCtrCipher implements SeekableCipher {
             cipher.init(opmode, key, new IvParameterSpec(initIv));
             return cipher;
         } catch (GeneralSecurityException e) {
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -99,7 +98,7 @@ public final class AesCtrCipher implements SeekableCipher {
             cipher.update(skip, 0 /* inputOffset */, bytesToSkip, out, 0 /* outputOffset */);
             return cipher;
         } catch (GeneralSecurityException e) {
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
 

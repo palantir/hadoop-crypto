@@ -16,7 +16,6 @@
 
 package com.palantir.crypto2.cipher;
 
-import com.google.common.base.Throwables;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -35,7 +34,7 @@ public final class CipherStreamSupplierImpl implements CipherStreamSupplier {
                     seekableCipher.getKeyMaterial().getSecretKey(),
                     seekableCipher.getCurrIv());
         } catch (IOException e) {
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -48,7 +47,7 @@ public final class CipherStreamSupplierImpl implements CipherStreamSupplier {
                     seekableCipher.getKeyMaterial().getSecretKey(),
                     seekableCipher.getCurrIv());
         } catch (IOException e) {
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
 

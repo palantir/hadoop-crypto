@@ -17,7 +17,6 @@
 package com.palantir.crypto2.cipher;
 
 import com.google.common.base.Preconditions;
-import com.google.common.base.Throwables;
 import com.palantir.crypto2.keys.KeyMaterial;
 import com.palantir.crypto2.keys.serialization.KeyMaterials;
 import java.security.GeneralSecurityException;
@@ -60,7 +59,7 @@ public final class AesCbcCipher implements SeekableCipher {
             cipher.init(opmode, key, new IvParameterSpec(initIv));
             return cipher;
         } catch (GeneralSecurityException e) {
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
 

@@ -57,7 +57,7 @@ public final class CipherStreamSupplierImplTest {
         rng.nextBytes(iv);
         KeyGenerator keyGen = KeyGenerator.getInstance("AES");
         keyGen.init(256);
-        this.key = keyGen.generateKey();
+        key = keyGen.generateKey();
 
         when(seekableCipher.getAlgorithm()).thenReturn(algorithm);
         when(seekableCipher.getKeyMaterial()).thenReturn(KeyMaterial.of(key, iv));
