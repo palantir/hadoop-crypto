@@ -52,6 +52,17 @@ decryptedStream.read(readBytes, 0, bytes.length);
 assertThat(readBytes, is(bytes));
 ```
 
+Native Libraries
+----------------
+Seekable Crypto uses the Apache
+[commons-crypto](http://commons.apache.org/proper/commons-crypto/) library, which uses
+[Openssl](https://www.openssl.org/) native cryptography libraries if they are available.
+If these libraries are not available, then the Java Cryptography Extension is used instead.
+
+To use the Openssl native libraries, include them in the `LD_LIBARY_PATH` variable of
+your application's environment. Java applications can also use the `java.library.path`
+Java property.
+
 Hadoop Crypto
 =============
 *Hadoop Crypto* is a library for per-file client-side encryption in Hadoop

@@ -16,22 +16,39 @@
 
 package com.palantir.crypto2.cipher;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import javax.crypto.Cipher;
-import javax.crypto.CipherInputStream;
-import javax.crypto.CipherOutputStream;
+import java.util.Properties;
+import org.apache.commons.crypto.stream.CryptoInputStream;
+import org.apache.commons.crypto.stream.CryptoOutputStream;
 
 public final class CipherStreamSupplierImpl implements CipherStreamSupplier {
 
     @Override
-    public  CipherInputStream getInputStream(InputStream is, Cipher cipher) {
-        return new CipherInputStream(is, cipher);
+    public CryptoInputStream getInputStream(InputStream is, SeekableCipher seekableCipher) {
+        try {
+            return new CryptoInputStream(seekableCipher.getAlgorithm(),
+                    new Properties(),
+                    is,
+                    seekableCipher.getKeyMaterial().getSecretKey(),
+                    seekableCipher.getCurrIv());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
-    public CipherOutputStream getOutputStream(OutputStream os, Cipher cipher) {
-        return new CipherOutputStream(os, cipher);
+    public CryptoOutputStream getOutputStream(OutputStream os, SeekableCipher seekableCipher) {
+        try {
+            return new CryptoOutputStream(seekableCipher.getAlgorithm(),
+                    new Properties(),
+                    os,
+                    seekableCipher.getKeyMaterial().getSecretKey(),
+                    seekableCipher.getCurrIv());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

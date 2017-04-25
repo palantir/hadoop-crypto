@@ -18,9 +18,11 @@ package com.palantir.crypto2.cipher;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import javax.crypto.Cipher;
-import javax.crypto.CipherInputStream;
-import javax.crypto.CipherOutputStream;
+import java.security.Key;
+import java.security.spec.AlgorithmParameterSpec;
+import org.apache.commons.crypto.cipher.CryptoCipher;
+import org.apache.commons.crypto.stream.CryptoInputStream;
+import org.apache.commons.crypto.stream.CryptoOutputStream;
 
 /**
  * Wraps streams in cryptographic streams for encryption and decryption.
@@ -28,14 +30,21 @@ import javax.crypto.CipherOutputStream;
 public interface CipherStreamSupplier {
 
     /**
-     * Wraps the {@link InputStream} in a {@link CipherInputStream} which uses the given {@link Cipher} for decryption.
+     * Wraps the {@link InputStream} in a {@link CryptoInputStream}. The CryptoInputStream is decrypted via a
+     * {@link CryptoCipher} which uses the given transformation, e.g., <i>AES/CBC/PKCS5Padding</i>, along with the
+     * given {@link Key} and {@link AlgorithmParameterSpec}.
+     *
+     * Callers should initialize the given {@link SeekableCipher} before calling this method.
      */
-    CipherInputStream getInputStream(InputStream is, Cipher cipher);
+    CryptoInputStream getInputStream(InputStream is, SeekableCipher cipher);
 
     /**
-     * Wraps the {@link OutputStream} in a {@link CipherOutputStream} which uses the given {@link Cipher} for
-     * encryption.
+     * Wraps the {@link OutputStream} in a {@link CryptoOutputStream}. The CryptoOutputStream is encrypted via a
+     * {@link CryptoCipher} which uses the given {transformation, e.g., <i>AES/CBC/PKCS5Padding</i>, along with the
+     * given {@link Key} and {@link AlgorithmParameterSpec}.
+     *
+     * Callers should initialize the given {@link SeekableCipher} before calling this method.
      */
-    CipherOutputStream getOutputStream(OutputStream os, Cipher cipher);
+    CryptoOutputStream getOutputStream(OutputStream os, SeekableCipher cipher);
 
 }

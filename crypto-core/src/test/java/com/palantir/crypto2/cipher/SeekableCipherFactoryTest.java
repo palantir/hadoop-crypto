@@ -20,8 +20,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import com.palantir.crypto2.keys.KeyMaterial;
+import java.security.SecureRandom;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -44,6 +46,10 @@ public final class SeekableCipherFactoryTest {
     @Test
     public void testGetAesCtr_keyMaterial() {
         KeyMaterial keyMaterial = mock(KeyMaterial.class);
+        byte[] iv = new byte[16];
+        SecureRandom rng = new SecureRandom();
+        rng.nextBytes(iv);
+        when(keyMaterial.getIv()).thenReturn(iv);
         SeekableCipher cipher = SeekableCipherFactory.getCipher(AES_CTR, keyMaterial);
         assertTrue(cipher instanceof AesCtrCipher);
         assertEquals(cipher.getKeyMaterial(), keyMaterial);
@@ -59,6 +65,10 @@ public final class SeekableCipherFactoryTest {
     @Test
     public void testGetAesCbc_keyMaterial() {
         KeyMaterial keyMaterial = mock(KeyMaterial.class);
+        byte[] iv = new byte[16];
+        SecureRandom rng = new SecureRandom();
+        rng.nextBytes(iv);
+        when(keyMaterial.getIv()).thenReturn(iv);
         SeekableCipher cipher = SeekableCipherFactory.getCipher(AES_CBC, keyMaterial);
         assertTrue(cipher instanceof AesCbcCipher);
         assertEquals(cipher.getKeyMaterial(), keyMaterial);

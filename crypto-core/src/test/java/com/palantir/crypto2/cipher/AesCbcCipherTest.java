@@ -30,4 +30,9 @@ public final class AesCbcCipherTest extends AbstractSeekableCipherTest {
         return new AesCbcCipher(initKeyMaterial);
     }
 
+    @Override
+    String getAlgorithm() {
+        return AesCbcCipher.ALGORITHM;
+    }
+
 }

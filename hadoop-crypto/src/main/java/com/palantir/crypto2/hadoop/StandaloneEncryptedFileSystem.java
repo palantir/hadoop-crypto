@@ -28,11 +28,14 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.function.Function;
 import javax.ws.rs.core.UriBuilder;
+import org.apache.commons.crypto.Crypto;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FilterFileSystem;
 import org.apache.hadoop.fs.Path;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A {@link FileSystem} that transparently encrypts and decrypts the streams of an underlying FileSystem and stores
@@ -52,6 +55,7 @@ public final class StandaloneEncryptedFileSystem extends FilterFileSystem {
      */
     private static final String SCHEME = "";
     private static final String DEFAULT_ALGORITHM = "RSA";
+    private static final Logger log = LoggerFactory.getLogger(StandaloneEncryptedFileSystem.class);
     private static final Predicate<FileStatus> NOT_KEY_MATERIAL = new Predicate<FileStatus>() {
         @Override
         public boolean apply(FileStatus status) {
@@ -85,6 +89,13 @@ public final class StandaloneEncryptedFileSystem extends FilterFileSystem {
 
         KeyPair keyPair = getKeyPair(conf);
         KeyStorageStrategy keyStore = new FileKeyStorageStrategy(delegate, keyPair);
+
+        if (Crypto.isNativeCodeLoaded()) {
+            log.info("Successfully loaded Openssl native crypto libraries.");
+        } else {
+            log.warn("Openssl native crypto libraries were not found; falling back to Java libraries."
+                    + " Please consider adding Openssl libraries for improved performance.");
+        }
 
         this.fs = new EncryptedFileSystem(delegate, keyStore);
     }

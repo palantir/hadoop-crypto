@@ -17,26 +17,19 @@
 package com.palantir.crypto2.cipher;
 
 import com.google.common.base.Preconditions;
-import com.google.common.base.Throwables;
 import com.palantir.crypto2.keys.KeyMaterial;
 import com.palantir.crypto2.keys.serialization.KeyMaterials;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import javax.crypto.Cipher;
-import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
+import org.apache.commons.crypto.cipher.CryptoCipher;
 
 /**
- * An extention of the 'AES/CBC/PKCS5Padding' {@link Cipher} implementation which allows seeking of the cipher in
+ * An extention of the 'AES/CBC/PKCS5Padding' {@link CryptoCipher} implementation which allows seeking of the cipher in
  * constant time. This is the same Cipher used by the original implementation of the hadoop-s3e-adapter.
  */
 public final class AesCbcCipher implements SeekableCipher {
 
     public static final String ALGORITHM = "AES/CBC/PKCS5Padding";
-    private static final String PROVIDER = "SunJCE";
     private static final String KEY_ALGORITHM = "AES";
     private static final int KEY_SIZE = 256;
     private static final int BLOCK_SIZE = 16;
@@ -45,39 +38,24 @@ public final class AesCbcCipher implements SeekableCipher {
     private final KeyMaterial keyMaterial;
     private final SecretKey key;
     private final byte[] initIv;
-    private int currentOpmode;
+    private IvParameterSpec currIvParameterSpec;
 
     public AesCbcCipher(KeyMaterial keyMaterial) {
         this.initIv = keyMaterial.getIv();
+        this.currIvParameterSpec = new IvParameterSpec(initIv);
         this.key = keyMaterial.getSecretKey();
         this.keyMaterial = keyMaterial;
     }
 
-    @Override
-    public Cipher initCipher(int opmode) {
-        this.currentOpmode = opmode;
-        try {
-            Cipher cipher = getInstance();
-            cipher.init(opmode, key, new IvParameterSpec(initIv));
-            return cipher;
-        } catch (InvalidKeyException | InvalidAlgorithmParameterException e) {
-            throw Throwables.propagate(e);
-        }
-    }
-
     /**
-     * Seeking the AES/CBC {@link Cipher} requires initializing its IV with the previous block of encrypted data and
-     * therefore cannot be done by the Cipher alone, which is why seeking returns a Cipher initialized the same way
-     * regardless of position.
+     * Seeking the AES/CBC {@link CryptoCipher} requires initializing its IV with the previous block of encrypted data,
+     * and therefore cannot be done by the cipher alone. Therefore we do not update currIvParameterSpec here.
      */
     @Override
-    public Cipher seek(long pos) {
-        Preconditions.checkState(currentOpmode == Cipher.DECRYPT_MODE || currentOpmode == Cipher.ENCRYPT_MODE,
-                "Cipher not initialized");
+    public void updateIvForNewPosition(long pos) {
         Preconditions.checkArgument(pos >= 0, "Cannot seek to negative position: %s", pos);
         Preconditions.checkArgument(pos % BLOCK_SIZE == 0,
                 "Can only seek AES/CBC cipher to block offset positions every %s bytes", BLOCK_SIZE);
-        return initCipher(currentOpmode);
     }
 
     @Override
@@ -90,16 +68,18 @@ public final class AesCbcCipher implements SeekableCipher {
         return BLOCK_SIZE;
     }
 
-    public static KeyMaterial generateKeyMaterial() {
-        return KeyMaterials.generateKeyMaterial(KEY_ALGORITHM, KEY_SIZE, IV_SIZE);
+    @Override
+    public String getAlgorithm() {
+        return ALGORITHM;
     }
 
-    private Cipher getInstance() {
-        try {
-            return Cipher.getInstance(ALGORITHM, PROVIDER);
-        } catch (NoSuchAlgorithmException | NoSuchProviderException | NoSuchPaddingException e) {
-            throw Throwables.propagate(e);
-        }
+    @Override
+    public IvParameterSpec getCurrIv() {
+        return currIvParameterSpec;
+    }
+
+    public static KeyMaterial generateKeyMaterial() {
+        return KeyMaterials.generateKeyMaterial(KEY_ALGORITHM, KEY_SIZE, IV_SIZE);
     }
 
 }

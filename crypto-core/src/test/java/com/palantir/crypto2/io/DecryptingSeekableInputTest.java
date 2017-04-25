@@ -32,9 +32,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Properties;
 import java.util.Random;
-import javax.crypto.Cipher;
-import javax.crypto.CipherOutputStream;
+import javax.crypto.spec.IvParameterSpec;
+import org.apache.commons.crypto.stream.CryptoOutputStream;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -66,11 +67,15 @@ public final class DecryptingSeekableInputTest {
         return ImmutableList.of(AesCtrCipher.ALGORITHM, AesCbcCipher.ALGORITHM);
     }
 
-    public DecryptingSeekableInputTest(String cipher) {
+    public DecryptingSeekableInputTest(String algorithm) {
         try {
-            seekableCipher = SeekableCipherFactory.getCipher(cipher);
+            seekableCipher = SeekableCipherFactory.getCipher(algorithm);
             ByteArrayOutputStream os = new ByteArrayOutputStream();
-            CipherOutputStream cos = new CipherOutputStream(os, seekableCipher.initCipher(Cipher.ENCRYPT_MODE));
+            CryptoOutputStream cos = new CryptoOutputStream(algorithm,
+                    new Properties(),
+                    os,
+                    seekableCipher.getKeyMaterial().getSecretKey(),
+                    new IvParameterSpec(seekableCipher.getKeyMaterial().getIv()));
             cos.write(data);
             cos.close();
             cis = new DecryptingSeekableInput(new InMemorySeekableDataInput(os.toByteArray()), seekableCipher);
@@ -142,15 +147,15 @@ public final class DecryptingSeekableInputTest {
     public void testBulkRead() throws IOException {
         long startPos = cis.getPos();
         byte[] buffer = new byte[NUM_BYTES];
-        int offset = 0;
-        int read;
-        while ((read = cis.read(buffer, offset, buffer.length)) != -1) {
-            offset += read;
+        int read = 0;
+        int len = buffer.length;
+        while (read < len) {
+            read += cis.read(buffer, read, len - read);
         }
 
         assertThat(cis.getPos(), is(startPos + buffer.length));
         assertThat(buffer, is(data));
-        assertThat(offset, is(NUM_BYTES));
+        assertThat(read, is(NUM_BYTES));
         cis.close();
     }
 

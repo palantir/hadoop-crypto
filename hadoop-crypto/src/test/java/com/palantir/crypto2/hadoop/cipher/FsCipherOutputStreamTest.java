@@ -16,7 +16,6 @@
 
 package com.palantir.crypto2.hadoop.cipher;
 
-import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -28,10 +27,9 @@ import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import javax.crypto.Cipher;
-import javax.crypto.CipherOutputStream;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.ShortBufferException;
+import org.apache.commons.crypto.stream.CryptoOutputStream;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,32 +39,28 @@ public final class FsCipherOutputStreamTest {
     private static final byte[] bytes = "bytes".getBytes(StandardCharsets.UTF_8);
 
     private FSDataOutputStream os;
-    private Cipher initCipher;
     private SeekableCipher seekableCipher;
     private CipherStreamSupplier supplier;
-    private CipherOutputStream cos;
+    private CryptoOutputStream cos;
     private FsCipherOutputStream scos;
 
     @Before
     public void before()
             throws ShortBufferException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException,
             InvalidAlgorithmParameterException {
-        initCipher = mock(Cipher.class);
         os = mock(FSDataOutputStream.class);
-        cos = mock(CipherOutputStream.class);
+        cos = mock(CryptoOutputStream.class);
         seekableCipher = mock(SeekableCipher.class);
         supplier = mock(CipherStreamSupplier.class);
 
-        when(seekableCipher.initCipher(anyInt())).thenReturn(initCipher);
-        when(supplier.getOutputStream(os, initCipher)).thenReturn(cos);
+        when(supplier.getOutputStream(os, seekableCipher)).thenReturn(cos);
 
         scos = new FsCipherOutputStream(os, seekableCipher, supplier);
     }
 
     @Test
     public void testInit() throws IOException {
-        verify(seekableCipher).initCipher(Cipher.ENCRYPT_MODE);
-        verify(supplier).getOutputStream(os, initCipher);
+        verify(supplier).getOutputStream(os, seekableCipher);
     }
 
     @Test
