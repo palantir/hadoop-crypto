@@ -33,6 +33,8 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Random;
+import java.util.function.BiFunction;
+import javafx.util.Pair;
 import javax.crypto.Cipher;
 import javax.crypto.CipherOutputStream;
 import org.junit.BeforeClass;
@@ -49,8 +51,8 @@ public final class DecryptingSeekableInputTest {
     private static final Random random = new Random(0);
     private static byte[] data;
 
-    private SeekableCipher seekableCipher;
-    private DecryptingSeekableInput cis;
+    private int blockSize;
+    private SeekableInput cis;
 
     @Rule
     public TemporaryFolder tempFolder = new TemporaryFolder();
@@ -62,18 +64,37 @@ public final class DecryptingSeekableInputTest {
     }
 
     @Parameterized.Parameters
-    public static Collection<String> ciphers() {
-        return ImmutableList.of(AesCtrCipher.ALGORITHM, AesCbcCipher.ALGORITHM);
+    public static Collection<Pair<String, BiFunction<SeekableCipher, SeekableInput, SeekableInput>>> ciphers() {
+        return ImmutableList.of(
+                new Pair<>(AesCtrCipher.ALGORITHM, DecryptingSeekableInputTest::apacheStream),
+                new Pair<>(AesCtrCipher.ALGORITHM, DecryptingSeekableInputTest::jceStream),
+                new Pair<>(AesCbcCipher.ALGORITHM, DecryptingSeekableInputTest::jceStream));
     }
 
-    public DecryptingSeekableInputTest(String cipher) {
+    private static SeekableInput apacheStream(SeekableCipher cipher, SeekableInput input) {
+        if (cipher instanceof AesCtrCipher) {
+            return new ApacheCtrDecryptingSeekableInput(input, cipher.getKeyMaterial());
+        } else {
+            throw new IllegalArgumentException("Unsupported cipher type");
+        }
+    }
+
+    private static SeekableInput jceStream(SeekableCipher cipher, SeekableInput input) {
+        return new DecryptingSeekableInput(input, cipher);
+    }
+
+    public DecryptingSeekableInputTest(
+            Pair<String, BiFunction<SeekableCipher, SeekableInput, SeekableInput>> streamConstructors) {
         try {
-            seekableCipher = SeekableCipherFactory.getCipher(cipher);
+            SeekableCipher seekableCipher = SeekableCipherFactory.getCipher(streamConstructors.getKey());
             ByteArrayOutputStream os = new ByteArrayOutputStream();
             CipherOutputStream cos = new CipherOutputStream(os, seekableCipher.initCipher(Cipher.ENCRYPT_MODE));
             cos.write(data);
             cos.close();
-            cis = new DecryptingSeekableInput(new InMemorySeekableDataInput(os.toByteArray()), seekableCipher);
+
+            InMemorySeekableDataInput input = new InMemorySeekableDataInput(os.toByteArray());
+            cis = streamConstructors.getValue().apply(seekableCipher, input);
+            blockSize = seekableCipher.getBlockSize();
         } catch (IOException e) {
             throw Throwables.propagate(e);
         }
@@ -102,13 +123,13 @@ public final class DecryptingSeekableInputTest {
 
     @Test
     public void testSeek_manyBlocks() throws IOException {
-        int pos = seekableCipher.getBlockSize() * 10;
+        int pos = blockSize * 10;
         testSeek(pos);
     }
 
     @Test
     public void testSeek_manyBlocksAndOffset() throws IOException {
-        int pos = seekableCipher.getBlockSize() * 10 + 1;
+        int pos = blockSize * 10 + 1;
         testSeek(pos);
     }
 
@@ -120,7 +141,7 @@ public final class DecryptingSeekableInputTest {
 
     @Test
     public void testSeek_manyBlocksAndNegativeOffset() throws IOException {
-        int pos = seekableCipher.getBlockSize() * 10 - 1;
+        int pos = blockSize * 10 - 1;
         testSeek(pos);
     }
 
