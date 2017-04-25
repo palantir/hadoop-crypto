@@ -16,75 +16,98 @@
 
 package com.palantir.crypto2.io;
 
-import com.google.common.io.ByteStreams;
-import com.palantir.crypto2.cipher.CounterMode;
 import com.palantir.crypto2.keys.KeyMaterial;
 import com.palantir.seekio.SeekableInput;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.Properties;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.IvParameterSpec;
-import org.apache.commons.crypto.stream.CryptoInputStream;
+import org.apache.commons.crypto.stream.CtrCryptoInputStream;
+import org.apache.commons.crypto.stream.input.Input;
+import org.apache.commons.crypto.utils.Utils;
 
-public final class ApacheCtrDecryptingSeekableInput implements SeekableInput {
+public final class ApacheCtrDecryptingSeekableInput extends CtrCryptoInputStream implements SeekableInput {
 
     private static final String ALGORITHM = "AES/CTR/NoPadding";
+    private static final int BUFFER_SIZE = 8192;
 
-    private SeekableInput input;
-    private SecretKey key;
-    private byte[] iv;
-    private CryptoInputStream decryptingStream;
-    private Properties properties;
-    private long decryptedStreamPos;
+    private ApacheCtrDecryptingSeekableInput(SeekableInput input, KeyMaterial keyMaterial) throws IOException {
+        super(new InputAdapter(input), Utils.getCipherInstance(ALGORITHM, new Properties()), BUFFER_SIZE,
+                keyMaterial.getSecretKey().getEncoded(), keyMaterial.getIv());
+    }
 
-    public ApacheCtrDecryptingSeekableInput(SeekableInput input, KeyMaterial keyMaterial) {
-        this.input = input;
-        this.key = keyMaterial.getSecretKey();
-        this.iv = keyMaterial.getIv();
-        this.properties = new Properties();
-        this.decryptingStream = getCryptoInputStream(input, new IvParameterSpec(iv));
-        this.decryptedStreamPos = 0;
+    public static ApacheCtrDecryptingSeekableInput create(SeekableInput input, KeyMaterial keyMaterial) {
+        try {
+            return new ApacheCtrDecryptingSeekableInput(input, keyMaterial);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public void seek(long offset) throws IOException {
-        long blockOffset = offset / CounterMode.BLOCK_SIZE;
-        IvParameterSpec newIv = CounterMode.computeIv(iv, blockOffset);
-        input.seek(blockOffset);
-
-        decryptingStream = getCryptoInputStream(input, newIv);
-
-        long skip = (int) offset % CounterMode.BLOCK_SIZE;
-        ByteStreams.skipFully(decryptingStream, skip);
-
-        decryptedStreamPos = offset;
+        super.seek(offset);
     }
 
     @Override
     public long getPos() throws IOException {
-        return decryptedStreamPos;
+        return super.getStreamPosition();
     }
 
     @Override
     public int read(byte[] bytes, int offset, int length) throws IOException {
-        int bytesRead = decryptingStream.read(bytes, offset, length);
-        if (bytesRead != -1) {
-            decryptedStreamPos += bytesRead;
-        }
-        return bytesRead;
+        return super.read(bytes, offset, length);
     }
 
     @Override
     public void close() throws IOException {
-        decryptingStream.close();
+        super.close();
     }
 
-    private CryptoInputStream getCryptoInputStream(SeekableInput in, IvParameterSpec ivSpec) {
-        try {
-            DefaultSeekableInputStream is = new DefaultSeekableInputStream(in);
-            return new CryptoInputStream(ALGORITHM, properties, is, key, ivSpec);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+    private static class InputAdapter implements Input {
+
+        private SeekableInput input;
+
+        private InputAdapter(SeekableInput input) {
+            this.input = input;
+        }
+
+        @Override
+        public int read(ByteBuffer dst) throws IOException {
+            byte[] bytes = new byte[dst.capacity() - dst.position()];
+            int read = input.read(bytes, 0, bytes.length);
+
+            if (read != -1) {
+                dst.put(bytes, 0, read);
+            }
+
+            return read;
+        }
+
+        @Override
+        public long skip(long bytes) throws IOException {
+            input.seek(input.getPos() + bytes);
+            return bytes;
+        }
+
+        @Override
+        public int available() throws IOException {
+            return 0;
+        }
+
+        @Override
+        public int read(long position, byte[] buffer, int offset, int length) throws IOException {
+            input.seek(position);
+            return input.read(buffer, offset, length);
+        }
+
+        @Override
+        public void seek(long position) throws IOException {
+            input.seek(position);
+        }
+
+        @Override
+        public void close() throws IOException {
+            input.close();
         }
     }
 

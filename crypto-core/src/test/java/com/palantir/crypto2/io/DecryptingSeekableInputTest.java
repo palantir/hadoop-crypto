@@ -73,7 +73,7 @@ public final class DecryptingSeekableInputTest {
 
     private static SeekableInput apacheStream(SeekableCipher cipher, SeekableInput input) {
         if (cipher instanceof AesCtrCipher) {
-            return new ApacheCtrDecryptingSeekableInput(input, cipher.getKeyMaterial());
+            return ApacheCtrDecryptingSeekableInput.create(input, cipher.getKeyMaterial());
         } else {
             throw new IllegalArgumentException("Unsupported cipher type");
         }
@@ -164,8 +164,12 @@ public final class DecryptingSeekableInputTest {
         long startPos = cis.getPos();
         byte[] buffer = new byte[NUM_BYTES];
         int offset = 0;
-        int read;
-        while ((read = cis.read(buffer, offset, buffer.length)) != -1) {
+
+        while (offset < buffer.length) {
+            int read = cis.read(buffer, offset, buffer.length - offset);
+            if (read == -1) {
+                break;
+            }
             offset += read;
         }
 
