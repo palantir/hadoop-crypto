@@ -82,7 +82,7 @@ public final class AesCtrCipherTest extends AbstractSeekableCipherTest {
         KeyMaterial keyMaterial = KeyMaterial.of(new SecretKeySpec(key, AesCtrCipher.KEY_ALGORITHM), iv);
         SeekableCipher seekableCipher = getCipher(keyMaterial);
         seekableCipher.initCipher(opmode);
-        Cipher cipher = seekableCipher.seek(blockNumber * (long) AesCtrCipher.BLOCK_SIZE);
+        Cipher cipher = seekableCipher.seek(blockNumber * (long) CounterMode.BLOCK_SIZE);
 
         byte[] finalBytes = cipher.update(inputBytes);
         assertThat(outputBytes, is(finalBytes));
