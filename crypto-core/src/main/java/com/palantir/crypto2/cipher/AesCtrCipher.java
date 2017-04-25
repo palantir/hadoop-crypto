@@ -39,6 +39,8 @@ public final class AesCtrCipher implements SeekableCipher {
     static final String PROVIDER = "SunJCE";
     static final String KEY_ALGORITHM = "AES";
     static final int KEY_SIZE = 256;
+    static final int BLOCK_SIZE = CounterMode.BLOCK_SIZE;
+    static final int IV_SIZE = CounterMode.IV_SIZE;
 
     private final KeyMaterial keyMaterial;
     private final SecretKey key;
@@ -70,7 +72,7 @@ public final class AesCtrCipher implements SeekableCipher {
         Preconditions.checkArgument(pos >= 0, "Cannot seek to negative position: %s", pos);
 
         // Compute the block that the byte 'pos' is located in
-        long block = pos / CounterMode.BLOCK_SIZE;
+        long block = pos / BLOCK_SIZE;
         IvParameterSpec newIv = CounterMode.computeIv(initIv, block);
 
         Cipher cipher = getInstance();
@@ -83,7 +85,7 @@ public final class AesCtrCipher implements SeekableCipher {
         }
 
         // Skip to the byte offset in the block where 'pos' is located
-        int bytesToSkip = (int) (pos % CounterMode.BLOCK_SIZE);
+        int bytesToSkip = (int) (pos % BLOCK_SIZE);
         byte[] skip = new byte[bytesToSkip];
         cipher.update(skip, 0, bytesToSkip);
 
@@ -97,11 +99,11 @@ public final class AesCtrCipher implements SeekableCipher {
 
     @Override
     public int getBlockSize() {
-        return CounterMode.BLOCK_SIZE;
+        return BLOCK_SIZE;
     }
 
     public static KeyMaterial generateKeyMaterial() {
-        return KeyMaterials.generateKeyMaterial(KEY_ALGORITHM, KEY_SIZE, CounterMode.IV_SIZE);
+        return KeyMaterials.generateKeyMaterial(KEY_ALGORITHM, KEY_SIZE, IV_SIZE);
     }
 
     private Cipher getInstance() {
