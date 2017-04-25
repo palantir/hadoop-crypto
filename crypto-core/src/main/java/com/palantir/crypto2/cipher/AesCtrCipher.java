@@ -38,7 +38,7 @@ public final class AesCtrCipher implements SeekableCipher {
     static final int KEY_SIZE = 256;
     static final int BLOCK_SIZE = 16;
     static final int IV_SIZE = 16;
-    private static byte[] unused_seek_output = new byte[BLOCK_SIZE];
+    private static byte[] unusedSeekOutput = new byte[BLOCK_SIZE];
 
     private final KeyMaterial keyMaterial;
     private final SecretKey key;
@@ -94,11 +94,11 @@ public final class AesCtrCipher implements SeekableCipher {
 
             // Skip to the byte offset in the block where 'pos' is located.
             // Since we've initialized a new CryptoCipher, we only need to seek from the beginning of the block
-            // containing the target position to the target position itself. Therefore unused_seek_output is
-            // BLOCK_SIZE bytes in length, and skip is the number of bytes from the beginning of the block to pos.
+            // containing the target position to the target position itself. Therefore unusedSeekOutput is BLOCK_SIZE
+            // bytes in length, and the length of skip is the number of bytes from the beginning of the block to pos.
             int bytesToSkip = (int) (pos % BLOCK_SIZE);
             byte[] skip = new byte[bytesToSkip];
-            cipher.update(skip, 0 /* inputOffset */, bytesToSkip, unused_seek_output,
+            cipher.update(skip, 0 /* inputOffset */, bytesToSkip, unusedSeekOutput,
                     0 /* outputOffset */);
             return cipher;
         } catch (GeneralSecurityException e) {
