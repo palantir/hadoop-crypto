@@ -26,8 +26,6 @@ import org.apache.commons.crypto.cipher.CryptoCipherFactory;
 import org.apache.commons.crypto.stream.CtrCryptoInputStream;
 import org.apache.commons.crypto.stream.input.Input;
 import org.apache.commons.crypto.utils.Utils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A {@link SeekableInput} that decrypts AES/CTR encrypted SeekableInputs using the given {@link KeyMaterial}. This
@@ -35,7 +33,6 @@ import org.slf4j.LoggerFactory;
  */
 public final class ApacheCtrDecryptingSeekableInput extends CtrCryptoInputStream implements SeekableInput {
 
-    private static final Logger log = LoggerFactory.getLogger(ApacheCtrDecryptingSeekableInput.class);
     private static final String ALGORITHM = "AES/CTR/NoPadding";
     private static final int BUFFER_SIZE = 8192;
     private static final Properties PROPS;
