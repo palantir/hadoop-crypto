@@ -63,12 +63,18 @@ public final class ApacheCtrDecryptingSeekableInput extends CtrCryptoInputStream
         super.close();
     }
 
-    private static class InputAdapter implements Input {
+    private static final class InputAdapter implements Input {
 
         private SeekableInput input;
 
         private InputAdapter(SeekableInput input) {
             this.input = input;
+        }
+
+        @Override
+        public int read(long position, byte[] buffer, int offset, int length) throws IOException {
+            input.seek(position);
+            return input.read(buffer, offset, length);
         }
 
         @Override
@@ -92,12 +98,6 @@ public final class ApacheCtrDecryptingSeekableInput extends CtrCryptoInputStream
         @Override
         public int available() throws IOException {
             return 0;
-        }
-
-        @Override
-        public int read(long position, byte[] buffer, int offset, int length) throws IOException {
-            input.seek(position);
-            return input.read(buffer, offset, length);
         }
 
         @Override
