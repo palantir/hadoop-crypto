@@ -34,7 +34,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Random;
 import java.util.function.BiFunction;
-import javafx.util.Pair;
 import javax.crypto.Cipher;
 import javax.crypto.CipherOutputStream;
 import org.junit.BeforeClass;
@@ -84,16 +83,16 @@ public final class DecryptingSeekableInputTest {
     }
 
     public DecryptingSeekableInputTest(
-            Pair<String, BiFunction<SeekableCipher, SeekableInput, SeekableInput>> streamConstructors) {
+            Pair<String, BiFunction<SeekableCipher, SeekableInput, SeekableInput>> testCase) {
         try {
-            SeekableCipher seekableCipher = SeekableCipherFactory.getCipher(streamConstructors.getKey());
+            SeekableCipher seekableCipher = SeekableCipherFactory.getCipher(testCase.key);
             ByteArrayOutputStream os = new ByteArrayOutputStream();
             CipherOutputStream cos = new CipherOutputStream(os, seekableCipher.initCipher(Cipher.ENCRYPT_MODE));
             cos.write(data);
             cos.close();
 
             InMemorySeekableDataInput input = new InMemorySeekableDataInput(os.toByteArray());
-            cis = streamConstructors.getValue().apply(seekableCipher, input);
+            cis = testCase.val.apply(seekableCipher, input);
             blockSize = seekableCipher.getBlockSize();
         } catch (IOException e) {
             throw Throwables.propagate(e);
@@ -181,6 +180,15 @@ public final class DecryptingSeekableInputTest {
 
     private static void readFully(SeekableInput input, byte[] decrypted) throws IOException {
         ByteStreams.readFully(new DefaultSeekableInputStream(input), decrypted);
+    }
+
+    private static final class Pair<K, V> {
+        K key;
+        V val;
+        public Pair(K key, V val) {
+            this.key = key;
+            this.val = val;
+        }
     }
 
 }

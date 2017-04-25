@@ -21,17 +21,33 @@ import com.palantir.seekio.SeekableInput;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Properties;
+import org.apache.commons.crypto.Crypto;
+import org.apache.commons.crypto.cipher.CryptoCipherFactory;
 import org.apache.commons.crypto.stream.CtrCryptoInputStream;
 import org.apache.commons.crypto.stream.input.Input;
 import org.apache.commons.crypto.utils.Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+/**
+ * A {@link SeekableInput} that decrypts AES/CTR encrypted SeekableInputs using the given {@link KeyMaterial}. This
+ * implementation uses Apache's {@link CtrCryptoInputStream} which uses OpenSSL and supports AES-NI.
+ */
 public final class ApacheCtrDecryptingSeekableInput extends CtrCryptoInputStream implements SeekableInput {
 
+    private static final Logger log = LoggerFactory.getLogger(ApacheCtrDecryptingSeekableInput.class);
     private static final String ALGORITHM = "AES/CTR/NoPadding";
     private static final int BUFFER_SIZE = 8192;
+    private static final Properties PROPS;
+
+    static {
+        // Force OpenSSL for AES-NI support
+        PROPS = new Properties();
+        PROPS.setProperty(CryptoCipherFactory.CLASSES_KEY, CryptoCipherFactory.CipherProvider.OPENSSL.getClassName());
+    }
 
     private ApacheCtrDecryptingSeekableInput(SeekableInput input, KeyMaterial keyMaterial) throws IOException {
-        super(new InputAdapter(input), Utils.getCipherInstance(ALGORITHM, new Properties()), BUFFER_SIZE,
+        super(new InputAdapter(input), Utils.getCipherInstance(ALGORITHM, PROPS), BUFFER_SIZE,
                 keyMaterial.getSecretKey().getEncoded(), keyMaterial.getIv());
     }
 
@@ -41,6 +57,13 @@ public final class ApacheCtrDecryptingSeekableInput extends CtrCryptoInputStream
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * Returns true if the OpenSSL is able to be loaded.
+     */
+    public boolean isSupported() {
+        return Crypto.isNativeCodeLoaded();
     }
 
     @Override
