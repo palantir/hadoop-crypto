@@ -23,7 +23,6 @@ import com.palantir.crypto2.cipher.CipherStreamSupplierImpl;
 import com.palantir.crypto2.cipher.SeekableCipher;
 import com.palantir.seekio.SeekableInput;
 import java.io.IOException;
-import javax.crypto.Cipher;
 import org.apache.commons.crypto.stream.CryptoInputStream;
 
 public final class DecryptingSeekableInput implements SeekableInput {
@@ -57,7 +56,6 @@ public final class DecryptingSeekableInput implements SeekableInput {
          */
         this.skipThreshold = Math.max(seekableCipher.getBlockSize() * 2, CRYPTO_INPUT_STREAM_BUFFER_SIZE);
 
-        cipher.setOpMode(Cipher.DECRYPT_MODE);
         decryptedStream = supplier.getInputStream(delegate, cipher);
         decryptedStreamPos = 0L;
     }

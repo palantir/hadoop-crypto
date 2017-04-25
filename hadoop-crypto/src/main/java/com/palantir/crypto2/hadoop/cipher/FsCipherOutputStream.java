@@ -22,8 +22,6 @@ import com.palantir.crypto2.cipher.CipherStreamSupplierImpl;
 import com.palantir.crypto2.cipher.SeekableCipher;
 import java.io.FilterOutputStream;
 import java.io.IOException;
-import javax.crypto.Cipher;
-import org.apache.commons.crypto.stream.CryptoOutputStream;
 import org.apache.hadoop.fs.FSDataOutputStream;
 
 /**
@@ -38,13 +36,7 @@ public class FsCipherOutputStream extends FilterOutputStream {
     @VisibleForTesting
     FsCipherOutputStream(FSDataOutputStream delegate, SeekableCipher seekableCipher,
             CipherStreamSupplier supplier) {
-        super(setOpModeAndGetOutputStream(delegate, seekableCipher, supplier));
-    }
-
-    private static CryptoOutputStream setOpModeAndGetOutputStream(FSDataOutputStream delegate,
-            SeekableCipher seekableCipher, CipherStreamSupplier supplier) {
-        seekableCipher.setOpMode(Cipher.ENCRYPT_MODE);
-        return supplier.getOutputStream(delegate, seekableCipher);
+        super(supplier.getOutputStream(delegate, seekableCipher));
     }
 
     @Override

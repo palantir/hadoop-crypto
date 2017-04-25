@@ -30,7 +30,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Properties;
-import javax.crypto.Cipher;
 import org.apache.commons.crypto.stream.CryptoOutputStream;
 import org.junit.Test;
 
@@ -41,7 +40,6 @@ public final class ExampleUsage {
         byte[] bytes = "0123456789".getBytes(StandardCharsets.UTF_8);
         SeekableCipher seekableCipher = SeekableCipherFactory.getCipher(AesCtrCipher.ALGORITHM);
         ByteArrayOutputStream os = new ByteArrayOutputStream(bytes.length);
-        seekableCipher.setOpMode(Cipher.ENCRYPT_MODE);
 
         // Store this key material for future decryption
         // KeyMaterial keyMaterial = cipher.getKeyMaterial();

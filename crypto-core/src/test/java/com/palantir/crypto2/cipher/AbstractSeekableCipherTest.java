@@ -64,11 +64,9 @@ public abstract class AbstractSeekableCipherTest {
         keyMaterial = generateKeyMaterial();
         seekableCipher = getCipher(keyMaterial);
 
-        seekableCipher.setOpMode(Cipher.ENCRYPT_MODE);
         encryptCipher = CryptoCipherFactory.getCryptoCipher(getAlgorithm());
         initCipherUsingSeekableCipher(Cipher.ENCRYPT_MODE, encryptCipher);
 
-        seekableCipher.setOpMode(Cipher.DECRYPT_MODE);
         decryptCipher = CryptoCipherFactory.getCryptoCipher(getAlgorithm());
         initCipherUsingSeekableCipher(Cipher.DECRYPT_MODE, decryptCipher);
     }
@@ -83,7 +81,6 @@ public abstract class AbstractSeekableCipherTest {
     public final void testEncryptDecrypt_seekMaxValue() throws GeneralSecurityException {
         long offset = Long.MAX_VALUE / seekableCipher.getBlockSize() * seekableCipher.getBlockSize();
 
-        seekableCipher.setOpMode(Cipher.ENCRYPT_MODE);
         seekableCipher.updateIvForNewPosition(offset);
         initCipherUsingSeekableCipher(Cipher.ENCRYPT_MODE, encryptCipher);
         initCipherUsingSeekableCipher(Cipher.DECRYPT_MODE, decryptCipher);
@@ -108,7 +105,6 @@ public abstract class AbstractSeekableCipherTest {
         byte[] encryptedData = new byte[blockSize * (NUM_BLOCKS + 1)];
         encryptCipher.doFinal(data, 0, data.length, encryptedData, 0);
 
-        seekableCipher.setOpMode(Cipher.DECRYPT_MODE);
         seekableCipher.updateIvForNewPosition(prevBlockOffset);
         initCipherUsingSeekableCipher(Cipher.DECRYPT_MODE, decryptCipher);
 
@@ -132,16 +128,6 @@ public abstract class AbstractSeekableCipherTest {
             fail();
         } catch (IllegalArgumentException e) {
             assertThat(e.getMessage(), is(String.format("Cannot seek to negative position: %d", negPos)));
-        }
-    }
-
-    @Test
-    public final void testSeek_notInitialized() {
-        try {
-            getCipher(keyMaterial).updateIvForNewPosition(0);
-            fail();
-        } catch (IllegalStateException e) {
-            assertThat(e.getMessage(), is("Cipher not initialized"));
         }
     }
 

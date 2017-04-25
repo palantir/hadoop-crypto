@@ -40,7 +40,6 @@ public final class AesCtrCipher implements SeekableCipher {
     private final SecretKey key;
     private final byte[] initIv;
     private IvParameterSpec currIvParameterSpec;
-    private int currentOpmode;
 
     public AesCtrCipher(KeyMaterial keyMaterial) {
         this.key = keyMaterial.getSecretKey();
@@ -50,14 +49,7 @@ public final class AesCtrCipher implements SeekableCipher {
     }
 
     @Override
-    public void setOpMode(int opmode) {
-        this.currentOpmode = opmode;
-    }
-
-    @Override
     public void updateIvForNewPosition(long pos) {
-        Preconditions.checkState(currentOpmode == Cipher.DECRYPT_MODE || currentOpmode == Cipher.ENCRYPT_MODE,
-                "Cipher not initialized");
         Preconditions.checkArgument(pos >= 0, "Cannot seek to negative position: %s", pos);
 
         // Compute the block that the byte 'pos' is located in

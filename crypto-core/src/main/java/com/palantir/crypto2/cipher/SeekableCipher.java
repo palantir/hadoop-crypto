@@ -17,7 +17,6 @@
 package com.palantir.crypto2.cipher;
 
 import com.palantir.crypto2.keys.KeyMaterial;
-import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import org.apache.commons.crypto.cipher.CryptoCipher;
 import org.apache.commons.crypto.stream.CryptoInputStream;
@@ -29,12 +28,6 @@ import org.apache.commons.crypto.stream.CryptoOutputStream;
  * // TODO(jellis): add note about using SeekableCipher streams instead of this directly
  */
 public interface SeekableCipher {
-
-    /**
-     * Sets whether a {@link CryptoCipher} constructed using this SeekableCipher will be initialized to
-     * {@link Cipher#ENCRYPT_MODE} or to {@link Cipher#DECRYPT_MODE}.
-     */
-    void setOpMode(int opmode);
 
     /**
      * The returned {@link CryptoCipher} is initialized such that future operations will encrypt/decrypt correctly for

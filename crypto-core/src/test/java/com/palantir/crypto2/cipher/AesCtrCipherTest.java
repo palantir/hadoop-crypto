@@ -95,7 +95,6 @@ public final class AesCtrCipherTest extends AbstractSeekableCipherTest {
 
         KeyMaterial keyMaterial = KeyMaterial.of(new SecretKeySpec(key, AesCtrCipher.KEY_ALGORITHM), iv);
         SeekableCipher seekableCipher = getCipher(keyMaterial);
-        seekableCipher.setOpMode(opmode);
         seekableCipher.updateIvForNewPosition(blockNumber * (long) AesCtrCipher.BLOCK_SIZE);
         CryptoCipher cipher = CryptoCipherFactory.getCryptoCipher(getAlgorithm());
         initCipherUsingSeekableCipher(opmode, cipher, seekableCipher);
@@ -115,12 +114,10 @@ public final class AesCtrCipherTest extends AbstractSeekableCipherTest {
 
         SeekableCipher seekableCipher = getCipher(maxIvKeyMaterial);
         // Encrypt without seeking so iv is not modified in seek method
-        seekableCipher.setOpMode(Cipher.ENCRYPT_MODE);
         CryptoCipher encryptCipher = CryptoCipherFactory.getCryptoCipher(getAlgorithm());
         initCipherUsingSeekableCipher(Cipher.ENCRYPT_MODE, encryptCipher, seekableCipher);
 
         // Seek and decrypt so iv is modified by seek method
-        seekableCipher.setOpMode(Cipher.DECRYPT_MODE);
         seekableCipher.updateIvForNewPosition(0);
         CryptoCipher decryptCipher = CryptoCipherFactory.getCryptoCipher(getAlgorithm());
         initCipherUsingSeekableCipher(Cipher.DECRYPT_MODE, decryptCipher, seekableCipher);
@@ -139,7 +136,6 @@ public final class AesCtrCipherTest extends AbstractSeekableCipherTest {
         KeyMaterial keyMaterial = KeyMaterial.of(baseKeyMaterial.getSecretKey(), iv);
 
         SeekableCipher cipher = getCipher(keyMaterial);
-        cipher.setOpMode(Cipher.ENCRYPT_MODE);
         cipher.updateIvForNewPosition(100);
     }
 
@@ -153,7 +149,6 @@ public final class AesCtrCipherTest extends AbstractSeekableCipherTest {
         KeyMaterial keyMaterial = KeyMaterial.of(baseKeyMaterial.getSecretKey(), iv);
 
         SeekableCipher cipher = getCipher(keyMaterial);
-        cipher.setOpMode(Cipher.ENCRYPT_MODE);
         cipher.updateIvForNewPosition(100);
     }
 

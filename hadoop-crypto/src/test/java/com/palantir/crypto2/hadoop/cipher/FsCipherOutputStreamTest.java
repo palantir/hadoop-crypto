@@ -27,7 +27,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.ShortBufferException;
 import org.apache.commons.crypto.stream.CryptoOutputStream;
@@ -61,7 +60,6 @@ public final class FsCipherOutputStreamTest {
 
     @Test
     public void testInit() throws IOException {
-        verify(seekableCipher).setOpMode(Cipher.ENCRYPT_MODE);
         verify(supplier).getOutputStream(os, seekableCipher);
     }
 

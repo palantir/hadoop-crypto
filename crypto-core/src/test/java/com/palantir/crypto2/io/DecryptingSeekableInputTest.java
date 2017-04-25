@@ -34,7 +34,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Properties;
 import java.util.Random;
-import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import org.apache.commons.crypto.stream.CryptoOutputStream;
 import org.junit.BeforeClass;
@@ -71,7 +70,6 @@ public final class DecryptingSeekableInputTest {
     public DecryptingSeekableInputTest(String algorithm) {
         try {
             seekableCipher = SeekableCipherFactory.getCipher(algorithm);
-            seekableCipher.setOpMode(Cipher.ENCRYPT_MODE);
             ByteArrayOutputStream os = new ByteArrayOutputStream();
             CryptoOutputStream cos = new CryptoOutputStream(algorithm,
                     new Properties(),

@@ -19,7 +19,6 @@ package com.palantir.crypto2.cipher;
 import com.google.common.base.Preconditions;
 import com.palantir.crypto2.keys.KeyMaterial;
 import com.palantir.crypto2.keys.serialization.KeyMaterials;
-import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import org.apache.commons.crypto.cipher.CryptoCipher;
@@ -40,7 +39,6 @@ public final class AesCbcCipher implements SeekableCipher {
     private final SecretKey key;
     private final byte[] initIv;
     private IvParameterSpec currIvParameterSpec;
-    private int currentOpmode;
 
     public AesCbcCipher(KeyMaterial keyMaterial) {
         this.initIv = keyMaterial.getIv();
@@ -49,19 +47,12 @@ public final class AesCbcCipher implements SeekableCipher {
         this.keyMaterial = keyMaterial;
     }
 
-    @Override
-    public void setOpMode(int opmode) {
-        this.currentOpmode = opmode;
-    }
-
     /**
      * Seeking the AES/CBC {@link CryptoCipher} requires initializing its IV with the previous block of encrypted data,
      * and therefore cannot be done by the cipher alone. Therefore we do not update currIvParameterSpec here.
      */
     @Override
     public void updateIvForNewPosition(long pos) {
-        Preconditions.checkState(currentOpmode == Cipher.DECRYPT_MODE || currentOpmode == Cipher.ENCRYPT_MODE,
-                "Cipher not initialized");
         Preconditions.checkArgument(pos >= 0, "Cannot seek to negative position: %s", pos);
         Preconditions.checkArgument(pos % BLOCK_SIZE == 0,
                 "Can only seek AES/CBC cipher to block offset positions every %s bytes", BLOCK_SIZE);
