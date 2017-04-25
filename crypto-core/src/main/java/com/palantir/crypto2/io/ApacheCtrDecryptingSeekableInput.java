@@ -39,8 +39,7 @@ public final class ApacheCtrDecryptingSeekableInput extends CtrCryptoInputStream
 
     static {
         // Force OpenSSL for AES-NI support
-        PROPS = new Properties();
-        PROPS.setProperty(CryptoCipherFactory.CLASSES_KEY, CryptoCipherFactory.CipherProvider.OPENSSL.getClassName());
+        PROPS = initializeProps();
     }
 
     private ApacheCtrDecryptingSeekableInput(SeekableInput input, KeyMaterial keyMaterial) throws IOException {
@@ -129,6 +128,12 @@ public final class ApacheCtrDecryptingSeekableInput extends CtrCryptoInputStream
         public void close() throws IOException {
             input.close();
         }
+    }
+
+    private static Properties initializeProps() {
+        Properties props = new Properties();
+        props.setProperty(CryptoCipherFactory.CLASSES_KEY, CryptoCipherFactory.CipherProvider.OPENSSL.getClassName());
+        return props;
     }
 
 }
