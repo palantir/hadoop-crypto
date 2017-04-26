@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Random;
+import java.util.function.BiFunction;
 import javax.crypto.Cipher;
 import javax.crypto.CipherOutputStream;
 import org.junit.BeforeClass;
@@ -49,8 +50,8 @@ public final class DecryptingSeekableInputTest {
     private static final Random random = new Random(0);
     private static byte[] data;
 
-    private SeekableCipher seekableCipher;
-    private DecryptingSeekableInput cis;
+    private int blockSize;
+    private SeekableInput cis;
 
     @Rule
     public TemporaryFolder tempFolder = new TemporaryFolder();
@@ -62,18 +63,37 @@ public final class DecryptingSeekableInputTest {
     }
 
     @Parameterized.Parameters
-    public static Collection<String> ciphers() {
-        return ImmutableList.of(AesCtrCipher.ALGORITHM, AesCbcCipher.ALGORITHM);
+    public static Collection<Pair<String, BiFunction<SeekableCipher, SeekableInput, SeekableInput>>> ciphers() {
+        return ImmutableList.of(
+                new Pair<>(AesCtrCipher.ALGORITHM, DecryptingSeekableInputTest::apacheStream),
+                new Pair<>(AesCtrCipher.ALGORITHM, DecryptingSeekableInputTest::jceStream),
+                new Pair<>(AesCbcCipher.ALGORITHM, DecryptingSeekableInputTest::jceStream));
     }
 
-    public DecryptingSeekableInputTest(String cipher) {
+    private static SeekableInput apacheStream(SeekableCipher cipher, SeekableInput input) {
+        if (cipher instanceof AesCtrCipher) {
+            return ApacheCtrDecryptingSeekableInput.create(input, cipher.getKeyMaterial());
+        } else {
+            throw new IllegalArgumentException("Unsupported cipher type");
+        }
+    }
+
+    private static SeekableInput jceStream(SeekableCipher cipher, SeekableInput input) {
+        return new DecryptingSeekableInput(input, cipher);
+    }
+
+    public DecryptingSeekableInputTest(
+            Pair<String, BiFunction<SeekableCipher, SeekableInput, SeekableInput>> testCase) {
         try {
-            seekableCipher = SeekableCipherFactory.getCipher(cipher);
+            SeekableCipher seekableCipher = SeekableCipherFactory.getCipher(testCase.key);
             ByteArrayOutputStream os = new ByteArrayOutputStream();
             CipherOutputStream cos = new CipherOutputStream(os, seekableCipher.initCipher(Cipher.ENCRYPT_MODE));
             cos.write(data);
             cos.close();
-            cis = new DecryptingSeekableInput(new InMemorySeekableDataInput(os.toByteArray()), seekableCipher);
+
+            InMemorySeekableDataInput input = new InMemorySeekableDataInput(os.toByteArray());
+            cis = testCase.val.apply(seekableCipher, input);
+            blockSize = seekableCipher.getBlockSize();
         } catch (IOException e) {
             throw Throwables.propagate(e);
         }
@@ -102,13 +122,13 @@ public final class DecryptingSeekableInputTest {
 
     @Test
     public void testSeek_manyBlocks() throws IOException {
-        int pos = seekableCipher.getBlockSize() * 10;
+        int pos = blockSize * 10;
         testSeek(pos);
     }
 
     @Test
     public void testSeek_manyBlocksAndOffset() throws IOException {
-        int pos = seekableCipher.getBlockSize() * 10 + 1;
+        int pos = blockSize * 10 + 1;
         testSeek(pos);
     }
 
@@ -120,7 +140,7 @@ public final class DecryptingSeekableInputTest {
 
     @Test
     public void testSeek_manyBlocksAndNegativeOffset() throws IOException {
-        int pos = seekableCipher.getBlockSize() * 10 - 1;
+        int pos = blockSize * 10 - 1;
         testSeek(pos);
     }
 
@@ -143,8 +163,12 @@ public final class DecryptingSeekableInputTest {
         long startPos = cis.getPos();
         byte[] buffer = new byte[NUM_BYTES];
         int offset = 0;
-        int read;
-        while ((read = cis.read(buffer, offset, buffer.length)) != -1) {
+
+        while (offset < buffer.length) {
+            int read = cis.read(buffer, offset, buffer.length - offset);
+            if (read == -1) {
+                break;
+            }
             offset += read;
         }
 
@@ -156,6 +180,17 @@ public final class DecryptingSeekableInputTest {
 
     private static void readFully(SeekableInput input, byte[] decrypted) throws IOException {
         ByteStreams.readFully(new DefaultSeekableInputStream(input), decrypted);
+    }
+
+    @SuppressWarnings("VisibilityModifier")
+    private static final class Pair<K, V> {
+        K key;
+        V val;
+
+        Pair(K key, V val) {
+            this.key = key;
+            this.val = val;
+        }
     }
 
 }

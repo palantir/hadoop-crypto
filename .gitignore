@@ -21,6 +21,7 @@ bin/
 .idea/
 out/
 generated_src/
+generated_testSrc/
 
 # Codegen
 .generated

@@ -10,6 +10,8 @@
         <Or>
             <Bug pattern="NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE" />
             <Bug pattern="PT_FINAL_TYPE_CONSTRUCTOR" />
+            <Bug pattern="PT_FINAL_TYPE_RETURN" />
+            <Bug pattern="PT_FINAL_TYPE_PARAM" />
             <Bug pattern="PT_EXTENDS_CONCRETE_TYPE" />
         </Or>
     </Match>
