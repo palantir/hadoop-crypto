@@ -1,0 +1,7 @@
+test { 
+    if (org.gradle.internal.os.OperatingSystem.current().isMacOsX()) {
+        def opensslDir = "/usr/local/opt/openssl/lib"
+        println "Detected MacOS. Assuming openssl is installed at: " + opensslDir
+        environment "LD_LIBRARY_PATH", opensslDir
+    }
+} 

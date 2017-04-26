@@ -1,5 +1,6 @@
-apply from: "${rootDir}/gradle/publish.gradle"
 apply from: "${rootDir}/gradle/immutables-processors.gradle"
+apply from: "${rootDir}/gradle/openssl.gradle"
+apply from: "${rootDir}/gradle/publish.gradle"
 
 dependencies {
     compile project(':crypto-keys')
