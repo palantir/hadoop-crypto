@@ -94,7 +94,7 @@ public final class ApacheCtrDecryptingSeekableInput extends CtrCryptoInputStream
 
         @Override
         public int read(ByteBuffer dst) throws IOException {
-            byte[] bytes = new byte[dst.capacity() - dst.position()];
+            byte[] bytes = new byte[dst.remaining()];
             int read = input.read(bytes, 0, bytes.length);
 
             if (read != -1) {
