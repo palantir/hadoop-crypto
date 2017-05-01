@@ -27,7 +27,8 @@ import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FSInputStream;
 
 /**
- * Decrypts data read from the given {@link FSDataInputStream} using the given {@link SeekableCipher}.
+ * Decrypts data read from the given {@link FSDataInputStream} using the given {@link KeyMaterial} and cipher {@code
+ * algorithm}.
  */
 public final class FsCipherInputStream extends FSInputStream {
 

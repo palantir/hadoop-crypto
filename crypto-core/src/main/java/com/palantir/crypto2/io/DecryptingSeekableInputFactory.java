@@ -26,7 +26,7 @@ public final class DecryptingSeekableInputFactory {
 
     /**
      * Returns a {@link SeekableInput} that decrypts the given SeekableInput using the given {@link KeyMaterial} and
-     * {@code algorithm}.
+     * cipher {@code algorithm}.
      */
     public static SeekableInput decrypt(SeekableInput encryptedInput, KeyMaterial keyMaterial, String algorithm) {
         if (algorithm.equals(ApacheCtrDecryptingSeekableInput.ALGORITHM)
