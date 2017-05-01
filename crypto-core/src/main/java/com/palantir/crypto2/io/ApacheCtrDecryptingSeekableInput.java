@@ -33,7 +33,7 @@ import org.apache.commons.crypto.utils.Utils;
  */
 public final class ApacheCtrDecryptingSeekableInput extends CtrCryptoInputStream implements SeekableInput {
 
-    private static final String ALGORITHM = "AES/CTR/NoPadding";
+    public static final String ALGORITHM = "AES/CTR/NoPadding";
     private static final int BUFFER_SIZE = 8192;
     // Force OpenSSL for AES-NI support
     private static final Properties PROPS = initializeProps();
@@ -54,7 +54,7 @@ public final class ApacheCtrDecryptingSeekableInput extends CtrCryptoInputStream
     /**
      * Returns true if the OpenSSL is able to be loaded.
      */
-    public boolean isSupported() {
+    public static boolean isSupported() {
         return Crypto.isNativeCodeLoaded();
     }
 
