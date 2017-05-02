@@ -21,8 +21,8 @@ import com.palantir.seekio.SeekableInput;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Properties;
-import org.apache.commons.crypto.Crypto;
 import org.apache.commons.crypto.cipher.CryptoCipherFactory;
+import org.apache.commons.crypto.cipher.OpenSslPublic;
 import org.apache.commons.crypto.stream.CtrCryptoInputStream;
 import org.apache.commons.crypto.stream.input.Input;
 import org.apache.commons.crypto.utils.Utils;
@@ -43,6 +43,10 @@ public final class ApacheCtrDecryptingSeekableInput extends CtrCryptoInputStream
                 keyMaterial.getSecretKey().getEncoded(), keyMaterial.getIv());
     }
 
+    /**
+     * Creates a new {@link ApacheCtrDecryptingSeekableInput}. This constructor is expected to succeed if and only if
+     * {@link #isSupported} returns true. Callers should check {@link #isSupported} before calling this constructor.
+     */
     public static ApacheCtrDecryptingSeekableInput create(SeekableInput input, KeyMaterial keyMaterial) {
         try {
             return new ApacheCtrDecryptingSeekableInput(input, keyMaterial);
@@ -52,10 +56,10 @@ public final class ApacheCtrDecryptingSeekableInput extends CtrCryptoInputStream
     }
 
     /**
-     * Returns true if the OpenSSL is able to be loaded.
+     * Returns true if the OpenSSL library is able to be loaded.
      */
     public static boolean isSupported() {
-        return Crypto.isNativeCodeLoaded();
+        return OpenSslPublic.isSupported();
     }
 
     @Override

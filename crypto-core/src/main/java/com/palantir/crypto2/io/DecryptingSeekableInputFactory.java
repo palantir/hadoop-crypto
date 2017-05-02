@@ -26,7 +26,7 @@ public final class DecryptingSeekableInputFactory {
 
     /**
      * Returns a {@link SeekableInput} that decrypts the given SeekableInput using the given {@link KeyMaterial} and
-     * cipher {@code algorithm}.
+     * cipher {@code algorithm}. When OpenSSL is available an implementation that uses AES-NI will be returned.
      */
     public static SeekableInput decrypt(SeekableInput encryptedInput, KeyMaterial keyMaterial, String algorithm) {
         if (algorithm.equals(ApacheCtrDecryptingSeekableInput.ALGORITHM)

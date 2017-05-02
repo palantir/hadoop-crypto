@@ -72,6 +72,7 @@ public final class DecryptingSeekableInputTest {
 
     private static SeekableInput apacheStream(SeekableCipher cipher, SeekableInput input) {
         if (cipher instanceof AesCtrCipher) {
+            System.out.println("isSupported: " + ApacheCtrDecryptingSeekableInput.isSupported());
             return ApacheCtrDecryptingSeekableInput.create(input, cipher.getKeyMaterial());
         } else {
             throw new IllegalArgumentException("Unsupported cipher type");
