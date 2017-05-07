@@ -74,9 +74,8 @@ public final class EncryptedFileSystem extends FilterFileSystem {
         FSDataInputStream encryptedStream = fs.open(path, bufferSize);
 
         KeyMaterial keyMaterial = keyStore.get(path.toString());
-        SeekableCipher cipher = SeekableCipherFactory.getCipher(cipherAlgorithm, keyMaterial);
 
-        return new FSDataInputStream(new FsCipherInputStream(encryptedStream, cipher));
+        return new FSDataInputStream(new FsCipherInputStream(encryptedStream, keyMaterial, cipherAlgorithm));
     }
 
     @Override

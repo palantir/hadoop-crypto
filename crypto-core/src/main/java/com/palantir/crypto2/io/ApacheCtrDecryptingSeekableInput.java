@@ -21,7 +21,6 @@ import com.palantir.seekio.SeekableInput;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Properties;
-import org.apache.commons.crypto.Crypto;
 import org.apache.commons.crypto.cipher.CryptoCipherFactory;
 import org.apache.commons.crypto.stream.CtrCryptoInputStream;
 import org.apache.commons.crypto.stream.input.Input;
@@ -33,7 +32,7 @@ import org.apache.commons.crypto.utils.Utils;
  */
 public final class ApacheCtrDecryptingSeekableInput extends CtrCryptoInputStream implements SeekableInput {
 
-    private static final String ALGORITHM = "AES/CTR/NoPadding";
+    public static final String ALGORITHM = "AES/CTR/NoPadding";
     private static final int BUFFER_SIZE = 8192;
     // Force OpenSSL for AES-NI support
     private static final Properties PROPS = initializeProps();
@@ -43,19 +42,16 @@ public final class ApacheCtrDecryptingSeekableInput extends CtrCryptoInputStream
                 keyMaterial.getSecretKey().getEncoded(), keyMaterial.getIv());
     }
 
+    /**
+     * Creates a new {@link ApacheCtrDecryptingSeekableInput}. This constructor is expected to succeed if and only if
+     * the OpenSSL library is able to be loaded.
+     */
     public static ApacheCtrDecryptingSeekableInput create(SeekableInput input, KeyMaterial keyMaterial) {
         try {
             return new ApacheCtrDecryptingSeekableInput(input, keyMaterial);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    /**
-     * Returns true if the OpenSSL is able to be loaded.
-     */
-    public boolean isSupported() {
-        return Crypto.isNativeCodeLoaded();
     }
 
     @Override
