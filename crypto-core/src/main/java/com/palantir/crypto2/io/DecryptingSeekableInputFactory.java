@@ -19,8 +19,12 @@ package com.palantir.crypto2.io;
 import com.palantir.crypto2.cipher.SeekableCipherFactory;
 import com.palantir.crypto2.keys.KeyMaterial;
 import com.palantir.seekio.SeekableInput;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class DecryptingSeekableInputFactory {
+
+    private static final Logger log = LoggerFactory.getLogger(DecryptingSeekableInputFactory.class);
 
     private DecryptingSeekableInputFactory() {}
 
@@ -29,12 +33,15 @@ public final class DecryptingSeekableInputFactory {
      * cipher {@code algorithm}. When OpenSSL is available an implementation that uses AES-NI will be returned.
      */
     public static SeekableInput decrypt(SeekableInput encryptedInput, KeyMaterial keyMaterial, String algorithm) {
-        if (algorithm.equals(ApacheCtrDecryptingSeekableInput.ALGORITHM)
-                && ApacheCtrDecryptingSeekableInput.isSupported()) {
-            return ApacheCtrDecryptingSeekableInput.create(encryptedInput, keyMaterial);
-        } else {
-            return new DecryptingSeekableInput(encryptedInput, SeekableCipherFactory.getCipher(algorithm, keyMaterial));
+        if (algorithm.equals(ApacheCtrDecryptingSeekableInput.ALGORITHM)) {
+            try {
+                return ApacheCtrDecryptingSeekableInput.create(encryptedInput, keyMaterial);
+            } catch (Throwable e) {
+                log.warn("Unable to initialize cipher with OpenSSL falling back to JCE implementation");
+            }
         }
+
+        return new DecryptingSeekableInput(encryptedInput, SeekableCipherFactory.getCipher(algorithm, keyMaterial));
     }
 
 }
