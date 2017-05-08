@@ -27,7 +27,9 @@ import org.apache.hadoop.fs.FSDataOutputStream;
 
 /**
  * Encrypts data using the given {@link SeekableCipher} and writes it to the given {@link FSDataOutputStream}.
+ * @deprecated use {@link javax.crypto.CipherOutputStream} directly.
  */
+@Deprecated
 public class FsCipherOutputStream extends FilterOutputStream {
 
     public FsCipherOutputStream(FSDataOutputStream delegate, SeekableCipher cipher) {

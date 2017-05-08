@@ -18,7 +18,7 @@ package com.palantir.crypto2.hadoop.cipher;
 
 import com.palantir.crypto2.cipher.SeekableCipher;
 import com.palantir.crypto2.io.DecryptingSeekableInput;
-import com.palantir.crypto2.io.DecryptingSeekableInputFactory;
+import com.palantir.crypto2.io.CryptoStreamFactory;
 import com.palantir.crypto2.io.DefaultSeekableInputStream;
 import com.palantir.crypto2.keys.KeyMaterial;
 import com.palantir.seekio.SeekableInput;
@@ -44,7 +44,7 @@ public final class FsCipherInputStream extends FSInputStream {
     }
 
     public FsCipherInputStream(FSDataInputStream delegate, KeyMaterial keyMaterial, String algorithm) {
-        SeekableInput decrypted = DecryptingSeekableInputFactory.decrypt(
+        SeekableInput decrypted = CryptoStreamFactory.decrypt(
                 new FsSeekableInput(delegate), keyMaterial, algorithm);
         this.delegate = new DefaultSeekableInputStream(decrypted);
     }
