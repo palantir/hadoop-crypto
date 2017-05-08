@@ -17,8 +17,8 @@
 package com.palantir.crypto2.hadoop.cipher;
 
 import com.palantir.crypto2.cipher.SeekableCipher;
-import com.palantir.crypto2.io.DecryptingSeekableInput;
 import com.palantir.crypto2.io.CryptoStreamFactory;
+import com.palantir.crypto2.io.DecryptingSeekableInput;
 import com.palantir.crypto2.io.DefaultSeekableInputStream;
 import com.palantir.crypto2.keys.KeyMaterial;
 import com.palantir.seekio.SeekableInput;
