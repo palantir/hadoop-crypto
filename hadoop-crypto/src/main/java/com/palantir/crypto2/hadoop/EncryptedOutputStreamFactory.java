@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package com.palantir.crypto2.hadoop.cipher;
+package com.palantir.crypto2.hadoop;
 
 import com.palantir.crypto2.cipher.SeekableCipher;
 import com.palantir.crypto2.cipher.SeekableCipherFactory;
+import com.palantir.crypto2.hadoop.cipher.FsCipherOutputStream;
 import com.palantir.crypto2.keys.KeyMaterial;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -29,10 +30,11 @@ import org.apache.hadoop.fs.FSDataOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public final class EncryptedOutputStreamFactory {
+final class EncryptedOutputStreamFactory {
 
     private static final Logger log = LoggerFactory.getLogger(EncryptedOutputStreamFactory.class);
     private static final Properties PROPS = initializeProps();
+    private static final String AES_ALGORITHM = "AES/CTR/NoPadding";
 
     private EncryptedOutputStreamFactory() {}
 
@@ -41,15 +43,27 @@ public final class EncryptedOutputStreamFactory {
      * KeyMaterial} and cipher {@code algorithm}. When OpenSSL is available an implementation that uses AES-NI will be
      * returned.
      */
-    public static OutputStream encrypt(FSDataOutputStream output, KeyMaterial keyMaterial, String algorithm) {
-        try {
-            SecretKey secretKey = keyMaterial.getSecretKey();
-            byte[] iv = keyMaterial.getIv();
-            return new CtrCryptoOutputStream(PROPS, output, secretKey.getEncoded(), iv);
-        } catch (IOException e) {
-            log.warn("Unable to initialize cipher with OpenSSL falling back to JCE implementation");
+    static OutputStream encrypt(FSDataOutputStream output, KeyMaterial keyMaterial, String algorithm) {
+        if (!algorithm.equals(AES_ALGORITHM)) {
+            return createDefaultOutputStream(output, algorithm);
         }
 
+        try {
+            return createApacheOutputStream(output, keyMaterial);
+        } catch (IOException e) {
+            log.warn("Unable to initialize cipher with OpenSSL, falling back to JCE implementation");
+            return createDefaultOutputStream(output, algorithm);
+        }
+    }
+
+    private static OutputStream createApacheOutputStream(FSDataOutputStream output, KeyMaterial keyMaterial)
+            throws IOException {
+        SecretKey secretKey = keyMaterial.getSecretKey();
+        byte[] iv = keyMaterial.getIv();
+        return new CtrCryptoOutputStream(PROPS, output, secretKey.getEncoded(), iv);
+    }
+
+    private static OutputStream createDefaultOutputStream(FSDataOutputStream output, String algorithm) {
         SeekableCipher cipher = SeekableCipherFactory.getCipher(algorithm);
         return new FsCipherOutputStream(output, cipher);
     }

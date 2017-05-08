@@ -20,7 +20,6 @@ import com.google.common.annotations.VisibleForTesting;
 import com.palantir.crypto2.cipher.AesCtrCipher;
 import com.palantir.crypto2.cipher.SeekableCipher;
 import com.palantir.crypto2.cipher.SeekableCipherFactory;
-import com.palantir.crypto2.hadoop.cipher.EncryptedOutputStreamFactory;
 import com.palantir.crypto2.hadoop.cipher.FsCipherInputStream;
 import com.palantir.crypto2.keys.KeyMaterial;
 import com.palantir.crypto2.keys.KeyStorageStrategy;
