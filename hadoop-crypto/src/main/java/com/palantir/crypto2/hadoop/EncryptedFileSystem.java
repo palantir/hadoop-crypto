@@ -91,7 +91,7 @@ public final class EncryptedFileSystem extends FilterFileSystem {
         // Ensure we can open the stream before storing keys that would be irrelevant
         OutputStream encryptedOs =
                 CryptoStreamFactory.encrypt(encryptedStream, cipher.getKeyMaterial(), cipherAlgorithm);
-        FSDataOutputStream os = new FSDataOutputStream(encryptedOs, null);
+        FSDataOutputStream os = new FSDataOutputStream(encryptedOs, statistics);
         keyStore.put(path.toString(), cipher.getKeyMaterial());
 
         return os;
