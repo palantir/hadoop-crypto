@@ -25,13 +25,8 @@ import com.palantir.crypto2.cipher.CipherStreamSupplier;
 import com.palantir.crypto2.cipher.SeekableCipher;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import javax.crypto.Cipher;
 import javax.crypto.CipherOutputStream;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.ShortBufferException;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.junit.Before;
 import org.junit.Test;
@@ -48,9 +43,7 @@ public final class FsCipherOutputStreamTest {
     private FsCipherOutputStream scos;
 
     @Before
-    public void before()
-            throws ShortBufferException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException,
-            InvalidAlgorithmParameterException {
+    public void before() {
         initCipher = mock(Cipher.class);
         os = mock(FSDataOutputStream.class);
         cos = mock(CipherOutputStream.class);

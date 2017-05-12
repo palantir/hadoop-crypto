@@ -21,11 +21,12 @@ import com.palantir.crypto2.cipher.AesCtrCipher;
 import com.palantir.crypto2.cipher.SeekableCipher;
 import com.palantir.crypto2.cipher.SeekableCipherFactory;
 import com.palantir.crypto2.hadoop.cipher.FsCipherInputStream;
-import com.palantir.crypto2.hadoop.cipher.FsCipherOutputStream;
+import com.palantir.crypto2.io.CryptoStreamFactory;
 import com.palantir.crypto2.keys.KeyMaterial;
 import com.palantir.crypto2.keys.KeyStorageStrategy;
 import java.io.IOException;
 import java.util.EnumSet;
+import java.io.OutputStream;
 import java.util.Optional;
 import org.apache.hadoop.fs.CreateFlag;
 import org.apache.hadoop.fs.FSDataInputStream;
@@ -77,9 +78,8 @@ public final class EncryptedFileSystem extends FilterFileSystem {
         FSDataInputStream encryptedStream = fs.open(path, bufferSize);
 
         KeyMaterial keyMaterial = keyStore.get(path.toString());
-        SeekableCipher cipher = SeekableCipherFactory.getCipher(cipherAlgorithm, keyMaterial);
 
-        return new FSDataInputStream(new FsCipherInputStream(encryptedStream, cipher));
+        return new FSDataInputStream(new FsCipherInputStream(encryptedStream, keyMaterial, cipherAlgorithm));
     }
 
     @Override
@@ -92,7 +92,9 @@ public final class EncryptedFileSystem extends FilterFileSystem {
         SeekableCipher cipher = SeekableCipherFactory.getCipher(cipherAlgorithm);
 
         // Ensure we can open the stream before storing keys that would be irrelevant
-        FSDataOutputStream os = new FSDataOutputStream(new FsCipherOutputStream(encryptedStream, cipher), null);
+        OutputStream encryptedOs =
+                CryptoStreamFactory.encrypt(encryptedStream, cipher.getKeyMaterial(), cipherAlgorithm);
+        FSDataOutputStream os = new FSDataOutputStream(encryptedOs, statistics);
         keyStore.put(path.toString(), cipher.getKeyMaterial());
 
         return os;

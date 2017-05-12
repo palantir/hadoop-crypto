@@ -17,23 +17,36 @@
 package com.palantir.crypto2.hadoop.cipher;
 
 import com.palantir.crypto2.cipher.SeekableCipher;
+import com.palantir.crypto2.io.CryptoStreamFactory;
 import com.palantir.crypto2.io.DecryptingSeekableInput;
 import com.palantir.crypto2.io.DefaultSeekableInputStream;
+import com.palantir.crypto2.keys.KeyMaterial;
 import com.palantir.seekio.SeekableInput;
 import java.io.IOException;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FSInputStream;
 
 /**
- * Decrypts data read from the given {@link FSDataInputStream} using the given {@link SeekableCipher}.
+ * Decrypts data read from the given {@link FSDataInputStream} using the given {@link KeyMaterial} and cipher {@code
+ * algorithm}.
  */
 public final class FsCipherInputStream extends FSInputStream {
 
     private final DefaultSeekableInputStream delegate;
 
+    /**
+     * @deprecated use {@link FsCipherInputStream#FsCipherInputStream(FSDataInputStream, KeyMaterial, String)} instead.
+     */
+    @Deprecated
     public FsCipherInputStream(FSDataInputStream delegate, SeekableCipher cipher) {
         this.delegate = new DefaultSeekableInputStream(
                 new DecryptingSeekableInput(new FsSeekableInput(delegate), cipher));
+    }
+
+    public FsCipherInputStream(FSDataInputStream delegate, KeyMaterial keyMaterial, String algorithm) {
+        SeekableInput decrypted = CryptoStreamFactory.decrypt(
+                new FsSeekableInput(delegate), keyMaterial, algorithm);
+        this.delegate = new DefaultSeekableInputStream(decrypted);
     }
 
     @Override

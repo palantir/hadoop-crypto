@@ -72,9 +72,17 @@ public final class DecryptingSeekableInputTest {
 
     private static SeekableInput apacheStream(SeekableCipher cipher, SeekableInput input) {
         if (cipher instanceof AesCtrCipher) {
-            return ApacheCtrDecryptingSeekableInput.create(input, cipher.getKeyMaterial());
+            return uncheckedApacheStream(cipher, input);
         } else {
             throw new IllegalArgumentException("Unsupported cipher type");
+        }
+    }
+
+    private static SeekableInput uncheckedApacheStream(SeekableCipher cipher, SeekableInput input) {
+        try {
+            return new ApacheCtrDecryptingSeekableInput(input, cipher.getKeyMaterial());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
