@@ -16,6 +16,8 @@
 
 package com.palantir.crypto2.keys;
 
+import java.util.concurrent.CompletableFuture;
+
 /**
  * The strategy used to store the per file {@link KeyMaterial} used for encryption operations.
  */
@@ -30,6 +32,10 @@ public interface KeyStorageStrategy {
      * Retrieves the {@link KeyMaterial} for a file with the given {@code fileKey}.
      */
     KeyMaterial get(String fileKey);
+
+    default CompletableFuture<KeyMaterial> getAsync(String fileKey) {
+        return CompletableFuture.completedFuture(get(fileKey));
+    }
 
     /**
      * Removes the {@link KeyMaterial} for a file with the given {@code fileKey}.

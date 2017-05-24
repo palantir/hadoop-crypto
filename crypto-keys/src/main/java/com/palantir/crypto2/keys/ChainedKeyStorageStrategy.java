@@ -17,9 +17,13 @@
 package com.palantir.crypto2.keys;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Suppliers;
 import com.google.common.collect.Collections2;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,6 +66,34 @@ public final class ChainedKeyStorageStrategy implements KeyStorageStrategy {
         throw new InternalError(String.format(
                 "Unable to get key material using any of the provided strategies: %s",
                 Collections2.transform(strategies, s -> s.getClass().getCanonicalName())));
+    }
+
+    @Override
+    public CompletableFuture<KeyMaterial> getAsync(String fileKey) {
+        List<Supplier<CompletableFuture<KeyMaterial>>> futures = strategies.stream()
+                .skip(1)
+                .map(strategy -> (Supplier<CompletableFuture<KeyMaterial>>)
+                        Suppliers.memoize(() -> strategy.getAsync("fileKey"))::get)
+                .collect(Collectors.toList());
+
+        CompletableFuture<KeyMaterial> accumulated = strategies.get(0).getAsync(fileKey);
+        for (Supplier<CompletableFuture<KeyMaterial>> remainingStrategies : futures) {
+            accumulated = accumulated
+                    .handle((result, error) -> {
+                        if (error != null) {
+                            logger.info("Failed to get key material", error);
+                        }
+                        return result;
+                    })
+                    .thenCompose(result -> {
+                        if (result != null) {
+                            return CompletableFuture.completedFuture(result);
+                        } else {
+                            return remainingStrategies.get();
+                        }
+                    });
+        }
+        return accumulated;
     }
 
     @Override
