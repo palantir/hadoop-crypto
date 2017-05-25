@@ -19,22 +19,22 @@ package com.palantir.crypto2.keys;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * The asynchronous strategy used to store the per file {@link KeyMaterial} used for encryption operations.
+ * The asynchronous equivalent of {@link KeyStorageStrategy}.
  */
 public interface AsyncKeyStorageStrategy {
 
     /**
-     * Stores the {@link KeyMaterial} for a file with the given {@code fileKey}.
+     * Async equivalent of {@link KeyStorageStrategy#put(String, KeyMaterial)}.
      */
     CompletableFuture<Void> put(String fileKey, KeyMaterial keyMaterial);
 
     /**
-     * Retrieves the {@link KeyMaterial} for a file with the given {@code fileKey}.
+     * Async equivalent of {@link KeyStorageStrategy#get(String)}.
      */
     CompletableFuture<KeyMaterial> get(String fileKey);
 
     /**
-     * Removes the {@link KeyMaterial} for a file with the given {@code fileKey}.
+     * Async equivalent of {@link KeyStorageStrategy#remove(String)}.
      */
     CompletableFuture<Void> remove(String fileKey);
 
