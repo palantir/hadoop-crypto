@@ -33,8 +33,16 @@ public interface KeyStorageStrategy {
      */
     KeyMaterial get(String fileKey);
 
+    /**
+     * Retrieves the {@link KeyMaterial} for a file with the given {@code fileKey},
+     * returning a {@link CompletableFuture}. Consumers should expect this to execute
+     * in a nonblocking fashion.
+     *
+     * By default uses the common fork-join pool - implementers will likely want to
+     * change this behaviour in non-trivial cases.
+     */
     default CompletableFuture<KeyMaterial> getAsync(String fileKey) {
-        return CompletableFuture.completedFuture(get(fileKey));
+        return CompletableFuture.supplyAsync(() -> get(fileKey));
     }
 
     /**

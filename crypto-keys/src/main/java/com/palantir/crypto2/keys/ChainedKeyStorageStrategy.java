@@ -73,7 +73,7 @@ public final class ChainedKeyStorageStrategy implements KeyStorageStrategy {
         List<Supplier<CompletableFuture<KeyMaterial>>> futures = strategies.stream()
                 .skip(1)
                 .map(strategy -> (Supplier<CompletableFuture<KeyMaterial>>)
-                        Suppliers.memoize(() -> strategy.getAsync("fileKey"))::get)
+                        Suppliers.memoize(() -> strategy.getAsync(fileKey))::get)
                 .collect(Collectors.toList());
 
         CompletableFuture<KeyMaterial> accumulated = strategies.get(0).getAsync(fileKey);
