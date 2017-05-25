@@ -67,10 +67,12 @@ public final class DecryptionTests {
         random.nextBytes(data);
     }
 
+    // Marker interfaces
+    private interface EncryptedStreamFactory extends BiFunction<SeekableCipher, OutputStream, OutputStream> {}
+    private interface DecryptedStreamFactory extends BiFunction<SeekableCipher, SeekableInput, SeekableInput> {}
+
     @Parameterized.Parameters
-    public static Collection<Case<String,
-                BiFunction<SeekableCipher, OutputStream, OutputStream>,
-                BiFunction<SeekableCipher, SeekableInput, SeekableInput>>> ciphers() {
+    public static Collection<Case<String, EncryptedStreamFactory, DecryptedStreamFactory>> ciphers() {
         return ImmutableList.of(
                 new Case<>(AesCtrCipher.ALGORITHM, DecryptionTests::jceEncrypted, DecryptionTests::apacheDecrypted),
                 new Case<>(AesCtrCipher.ALGORITHM, DecryptionTests::jceEncrypted, DecryptionTests::jceDecrypted),
@@ -79,9 +81,7 @@ public final class DecryptionTests {
                 new Case<>(AesCbcCipher.ALGORITHM, DecryptionTests::jceEncrypted, DecryptionTests::jceDecrypted));
     }
 
-    public DecryptionTests(Case<String,
-                BiFunction<SeekableCipher, OutputStream, OutputStream>,
-                BiFunction<SeekableCipher, SeekableInput, SeekableInput>> testCase) {
+    public DecryptionTests(Case<String, EncryptedStreamFactory, DecryptedStreamFactory> testCase) {
         try {
             SeekableCipher seekableCipher = SeekableCipherFactory.getCipher(testCase.alg);
             ByteArrayOutputStream os = new ByteArrayOutputStream();
