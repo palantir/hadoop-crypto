@@ -51,6 +51,8 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 public final class DecryptionTests {
 
+    private static final String AES_CTR = AesCtrCipher.ALGORITHM;
+    private static final String AES_CBC = AesCbcCipher.ALGORITHM;
     private static final int NUM_BYTES = 1024 * 1024;
     private static final Random random = new Random(0);
     private static byte[] data;
@@ -67,30 +69,26 @@ public final class DecryptionTests {
         random.nextBytes(data);
     }
 
-    // Marker interfaces
-    private interface EncryptedStreamFactory extends BiFunction<SeekableCipher, OutputStream, OutputStream> {}
-    private interface DecryptedStreamFactory extends BiFunction<SeekableCipher, SeekableInput, SeekableInput> {}
-
     @Parameterized.Parameters
-    public static Collection<Case<String, EncryptedStreamFactory, DecryptedStreamFactory>> ciphers() {
+    public static Collection<TestCase> ciphers() {
         return ImmutableList.of(
-                new Case<>(AesCtrCipher.ALGORITHM, DecryptionTests::jceEncrypted, DecryptionTests::apacheDecrypted),
-                new Case<>(AesCtrCipher.ALGORITHM, DecryptionTests::jceEncrypted, DecryptionTests::jceDecrypted),
-                new Case<>(AesCtrCipher.ALGORITHM, DecryptionTests::apacheEncrypted, DecryptionTests::apacheDecrypted),
-                new Case<>(AesCtrCipher.ALGORITHM, DecryptionTests::apacheEncrypted, DecryptionTests::jceDecrypted),
-                new Case<>(AesCbcCipher.ALGORITHM, DecryptionTests::jceEncrypted, DecryptionTests::jceDecrypted));
+                new TestCase(AES_CTR, DecryptionTests::jceEncrypted, DecryptionTests::apacheDecrypted),
+                new TestCase(AES_CTR, DecryptionTests::jceEncrypted, DecryptionTests::jceDecrypted),
+                new TestCase(AES_CTR, DecryptionTests::apacheEncrypted, DecryptionTests::apacheDecrypted),
+                new TestCase(AES_CTR, DecryptionTests::apacheEncrypted, DecryptionTests::jceDecrypted),
+                new TestCase(AES_CBC, DecryptionTests::jceEncrypted, DecryptionTests::jceDecrypted));
     }
 
-    public DecryptionTests(Case<String, EncryptedStreamFactory, DecryptedStreamFactory> testCase) {
+    public DecryptionTests(TestCase testCase) {
         try {
             SeekableCipher seekableCipher = SeekableCipherFactory.getCipher(testCase.alg);
             ByteArrayOutputStream os = new ByteArrayOutputStream();
-            OutputStream cos = testCase.encCipher.apply(seekableCipher, os);
+            OutputStream cos = testCase.encFactory.apply(seekableCipher, os);
             cos.write(data);
             cos.close();
 
             InMemorySeekableDataInput input = new InMemorySeekableDataInput(os.toByteArray());
-            cis = testCase.decCipher.apply(seekableCipher, input);
+            cis = testCase.decFactory.apply(seekableCipher, input);
             blockSize = seekableCipher.getBlockSize();
         } catch (IOException e) {
             throw Throwables.propagate(e);
@@ -180,16 +178,20 @@ public final class DecryptionTests {
         ByteStreams.readFully(new DefaultSeekableInputStream(input), decrypted);
     }
 
-    @SuppressWarnings("VisibilityModifier")
-    private static final class Case<A, E, D> {
-        A alg;
-        E encCipher;
-        D decCipher;
+    // Marker interfaces
+    private interface EncryptedStreamFactory extends BiFunction<SeekableCipher, OutputStream, OutputStream> {}
+    private interface DecryptedStreamFactory extends BiFunction<SeekableCipher, SeekableInput, SeekableInput> {}
 
-        Case(A alg, E encCipher, D decCipher) {
+    @SuppressWarnings("VisibilityModifier")
+    private static final class TestCase {
+        String alg;
+        EncryptedStreamFactory encFactory;
+        DecryptedStreamFactory decFactory;
+
+        TestCase(String alg, EncryptedStreamFactory encFactory, DecryptedStreamFactory decFactory) {
             this.alg = alg;
-            this.encCipher = encCipher;
-            this.decCipher = decCipher;
+            this.encFactory = encFactory;
+            this.decFactory = decFactory;
         }
     }
 
