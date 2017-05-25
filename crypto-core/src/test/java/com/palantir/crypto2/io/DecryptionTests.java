@@ -123,16 +123,16 @@ public final class DecryptionTests {
 
     public DecryptionTests(Case<String,
                 BiFunction<SeekableCipher, OutputStream, OutputStream>,
-                BiFunction<SeekableCipher, SeekableInput, SeekableInput>> aCase) {
+                BiFunction<SeekableCipher, SeekableInput, SeekableInput>> testCase) {
         try {
-            SeekableCipher seekableCipher = SeekableCipherFactory.getCipher(aCase.alg);
+            SeekableCipher seekableCipher = SeekableCipherFactory.getCipher(testCase.alg);
             ByteArrayOutputStream os = new ByteArrayOutputStream();
-            OutputStream cos = aCase.encCipher.apply(seekableCipher, os);
+            OutputStream cos = testCase.encCipher.apply(seekableCipher, os);
             cos.write(data);
             cos.close();
 
             InMemorySeekableDataInput input = new InMemorySeekableDataInput(os.toByteArray());
-            cis = aCase.decCipher.apply(seekableCipher, input);
+            cis = testCase.decCipher.apply(seekableCipher, input);
             blockSize = seekableCipher.getBlockSize();
         } catch (IOException e) {
             throw Throwables.propagate(e);
