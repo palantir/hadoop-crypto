@@ -17,7 +17,6 @@
 package com.palantir.crypto2.keys;
 
 import com.google.common.base.Preconditions;
-import com.google.common.base.Suppliers;
 import com.google.common.collect.Collections2;
 import java.util.Arrays;
 import java.util.List;
@@ -72,8 +71,7 @@ public final class ChainedKeyStorageStrategy implements KeyStorageStrategy {
     public CompletableFuture<KeyMaterial> getAsync(String fileKey) {
         List<Supplier<CompletableFuture<KeyMaterial>>> futures = strategies.stream()
                 .skip(1)
-                .map(strategy -> (Supplier<CompletableFuture<KeyMaterial>>)
-                        Suppliers.memoize(() -> strategy.getAsync(fileKey))::get)
+                .map(strategy -> (Supplier<CompletableFuture<KeyMaterial>>) () -> strategy.getAsync(fileKey))
                 .collect(Collectors.toList());
 
         CompletableFuture<KeyMaterial> accumulated = strategies.get(0).getAsync(fileKey);
