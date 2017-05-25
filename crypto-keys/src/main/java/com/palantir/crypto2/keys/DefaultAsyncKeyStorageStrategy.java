@@ -27,8 +27,8 @@ public final class DefaultAsyncKeyStorageStrategy implements AsyncKeyStorageStra
     private static final ExecutorService DEFAULT_EXECUTOR = Executors.newCachedThreadPool(
             new ThreadFactoryBuilder().setNameFormat("async-key-storage-strategy-%s").build());
 
-    private KeyStorageStrategy keys;
-    private ExecutorService executor;
+    private final KeyStorageStrategy keys;
+    private final ExecutorService executor;
 
     public DefaultAsyncKeyStorageStrategy(KeyStorageStrategy keys) {
         this(keys, DEFAULT_EXECUTOR);
