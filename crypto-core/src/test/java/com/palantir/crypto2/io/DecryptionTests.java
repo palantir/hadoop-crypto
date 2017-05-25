@@ -178,8 +178,10 @@ public final class DecryptionTests {
         ByteStreams.readFully(new DefaultSeekableInputStream(input), decrypted);
     }
 
-    // Marker interfaces
+    // Marker interface
     private interface EncryptedStreamFactory extends BiFunction<SeekableCipher, OutputStream, OutputStream> {}
+
+    // Marker interface
     private interface DecryptedStreamFactory extends BiFunction<SeekableCipher, SeekableInput, SeekableInput> {}
 
     @SuppressWarnings("VisibilityModifier")
