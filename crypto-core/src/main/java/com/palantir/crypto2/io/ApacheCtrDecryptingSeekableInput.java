@@ -16,12 +16,12 @@
 
 package com.palantir.crypto2.io;
 
+import com.palantir.crypto2.cipher.ApacheCiphers;
 import com.palantir.crypto2.keys.KeyMaterial;
 import com.palantir.seekio.SeekableInput;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Properties;
-import org.apache.commons.crypto.cipher.CryptoCipherFactory;
 import org.apache.commons.crypto.stream.CtrCryptoInputStream;
 import org.apache.commons.crypto.stream.input.Input;
 import org.apache.commons.crypto.utils.Utils;
@@ -35,7 +35,7 @@ public final class ApacheCtrDecryptingSeekableInput extends CtrCryptoInputStream
     private static final String ALGORITHM = "AES/CTR/NoPadding";
     private static final int BUFFER_SIZE = 8192;
     // Force OpenSSL for AES-NI support
-    private static final Properties PROPS = initializeProps();
+    private static final Properties PROPS = ApacheCiphers.forceOpenSsl(new Properties());
 
     /**
      * Creates a new {@link ApacheCtrDecryptingSeekableInput}. This constructor is expected to succeed if and only if
@@ -112,12 +112,6 @@ public final class ApacheCtrDecryptingSeekableInput extends CtrCryptoInputStream
         public void close() throws IOException {
             input.close();
         }
-    }
-
-    private static Properties initializeProps() {
-        Properties props = new Properties();
-        props.setProperty(CryptoCipherFactory.CLASSES_KEY, CryptoCipherFactory.CipherProvider.OPENSSL.getClassName());
-        return props;
     }
 
 }

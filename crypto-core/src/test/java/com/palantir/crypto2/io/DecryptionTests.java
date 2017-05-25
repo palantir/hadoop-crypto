@@ -24,18 +24,23 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.io.ByteStreams;
 import com.palantir.crypto2.cipher.AesCbcCipher;
 import com.palantir.crypto2.cipher.AesCtrCipher;
+import com.palantir.crypto2.cipher.ApacheCiphers;
 import com.palantir.crypto2.cipher.SeekableCipher;
 import com.palantir.crypto2.cipher.SeekableCipherFactory;
+import com.palantir.crypto2.keys.KeyMaterial;
 import com.palantir.seekio.InMemorySeekableDataInput;
 import com.palantir.seekio.SeekableInput;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Properties;
 import java.util.Random;
 import java.util.function.BiFunction;
 import javax.crypto.Cipher;
 import javax.crypto.CipherOutputStream;
+import org.apache.commons.crypto.stream.CtrCryptoOutputStream;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -44,7 +49,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
-public final class DecryptingSeekableInputTest {
+public final class DecryptionTests {
 
     private static final int NUM_BYTES = 1024 * 1024;
     private static final Random random = new Random(0);
@@ -63,22 +68,44 @@ public final class DecryptingSeekableInputTest {
     }
 
     @Parameterized.Parameters
-    public static Collection<Pair<String, BiFunction<SeekableCipher, SeekableInput, SeekableInput>>> ciphers() {
+    public static Collection<Case<String,
+                BiFunction<SeekableCipher, OutputStream, OutputStream>,
+                BiFunction<SeekableCipher, SeekableInput, SeekableInput>>> ciphers() {
         return ImmutableList.of(
-                new Pair<>(AesCtrCipher.ALGORITHM, DecryptingSeekableInputTest::apacheStream),
-                new Pair<>(AesCtrCipher.ALGORITHM, DecryptingSeekableInputTest::jceStream),
-                new Pair<>(AesCbcCipher.ALGORITHM, DecryptingSeekableInputTest::jceStream));
+                new Case<>(AesCtrCipher.ALGORITHM, DecryptionTests::jceEncrypted, DecryptionTests::apacheDecrypted),
+                new Case<>(AesCtrCipher.ALGORITHM, DecryptionTests::jceEncrypted, DecryptionTests::jceDecrypted),
+                new Case<>(AesCtrCipher.ALGORITHM, DecryptionTests::apacheEncrypted, DecryptionTests::apacheDecrypted),
+                new Case<>(AesCtrCipher.ALGORITHM, DecryptionTests::apacheEncrypted, DecryptionTests::jceDecrypted),
+                new Case<>(AesCbcCipher.ALGORITHM, DecryptionTests::jceEncrypted, DecryptionTests::jceDecrypted));
     }
 
-    private static SeekableInput apacheStream(SeekableCipher cipher, SeekableInput input) {
+    private static OutputStream apacheEncrypted(SeekableCipher cipher, OutputStream output) {
         if (cipher instanceof AesCtrCipher) {
-            return uncheckedApacheStream(cipher, input);
+            return uncheckedApacheEncrypted(cipher, output);
         } else {
             throw new IllegalArgumentException("Unsupported cipher type");
         }
     }
 
-    private static SeekableInput uncheckedApacheStream(SeekableCipher cipher, SeekableInput input) {
+    private static OutputStream uncheckedApacheEncrypted(SeekableCipher cipher, OutputStream output) {
+        try {
+            Properties props = ApacheCiphers.forceOpenSsl(new Properties());
+            KeyMaterial km = cipher.getKeyMaterial();
+            return new CtrCryptoOutputStream(props, output, km.getSecretKey().getEncoded(), km.getIv());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static SeekableInput apacheDecrypted(SeekableCipher cipher, SeekableInput input) {
+        if (cipher instanceof AesCtrCipher) {
+            return uncheckedApacheDecrypted(cipher, input);
+        } else {
+            throw new IllegalArgumentException("Unsupported cipher type");
+        }
+    }
+
+    private static SeekableInput uncheckedApacheDecrypted(SeekableCipher cipher, SeekableInput input) {
         try {
             return new ApacheCtrDecryptingSeekableInput(input, cipher.getKeyMaterial());
         } catch (IOException e) {
@@ -86,21 +113,26 @@ public final class DecryptingSeekableInputTest {
         }
     }
 
-    private static SeekableInput jceStream(SeekableCipher cipher, SeekableInput input) {
+    private static OutputStream jceEncrypted(SeekableCipher cipher, OutputStream output) {
+        return new CipherOutputStream(output, cipher.initCipher(Cipher.ENCRYPT_MODE));
+    }
+
+    private static SeekableInput jceDecrypted(SeekableCipher cipher, SeekableInput input) {
         return new DecryptingSeekableInput(input, cipher);
     }
 
-    public DecryptingSeekableInputTest(
-            Pair<String, BiFunction<SeekableCipher, SeekableInput, SeekableInput>> testCase) {
+    public DecryptionTests(Case<String,
+                BiFunction<SeekableCipher, OutputStream, OutputStream>,
+                BiFunction<SeekableCipher, SeekableInput, SeekableInput>> aCase) {
         try {
-            SeekableCipher seekableCipher = SeekableCipherFactory.getCipher(testCase.key);
+            SeekableCipher seekableCipher = SeekableCipherFactory.getCipher(aCase.alg);
             ByteArrayOutputStream os = new ByteArrayOutputStream();
-            CipherOutputStream cos = new CipherOutputStream(os, seekableCipher.initCipher(Cipher.ENCRYPT_MODE));
+            OutputStream cos = aCase.encCipher.apply(seekableCipher, os);
             cos.write(data);
             cos.close();
 
             InMemorySeekableDataInput input = new InMemorySeekableDataInput(os.toByteArray());
-            cis = testCase.val.apply(seekableCipher, input);
+            cis = aCase.decCipher.apply(seekableCipher, input);
             blockSize = seekableCipher.getBlockSize();
         } catch (IOException e) {
             throw Throwables.propagate(e);
@@ -191,13 +223,15 @@ public final class DecryptingSeekableInputTest {
     }
 
     @SuppressWarnings("VisibilityModifier")
-    private static final class Pair<K, V> {
-        K key;
-        V val;
+    private static final class Case<A, E, D> {
+        A alg;
+        E encCipher;
+        D decCipher;
 
-        Pair(K key, V val) {
-            this.key = key;
-            this.val = val;
+        Case(A alg, E encCipher, D decCipher) {
+            this.alg = alg;
+            this.encCipher = encCipher;
+            this.decCipher = decCipher;
         }
     }
 
