@@ -79,48 +79,6 @@ public final class DecryptionTests {
                 new Case<>(AesCbcCipher.ALGORITHM, DecryptionTests::jceEncrypted, DecryptionTests::jceDecrypted));
     }
 
-    private static OutputStream apacheEncrypted(SeekableCipher cipher, OutputStream output) {
-        if (cipher instanceof AesCtrCipher) {
-            return uncheckedApacheEncrypted(cipher, output);
-        } else {
-            throw new IllegalArgumentException("Unsupported cipher type");
-        }
-    }
-
-    private static OutputStream uncheckedApacheEncrypted(SeekableCipher cipher, OutputStream output) {
-        try {
-            Properties props = ApacheCiphers.forceOpenSsl(new Properties());
-            KeyMaterial km = cipher.getKeyMaterial();
-            return new CtrCryptoOutputStream(props, output, km.getSecretKey().getEncoded(), km.getIv());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private static SeekableInput apacheDecrypted(SeekableCipher cipher, SeekableInput input) {
-        if (cipher instanceof AesCtrCipher) {
-            return uncheckedApacheDecrypted(cipher, input);
-        } else {
-            throw new IllegalArgumentException("Unsupported cipher type");
-        }
-    }
-
-    private static SeekableInput uncheckedApacheDecrypted(SeekableCipher cipher, SeekableInput input) {
-        try {
-            return new ApacheCtrDecryptingSeekableInput(input, cipher.getKeyMaterial());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private static OutputStream jceEncrypted(SeekableCipher cipher, OutputStream output) {
-        return new CipherOutputStream(output, cipher.initCipher(Cipher.ENCRYPT_MODE));
-    }
-
-    private static SeekableInput jceDecrypted(SeekableCipher cipher, SeekableInput input) {
-        return new DecryptingSeekableInput(input, cipher);
-    }
-
     public DecryptionTests(Case<String,
                 BiFunction<SeekableCipher, OutputStream, OutputStream>,
                 BiFunction<SeekableCipher, SeekableInput, SeekableInput>> testCase) {
@@ -184,7 +142,7 @@ public final class DecryptionTests {
         testSeek(pos);
     }
 
-    public void testSeek(int seekPos) throws IOException {
+    private void testSeek(int seekPos) throws IOException {
         cis.seek(seekPos);
 
         assertThat(cis.getPos(), is((long) seekPos));
@@ -233,6 +191,48 @@ public final class DecryptionTests {
             this.encCipher = encCipher;
             this.decCipher = decCipher;
         }
+    }
+
+    private static OutputStream apacheEncrypted(SeekableCipher cipher, OutputStream output) {
+        if (cipher instanceof AesCtrCipher) {
+            return uncheckedApacheEncrypted(cipher, output);
+        } else {
+            throw new IllegalArgumentException("Unsupported cipher type");
+        }
+    }
+
+    private static OutputStream uncheckedApacheEncrypted(SeekableCipher cipher, OutputStream output) {
+        try {
+            Properties props = ApacheCiphers.forceOpenSsl(new Properties());
+            KeyMaterial km = cipher.getKeyMaterial();
+            return new CtrCryptoOutputStream(props, output, km.getSecretKey().getEncoded(), km.getIv());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static SeekableInput apacheDecrypted(SeekableCipher cipher, SeekableInput input) {
+        if (cipher instanceof AesCtrCipher) {
+            return uncheckedApacheDecrypted(cipher, input);
+        } else {
+            throw new IllegalArgumentException("Unsupported cipher type");
+        }
+    }
+
+    private static SeekableInput uncheckedApacheDecrypted(SeekableCipher cipher, SeekableInput input) {
+        try {
+            return new ApacheCtrDecryptingSeekableInput(input, cipher.getKeyMaterial());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static OutputStream jceEncrypted(SeekableCipher cipher, OutputStream output) {
+        return new CipherOutputStream(output, cipher.initCipher(Cipher.ENCRYPT_MODE));
+    }
+
+    private static SeekableInput jceDecrypted(SeekableCipher cipher, SeekableInput input) {
+        return new DecryptingSeekableInput(input, cipher);
     }
 
 }
