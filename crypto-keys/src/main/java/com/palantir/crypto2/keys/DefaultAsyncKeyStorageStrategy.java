@@ -16,26 +16,15 @@
 
 package com.palantir.crypto2.keys;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public final class DefaultAsyncKeyStorageStrategy implements AsyncKeyStorageStrategy {
-
-    private static final ExecutorService DEFAULT_EXECUTOR = Executors.newCachedThreadPool(
-            new ThreadFactoryBuilder().setNameFormat("async-key-storage-strategy-%s").build());
 
     private final KeyStorageStrategy keys;
     private final ExecutorService executor;
 
-    public DefaultAsyncKeyStorageStrategy(KeyStorageStrategy keys) {
-        this(keys, DEFAULT_EXECUTOR);
-    }
-
-    @VisibleForTesting
-    DefaultAsyncKeyStorageStrategy(KeyStorageStrategy keys, ExecutorService executor) {
+    public DefaultAsyncKeyStorageStrategy(KeyStorageStrategy keys, ExecutorService executor) {
         this.keys = keys;
         this.executor = executor;
     }
