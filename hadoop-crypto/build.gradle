@@ -8,6 +8,7 @@ dependencies {
     compile "org.apache.hadoop:hadoop-common"
 
     testCompile "junit:junit"
+    testCompile "org.assertj:assertj-core"
     testCompile "org.hamcrest:hamcrest-all"
     testCompile "org.mockito:mockito-core"
 }

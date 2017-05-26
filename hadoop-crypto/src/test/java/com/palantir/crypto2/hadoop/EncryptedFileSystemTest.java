@@ -16,6 +16,7 @@
 
 package com.palantir.crypto2.hadoop;
 
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
@@ -36,11 +37,14 @@ import static org.mockito.Mockito.when;
 import com.palantir.crypto2.cipher.AesCtrCipher;
 import com.palantir.crypto2.keys.KeyMaterial;
 import com.palantir.crypto2.keys.KeyStorageStrategy;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.util.Arrays;
@@ -50,6 +54,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.permission.FsPermission;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -359,4 +364,75 @@ public final class EncryptedFileSystemTest {
         assertFalse(efs.delete(path, false));
         assertThat(keyStore.get(path.toString()), is(nullValue()));
     }
+
+    @Test
+    public void testExists() throws IOException {
+        mockedEfs.exists(path);
+
+        verify(mockFs).exists(path);
+    }
+
+    @Test
+    public void testListStatus() throws IOException {
+        mockedEfs.listStatus(path);
+
+        verify(mockFs).listStatus(path);
+    }
+
+    @Test
+    public void testSetWorkingDirectory() {
+        mockedEfs.setWorkingDirectory(path);
+
+        verify(mockFs).setWorkingDirectory(path);
+    }
+
+    @Test
+    public void testGetWorkingDirectory() {
+        mockedEfs.getWorkingDirectory();
+
+        verify(mockFs).getWorkingDirectory();
+    }
+
+    @Test
+    public void testMkdirs() throws IOException {
+        mockedEfs.mkdirs(path, FsPermission.getDefault());
+
+        verify(mockFs).mkdirs(path, FsPermission.getDefault());
+    }
+
+    @Test
+    public void testGetFileStatus() throws IOException {
+        mockedEfs.getFileStatus(path);
+
+        verify(mockFs).getFileStatus(path);
+    }
+
+    @Test
+    public void testGetUri() {
+        mockedEfs.getUri();
+
+        verify(mockFs).getUri();
+    }
+
+    @Test
+    public void testAppend() {
+        assertThatExceptionOfType(UnsupportedOperationException.class)
+                .isThrownBy(() -> mockedEfs.append(path, 0, null))
+                .withMessage("appending to encrypted files is not supported");
+    }
+
+    @Test // https://github.com/palantir/hadoop-crypto/issues/27
+    public void testCopyFromLocalFile() throws IOException {
+        File file = folder.newFile();
+        byte[] data = "data".getBytes(StandardCharsets.UTF_8);
+        byte[] readBytes = new byte[data.length];
+
+        IOUtils.write(data, new FileOutputStream(file));
+        efs.copyFromLocalFile(new Path(file.getAbsolutePath()), path);
+
+        FSDataInputStream input = efs.open(path);
+        IOUtils.readFully(input, readBytes);
+        assertThat(readBytes, is(data));
+    }
+
 }
