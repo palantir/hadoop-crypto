@@ -98,8 +98,8 @@ public final class DefaultAsyncKeyStorageStrategyTest {
                 .join();
     }
 
-    private Void verifyIllegalStateThrown(Throwable t) {
-        assertThat(t.getCause(), instanceOf(IllegalStateException.class));
+    private Void verifyIllegalStateThrown(Throwable throwable) {
+        assertThat(throwable.getCause(), instanceOf(IllegalStateException.class));
         return null;
     }
 
