@@ -16,6 +16,7 @@
 
 package com.palantir.crypto2.hadoop;
 
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
@@ -50,6 +51,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.permission.FsPermission;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -359,4 +361,61 @@ public final class EncryptedFileSystemTest {
         assertFalse(efs.delete(path, false));
         assertThat(keyStore.get(path.toString()), is(nullValue()));
     }
+
+    @Test
+    public void testExists() throws IOException {
+        mockedEfs.exists(path);
+
+        verify(mockFs).exists(path);
+    }
+
+    @Test
+    public void testListStatus() throws IOException {
+        mockedEfs.listStatus(path);
+
+        verify(mockFs).listStatus(path);
+    }
+
+    @Test
+    public void testSetWorkingDirectory() {
+        mockedEfs.setWorkingDirectory(path);
+
+        verify(mockFs).setWorkingDirectory(path);
+    }
+
+    @Test
+    public void testGetWorkingDirectory() {
+        mockedEfs.getWorkingDirectory();
+
+        verify(mockFs).getWorkingDirectory();
+    }
+
+    @Test
+    public void testMkdirs() throws IOException {
+        mockedEfs.mkdirs(path, FsPermission.getDefault());
+
+        verify(mockFs).mkdirs(path, FsPermission.getDefault());
+    }
+
+    @Test
+    public void testGetFileStatus() throws IOException {
+        mockedEfs.getFileStatus(path);
+
+        verify(mockFs).getFileStatus(path);
+    }
+
+    @Test
+    public void testGetUri() {
+        mockedEfs.getUri();
+
+        verify(mockFs).getUri();
+    }
+
+    @Test
+    public void testAppend() {
+        assertThatExceptionOfType(UnsupportedOperationException.class)
+                .isThrownBy(() -> mockedEfs.append(path, 0, null))
+                .withMessage("appending to encrypted files is not supported");
+    }
+
 }

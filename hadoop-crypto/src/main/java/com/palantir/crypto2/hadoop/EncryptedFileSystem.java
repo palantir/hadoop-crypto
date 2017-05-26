@@ -26,13 +26,15 @@ import com.palantir.crypto2.keys.KeyMaterial;
 import com.palantir.crypto2.keys.KeyStorageStrategy;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URI;
 import java.util.EnumSet;
 import java.util.Optional;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.CreateFlag;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FSDataOutputStream;
+import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.FilterFileSystem;
 import org.apache.hadoop.fs.Options;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.permission.FsPermission;
@@ -47,7 +49,7 @@ import org.slf4j.LoggerFactory;
  * {@link #DEFAULT_CIPHER_ALGORITHM} will be used. The symmetric key used to encrypt each file is stored and retrieved
  * using the provided {@link KeyStorageStrategy}.
  */
-public final class EncryptedFileSystem extends FilterFileSystem {
+public final class EncryptedFileSystem extends FileSystem {
 
     private static final Logger log = LoggerFactory.getLogger(EncryptedFileSystem.class);
     private static final String DEFAULT_CIPHER_ALGORITHM = AesCtrCipher.ALGORITHM;
@@ -59,18 +61,19 @@ public final class EncryptedFileSystem extends FilterFileSystem {
     public static final String DEPRECATED_CIPHER_ALGORITHM_KEY = "fs.cipher";
     public static final String CIPHER_ALGORITHM_KEY = "fs.efs.cipher";
 
+    private final FileSystem fs;
     private final KeyStorageStrategy keyStore;
     private final String cipherAlgorithm;
 
     public EncryptedFileSystem(FileSystem fs, KeyStorageStrategy keyStore) {
-        super(fs);
+        this.setConf(fs.getConf());
+        this.fs = fs;
         this.keyStore = keyStore;
         this.cipherAlgorithm = getCipherAlgorithm();
     }
 
-    @Override
-    public boolean exists(Path path) throws IOException {
-        return fs.exists(path);
+    public void initialize(URI name, Configuration conf) throws IOException {
+        super.initialize(name, conf);
     }
 
     @Override
@@ -140,6 +143,48 @@ public final class EncryptedFileSystem extends FilterFileSystem {
         }
         keyStore.remove(path.toString());
         return fs.delete(path, false);
+    }
+
+    // Delegating methods below
+
+    @Override
+    public boolean exists(Path path) throws IOException {
+        return fs.exists(path);
+    }
+
+    @Override
+    public FileStatus[] listStatus(Path path) throws IOException {
+        return fs.listStatus(path);
+    }
+
+    @Override
+    public void setWorkingDirectory(Path path) {
+        fs.setWorkingDirectory(path);
+    }
+
+    @Override
+    public Path getWorkingDirectory() {
+        return fs.getWorkingDirectory();
+    }
+
+    @Override
+    public boolean mkdirs(Path path, FsPermission permission) throws IOException {
+        return fs.mkdirs(path, permission);
+    }
+
+    @Override
+    public FileStatus getFileStatus(Path path) throws IOException {
+        return fs.getFileStatus(path);
+    }
+
+    @Override
+    public URI getUri() {
+        return fs.getUri();
+    }
+
+    @Override
+    public FSDataOutputStream append(Path path, int bufferSize, Progressable progress) throws IOException {
+        throw new UnsupportedOperationException("appending to encrypted files is not supported");
     }
 
     @VisibleForTesting
