@@ -16,6 +16,7 @@
 
 package com.palantir.crypto2.io;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.palantir.crypto2.cipher.SeekableCipher;
 import com.palantir.crypto2.cipher.SeekableCipherFactory;
 import com.palantir.crypto2.keys.KeyMaterial;
@@ -47,6 +48,7 @@ public final class CryptoStreamFactory {
         return decrypt(encryptedInput, keyMaterial, algorithm, false);
     }
 
+    @VisibleForTesting
     static SeekableInput decrypt(
             SeekableInput encryptedInput, KeyMaterial keyMaterial, String algorithm, boolean forceJce) {
         if (!algorithm.equals(AES_ALGORITHM) || forceJce) {
@@ -69,6 +71,7 @@ public final class CryptoStreamFactory {
         return encrypt(output, keyMaterial, algorithm, false);
     }
 
+    @VisibleForTesting
     static OutputStream encrypt(OutputStream output, KeyMaterial keyMaterial, String algorithm, boolean forceJce) {
         if (!algorithm.equals(AES_ALGORITHM) || forceJce) {
             return createDefaultEncryptedStream(output, keyMaterial, algorithm);
