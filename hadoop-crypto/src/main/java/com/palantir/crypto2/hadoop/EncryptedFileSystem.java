@@ -27,15 +27,12 @@ import com.palantir.crypto2.keys.KeyStorageStrategy;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
-import java.util.EnumSet;
 import java.util.Optional;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.CreateFlag;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Options;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.util.Progressable;
@@ -101,14 +98,6 @@ public final class EncryptedFileSystem extends FileSystem {
         keyStore.put(path.toString(), cipher.getKeyMaterial());
 
         return os;
-    }
-
-    @Override
-    public FSDataOutputStream create(Path path, FsPermission permission,
-            EnumSet<CreateFlag> flags, int bufferSize, short replication, long blockSize,
-            Progressable progress, Options.ChecksumOpt checksumOpt) throws IOException {
-        return create(path, permission, flags.contains(CreateFlag.OVERWRITE), bufferSize, replication, blockSize,
-                progress);
     }
 
     @Override
