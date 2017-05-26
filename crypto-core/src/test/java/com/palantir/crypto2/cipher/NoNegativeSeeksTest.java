@@ -19,6 +19,7 @@ package com.palantir.crypto2.cipher;
 import static org.junit.Assert.fail;
 
 import com.palantir.crypto2.io.DecryptingSeekableInput;
+import com.palantir.crypto2.keys.KeyMaterial;
 import com.palantir.seekio.SeekableInput;
 import java.io.IOException;
 import org.junit.Test;
@@ -27,10 +28,12 @@ public final class NoNegativeSeeksTest {
 
     @Test
     public void testDecryptingSeekableInput_doesNotSeekNegatively() throws IOException {
+        KeyMaterial keyMaterial = SeekableCipherFactory.generateKeyMaterial(AesCtrCipher.ALGORITHM);
+        SeekableCipher cipher = SeekableCipherFactory.getCipher(AesCtrCipher.ALGORITHM, keyMaterial);
+
         for (int increment = 16; increment < 2048; increment += 16) {
             try (DecryptingSeekableInput stream = new DecryptingSeekableInput(
-                    new DisallowNegativeSeeksSeekableInput(),
-                    SeekableCipherFactory.getCipher(AesCtrCipher.ALGORITHM))) {
+                    new DisallowNegativeSeeksSeekableInput(), cipher)) {
                 for (int i = 0; i < 1024 * 1024; i += increment) {
                     stream.seek(i);
                 }

@@ -22,6 +22,7 @@ import com.palantir.crypto2.cipher.AesCtrCipher;
 import com.palantir.crypto2.cipher.SeekableCipher;
 import com.palantir.crypto2.cipher.SeekableCipherFactory;
 import com.palantir.crypto2.io.DecryptingSeekableInput;
+import com.palantir.crypto2.keys.KeyMaterial;
 import com.palantir.seekio.InMemorySeekableDataInput;
 import com.palantir.seekio.SeekableInput;
 import java.io.ByteArrayOutputStream;
@@ -36,12 +37,12 @@ public final class ExampleUsage {
     @Test
     public void decryptingSeekableInputExample() throws IOException {
         byte[] bytes = "0123456789".getBytes(StandardCharsets.UTF_8);
-        SeekableCipher cipher = SeekableCipherFactory.getCipher(AesCtrCipher.ALGORITHM);
-        ByteArrayOutputStream os = new ByteArrayOutputStream(bytes.length);
-        Cipher encrypt = cipher.initCipher(Cipher.ENCRYPT_MODE);
 
         // Store this key material for future decryption
-        // KeyMaterial keyMaterial = cipher.getKeyMaterial();
+        KeyMaterial keyMaterial = SeekableCipherFactory.generateKeyMaterial(AesCtrCipher.ALGORITHM);
+        SeekableCipher cipher = SeekableCipherFactory.getCipher(AesCtrCipher.ALGORITHM, keyMaterial);
+        ByteArrayOutputStream os = new ByteArrayOutputStream(bytes.length);
+        Cipher encrypt = cipher.initCipher(Cipher.ENCRYPT_MODE);
 
         // Encrypt some bytes
         CipherOutputStream encryptedStream = new CipherOutputStream(os, encrypt);

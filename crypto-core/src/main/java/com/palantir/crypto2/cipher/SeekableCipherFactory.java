@@ -26,6 +26,26 @@ public final class SeekableCipherFactory {
 
     private SeekableCipherFactory() {}
 
+    public static KeyMaterial generateKeyMaterial(String cipherAlgorithm) {
+        switch (cipherAlgorithm) {
+            case AesCtrCipher.ALGORITHM:
+                return AesCtrCipher.generateKeyMaterial();
+            case AesCbcCipher.ALGORITHM:
+                return AesCbcCipher.generateKeyMaterial();
+            default:
+                throw new IllegalArgumentException(
+                        String.format("No known SeekableCipher with algorithm: %s", cipherAlgorithm));
+        }
+    }
+
+    /**
+     * @deprecated This method has been found to be error prone because consumers are not forced to handle the generated
+     * {@link KeyMaterial} explicitly. Use {@link #generateKeyMaterial(String)} and {@link #getCipher(String,
+     * KeyMaterial)} directly.
+     * <p>
+     * ex: https://github.com/palantir/hadoop-crypto/pull/77
+     */
+    @Deprecated
     public static SeekableCipher getCipher(String cipherAlgorithm) {
         switch (cipherAlgorithm) {
             case AesCtrCipher.ALGORITHM:
@@ -40,8 +60,10 @@ public final class SeekableCipherFactory {
 
     public static SeekableCipher getCipher(String cipherAlgorithm, KeyMaterial keyMaterial) {
         switch (cipherAlgorithm) {
-            case AesCtrCipher.ALGORITHM: return new AesCtrCipher(keyMaterial);
-            case AesCbcCipher.ALGORITHM: return new AesCbcCipher(keyMaterial);
+            case AesCtrCipher.ALGORITHM:
+                return new AesCtrCipher(keyMaterial);
+            case AesCbcCipher.ALGORITHM:
+                return new AesCbcCipher(keyMaterial);
             default:
                 throw new IllegalArgumentException(
                         String.format("No known SeekableCipher with algorithm: %s", cipherAlgorithm));

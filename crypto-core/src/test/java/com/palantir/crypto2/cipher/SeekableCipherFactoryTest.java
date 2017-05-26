@@ -18,6 +18,11 @@ package com.palantir.crypto2.cipher;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 import com.palantir.crypto2.keys.KeyMaterial;
@@ -32,6 +37,20 @@ public final class SeekableCipherFactoryTest {
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
+
+    @Test
+    public void testGenerateKeyMaterial_aesCtr() {
+        KeyMaterial keyMaterial = SeekableCipherFactory.generateKeyMaterial(AES_CTR);
+        String algorithm = keyMaterial.getSecretKey().getAlgorithm();
+        assertThat(algorithm, is("AES"));
+    }
+
+    @Test
+    public void testGenerateKeyMaterial_aesCbc() {
+        KeyMaterial keyMaterial = SeekableCipherFactory.generateKeyMaterial(AES_CBC);
+        String algorithm = keyMaterial.getSecretKey().getAlgorithm();
+        assertThat(algorithm, is("AES"));
+    }
 
     @Test
     public void testGetAesCtr_noKeyMaterial() {
