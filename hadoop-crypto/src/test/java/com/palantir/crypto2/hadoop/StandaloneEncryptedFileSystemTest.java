@@ -22,6 +22,8 @@ import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -31,6 +33,7 @@ import java.security.KeyPair;
 import java.util.Base64;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -181,6 +184,20 @@ public final class StandaloneEncryptedFileSystemTest {
 
         assertThat(fileStatus.length, is(1));
         assertThat(fileStatuses, arrayContaining(expectedStatus));
+    }
+
+    @Test // https://github.com/palantir/hadoop-crypto/issues/27
+    public void testCopyFromLocalFile() throws IOException {
+        File file = folder.newFile();
+        byte[] data = "data".getBytes(StandardCharsets.UTF_8);
+        byte[] readBytes = new byte[data.length];
+
+        IOUtils.write(data, new FileOutputStream(file));
+        efs.copyFromLocalFile(new Path(file.getAbsolutePath()), path);
+
+        FSDataInputStream input = efs.open(path);
+        IOUtils.readFully(input, readBytes);
+        assertThat(readBytes, is(data));
     }
 
     private static Configuration getBaseConf() {
