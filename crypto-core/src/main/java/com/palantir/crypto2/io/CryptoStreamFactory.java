@@ -16,6 +16,7 @@
 
 package com.palantir.crypto2.io;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.palantir.crypto2.cipher.SeekableCipher;
 import com.palantir.crypto2.cipher.SeekableCipherFactory;
 import com.palantir.crypto2.keys.KeyMaterial;
@@ -44,7 +45,13 @@ public final class CryptoStreamFactory {
      * cipher {@code algorithm}. When OpenSSL is available an implementation that uses AES-NI will be returned.
      */
     public static SeekableInput decrypt(SeekableInput encryptedInput, KeyMaterial keyMaterial, String algorithm) {
-        if (!algorithm.equals(AES_ALGORITHM)) {
+        return decrypt(encryptedInput, keyMaterial, algorithm, false);
+    }
+
+    @VisibleForTesting
+    static SeekableInput decrypt(
+            SeekableInput encryptedInput, KeyMaterial keyMaterial, String algorithm, boolean forceJce) {
+        if (!algorithm.equals(AES_ALGORITHM) || forceJce) {
             return new DecryptingSeekableInput(encryptedInput, SeekableCipherFactory.getCipher(algorithm, keyMaterial));
         }
 
@@ -61,15 +68,20 @@ public final class CryptoStreamFactory {
      * cipher {@code algorithm}. When OpenSSL is available an implementation that uses AES-NI will be returned.
      */
     public static OutputStream encrypt(OutputStream output, KeyMaterial keyMaterial, String algorithm) {
-        if (!algorithm.equals(AES_ALGORITHM)) {
-            return createDefaultEncryptedStream(output, algorithm);
+        return encrypt(output, keyMaterial, algorithm, false);
+    }
+
+    @VisibleForTesting
+    static OutputStream encrypt(OutputStream output, KeyMaterial keyMaterial, String algorithm, boolean forceJce) {
+        if (!algorithm.equals(AES_ALGORITHM) || forceJce) {
+            return createDefaultEncryptedStream(output, keyMaterial, algorithm);
         }
 
         try {
             return createApacheEncryptedStream(output, keyMaterial);
         } catch (IOException e) {
             log.warn("Unable to initialize cipher with OpenSSL, falling back to JCE implementation");
-            return createDefaultEncryptedStream(output, algorithm);
+            return createDefaultEncryptedStream(output, keyMaterial, algorithm);
         }
     }
 
@@ -80,8 +92,9 @@ public final class CryptoStreamFactory {
         return new CtrCryptoOutputStream(PROPS, output, secretKey.getEncoded(), iv);
     }
 
-    private static OutputStream createDefaultEncryptedStream(OutputStream output, String algorithm) {
-        SeekableCipher cipher = SeekableCipherFactory.getCipher(algorithm);
+    private static OutputStream createDefaultEncryptedStream(OutputStream output, KeyMaterial keyMaterial,
+            String algorithm) {
+        SeekableCipher cipher = SeekableCipherFactory.getCipher(algorithm, keyMaterial);
         return new CipherOutputStream(output, cipher.initCipher(Cipher.ENCRYPT_MODE));
     }
 
