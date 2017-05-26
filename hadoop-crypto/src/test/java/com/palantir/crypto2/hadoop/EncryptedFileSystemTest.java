@@ -37,11 +37,14 @@ import static org.mockito.Mockito.when;
 import com.palantir.crypto2.cipher.AesCtrCipher;
 import com.palantir.crypto2.keys.KeyMaterial;
 import com.palantir.crypto2.keys.KeyStorageStrategy;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.util.Arrays;
@@ -416,6 +419,20 @@ public final class EncryptedFileSystemTest {
         assertThatExceptionOfType(UnsupportedOperationException.class)
                 .isThrownBy(() -> mockedEfs.append(path, 0, null))
                 .withMessage("appending to encrypted files is not supported");
+    }
+
+    @Test // https://github.com/palantir/hadoop-crypto/issues/27
+    public void testCopyFromLocalFile() throws IOException {
+        File file = folder.newFile();
+        byte[] data = "data".getBytes(StandardCharsets.UTF_8);
+        byte[] readBytes = new byte[data.length];
+
+        IOUtils.write(data, new FileOutputStream(file));
+        efs.copyFromLocalFile(new Path(file.getAbsolutePath()), path);
+
+        FSDataInputStream input = efs.open(path);
+        IOUtils.readFully(input, readBytes);
+        assertThat(readBytes, is(data));
     }
 
 }
