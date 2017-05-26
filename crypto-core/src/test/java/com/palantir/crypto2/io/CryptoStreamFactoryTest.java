@@ -16,6 +16,7 @@
 
 package com.palantir.crypto2.io;
 
+import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -27,6 +28,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import org.apache.commons.crypto.stream.CtrCryptoInputStream;
+import org.apache.commons.crypto.stream.CtrCryptoOutputStream;
 import org.junit.Test;
 
 public final class CryptoStreamFactoryTest {
@@ -34,11 +37,22 @@ public final class CryptoStreamFactoryTest {
     private static final boolean FORCE_JCE = true;
 
     @Test
-    public void testEncryptDecryptJce() throws IOException {
-        byte[] bytes = "data".getBytes(StandardCharsets.UTF_8);
+    public void ensureDefaultIsApache() {
         KeyMaterial keyMaterial = AesCtrCipher.generateKeyMaterial();
 
+        OutputStream encrypted = CryptoStreamFactory.encrypt(null, keyMaterial, AesCtrCipher.ALGORITHM);
+        SeekableInput decrypted = CryptoStreamFactory.decrypt(null, keyMaterial, AesCtrCipher.ALGORITHM);
+
+        assertThat(encrypted, instanceOf(CtrCryptoOutputStream.class));
+        assertThat(decrypted, instanceOf(CtrCryptoInputStream.class));
+    }
+
+    @Test
+    public void testEncryptDecryptJce() throws IOException {
+        KeyMaterial keyMaterial = AesCtrCipher.generateKeyMaterial();
+        byte[] bytes = "data".getBytes(StandardCharsets.UTF_8);
         ByteArrayOutputStream os = new ByteArrayOutputStream();
+
         OutputStream encrypted = CryptoStreamFactory.encrypt(os, keyMaterial, AesCtrCipher.ALGORITHM, FORCE_JCE);
 
         encrypted.write(bytes);
