@@ -52,6 +52,8 @@ public final class CryptoStreamFactoryTest {
 
         assertThat(bytesRead, is(bytes.length));
         assertThat(readBytes, is(bytes));
+
+        System.setProperty(CryptoStreamFactory.FORCE_JCE, "false");
     }
 
 }
