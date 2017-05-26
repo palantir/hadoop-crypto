@@ -12,6 +12,10 @@ dependencies {
     testCompile "org.mockito:mockito-core"
 }
 
+test {
+    systemProperty 'force.jce.cipher', System.getProperty('force.jce.cipher')
+}
+
 shadowJar {
     mergeServiceFiles()
 
