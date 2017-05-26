@@ -16,14 +16,17 @@
 
 package com.palantir.crypto2.keys;
 
+import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -52,6 +55,16 @@ public final class DefaultAsyncKeyStorageStrategyTest {
     }
 
     @Test
+    public void testPut_exception() {
+        doThrow(IllegalStateException.class).when(delegate).put(KEY, keyMaterial);
+
+        keys.put(KEY, keyMaterial)
+                .thenRun(Assert::fail)
+                .exceptionally(this::verifyIllegalStateThrown)
+                .join();
+    }
+
+    @Test
     public void testGet() {
         when(delegate.get(KEY)).thenReturn(keyMaterial);
 
@@ -59,10 +72,35 @@ public final class DefaultAsyncKeyStorageStrategyTest {
     }
 
     @Test
+    public void testGet_exception() {
+        doThrow(IllegalStateException.class).when(delegate).get(KEY);
+
+        keys.get(KEY)
+                .thenRun(Assert::fail)
+                .exceptionally(this::verifyIllegalStateThrown)
+                .join();
+    }
+
+    @Test
     public void testRemove() {
         keys.remove(KEY).join();
 
         verify(delegate).remove(KEY);
+    }
+
+    @Test
+    public void testRemove_exception() {
+        doThrow(IllegalStateException.class).when(delegate).remove(KEY);
+
+        keys.remove(KEY)
+                .thenRun(Assert::fail)
+                .exceptionally(this::verifyIllegalStateThrown)
+                .join();
+    }
+
+    private Void verifyIllegalStateThrown(Throwable t) {
+        assertThat(t.getCause(), instanceOf(IllegalStateException.class));
+        return null;
     }
 
 }
