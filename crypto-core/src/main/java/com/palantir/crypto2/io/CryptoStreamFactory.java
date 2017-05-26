@@ -36,7 +36,6 @@ public final class CryptoStreamFactory {
     private static final Logger log = LoggerFactory.getLogger(CryptoStreamFactory.class);
     private static final Properties PROPS = initializeProps();
     private static final String AES_ALGORITHM = "AES/CTR/NoPadding";
-    static final String FORCE_JCE = "force.jce.cipher";
 
     private CryptoStreamFactory() {}
 
@@ -45,7 +44,12 @@ public final class CryptoStreamFactory {
      * cipher {@code algorithm}. When OpenSSL is available an implementation that uses AES-NI will be returned.
      */
     public static SeekableInput decrypt(SeekableInput encryptedInput, KeyMaterial keyMaterial, String algorithm) {
-        if (!algorithm.equals(AES_ALGORITHM) || Boolean.parseBoolean(System.getProperty(FORCE_JCE))) {
+        return decrypt(encryptedInput, keyMaterial, algorithm, false);
+    }
+
+    static SeekableInput decrypt(
+            SeekableInput encryptedInput, KeyMaterial keyMaterial, String algorithm, boolean forceJce) {
+        if (!algorithm.equals(AES_ALGORITHM) || forceJce) {
             return new DecryptingSeekableInput(encryptedInput, SeekableCipherFactory.getCipher(algorithm, keyMaterial));
         }
 
@@ -62,7 +66,11 @@ public final class CryptoStreamFactory {
      * cipher {@code algorithm}. When OpenSSL is available an implementation that uses AES-NI will be returned.
      */
     public static OutputStream encrypt(OutputStream output, KeyMaterial keyMaterial, String algorithm) {
-        if (!algorithm.equals(AES_ALGORITHM) || Boolean.parseBoolean(System.getProperty(FORCE_JCE))) {
+        return encrypt(output, keyMaterial, algorithm, false);
+    }
+
+    static OutputStream encrypt(OutputStream output, KeyMaterial keyMaterial, String algorithm, boolean forceJce) {
+        if (!algorithm.equals(AES_ALGORITHM) || forceJce) {
             return createDefaultEncryptedStream(output, keyMaterial, algorithm);
         }
 

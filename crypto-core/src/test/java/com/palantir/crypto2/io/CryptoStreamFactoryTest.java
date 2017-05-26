@@ -31,29 +31,27 @@ import org.junit.Test;
 
 public final class CryptoStreamFactoryTest {
 
+    private static final boolean FORCE_JCE = true;
+
     @Test
     public void testEncryptDecryptJce() throws IOException {
-        System.setProperty(CryptoStreamFactory.FORCE_JCE, "true");
-
         byte[] bytes = "data".getBytes(StandardCharsets.UTF_8);
         KeyMaterial keyMaterial = AesCtrCipher.generateKeyMaterial();
 
         ByteArrayOutputStream os = new ByteArrayOutputStream();
-        OutputStream encrypted = CryptoStreamFactory.encrypt(os, keyMaterial, AesCtrCipher.ALGORITHM);
+        OutputStream encrypted = CryptoStreamFactory.encrypt(os, keyMaterial, AesCtrCipher.ALGORITHM, FORCE_JCE);
 
         encrypted.write(bytes);
         encrypted.close();
 
         SeekableInput decrypted = CryptoStreamFactory.decrypt(
-                new InMemorySeekableDataInput(os.toByteArray()), keyMaterial, AesCtrCipher.ALGORITHM);
+                new InMemorySeekableDataInput(os.toByteArray()), keyMaterial, AesCtrCipher.ALGORITHM, FORCE_JCE);
 
         byte[] readBytes = new byte[bytes.length];
         int bytesRead = decrypted.read(readBytes, 0, bytes.length);
 
         assertThat(bytesRead, is(bytes.length));
         assertThat(readBytes, is(bytes));
-
-        System.setProperty(CryptoStreamFactory.FORCE_JCE, "false");
     }
 
 }
