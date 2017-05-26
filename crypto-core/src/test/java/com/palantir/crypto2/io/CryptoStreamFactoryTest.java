@@ -32,17 +32,8 @@ import org.junit.Test;
 public final class CryptoStreamFactoryTest {
 
     @Test
-    public void testApache() throws IOException {
-        testEncryptDecrypt(false);
-    }
-
-    @Test
-    public void testJce() throws IOException {
-        testEncryptDecrypt(true);
-    }
-
-    public void testEncryptDecrypt(Boolean useJce) throws IOException {
-        System.setProperty(CryptoStreamFactory.FORCE_JCE, useJce.toString());
+    public void testEncryptDecryptJce() throws IOException {
+        System.setProperty(CryptoStreamFactory.FORCE_JCE, "true");
 
         byte[] bytes = "data".getBytes(StandardCharsets.UTF_8);
         KeyMaterial keyMaterial = AesCtrCipher.generateKeyMaterial();
