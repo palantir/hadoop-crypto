@@ -36,7 +36,7 @@ public final class CryptoStreamFactory {
     private static final Logger log = LoggerFactory.getLogger(CryptoStreamFactory.class);
     private static final Properties PROPS = initializeProps();
     private static final String AES_ALGORITHM = "AES/CTR/NoPadding";
-    private static final String FORCE_JCE = "force.jce.cipher";
+    static final String FORCE_JCE = "force.jce.cipher";
 
     private CryptoStreamFactory() {}
 

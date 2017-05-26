@@ -12,7 +12,6 @@ dependencies:
 test:
   override:
     - ./gradlew --parallel build
-    - ./gradlew --parallel build -Dforce.jce.cipher=true
 
 deployment:
   release:

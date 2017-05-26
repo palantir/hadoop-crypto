@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.palantir.crypto2.cipher;
+package com.palantir.crypto2.io;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
-import com.palantir.crypto2.io.CryptoStreamFactory;
+import com.palantir.crypto2.cipher.AesCtrCipher;
 import com.palantir.crypto2.keys.KeyMaterial;
 import com.palantir.seekio.InMemorySeekableDataInput;
 import com.palantir.seekio.SeekableInput;
@@ -30,8 +30,20 @@ import java.nio.charset.StandardCharsets;
 import org.junit.Test;
 
 public final class CryptoStreamFactoryTest {
+
     @Test
-    public void testEncryptDecrypt() throws IOException {
+    public void testApache() throws IOException {
+        testEncryptDecrypt(false);
+    }
+
+    @Test
+    public void testJce() throws IOException {
+        testEncryptDecrypt(true);
+    }
+
+    public void testEncryptDecrypt(Boolean useJce) throws IOException {
+        System.setProperty(CryptoStreamFactory.FORCE_JCE, useJce.toString());
+
         byte[] bytes = "data".getBytes(StandardCharsets.UTF_8);
         KeyMaterial keyMaterial = AesCtrCipher.generateKeyMaterial();
 
@@ -50,4 +62,5 @@ public final class CryptoStreamFactoryTest {
         assertThat(bytesRead, is(bytes.length));
         assertThat(readBytes, is(bytes));
     }
+
 }
