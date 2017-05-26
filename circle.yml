@@ -12,6 +12,7 @@ dependencies:
 test:
   override:
     - ./gradlew --parallel build
+    - ./gradlew --parallel build -DFORCE_JCE=true
 
 deployment:
   release:
