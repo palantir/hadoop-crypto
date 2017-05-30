@@ -18,6 +18,7 @@ package com.palantir.crypto2.keys;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.ImmutableList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -43,7 +44,7 @@ public final class ChainedAsyncKeyStorageStrategy implements AsyncKeyStorageStra
     public ChainedAsyncKeyStorageStrategy(Executor executor, List<AsyncKeyStorageStrategy> strategies) {
         Preconditions.checkArgument(strategies.size() > 0, "Must specify at least one storage strategy");
         this.executor = executor;
-        this.strategies = strategies;
+        this.strategies = ImmutableList.copyOf(strategies);
     }
 
     @Override
@@ -61,7 +62,7 @@ public final class ChainedAsyncKeyStorageStrategy implements AsyncKeyStorageStra
                     log.info("Failed to get key material using {}", strategy.getClass().getCanonicalName(), e);
                 }
             }
-            throw new InternalError(String.format(
+            throw new RuntimeException(String.format(
                     "Unable to get key material using any of the provided strategies: %s",
                     Collections2.transform(strategies, s -> s.getClass().getCanonicalName())));
         }, executor);

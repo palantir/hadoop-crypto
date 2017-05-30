@@ -35,7 +35,7 @@ import org.junit.Test;
 public final class ChainedAsyncKeyStorageStrategyTest {
 
     private static final Executor EXECUTOR = MoreExecutors.directExecutor();
-    private static final CompletableFuture<Void> VOID = CompletableFuture.completedFuture(null);
+    private static final CompletableFuture<Void> VOID = CompletableFuture.allOf();
     private static final String KEY = "key";
 
     private KeyMaterial keyMaterial;
@@ -95,7 +95,7 @@ public final class ChainedAsyncKeyStorageStrategyTest {
 
         assertThatExceptionOfType(CompletionException.class)
                 .isThrownBy(() -> chained.get(KEY).join())
-                .withCauseInstanceOf(InternalError.class)
+                .withCauseInstanceOf(RuntimeException.class)
                 .withMessageContaining(String.format(
                         "Unable to get key material using any of the provided strategies: %s",
                         ImmutableList.of(failingStrategy.getClass().getCanonicalName())));
