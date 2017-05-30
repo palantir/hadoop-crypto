@@ -28,7 +28,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Async equivalent of {@link ChainedKeyStorageStrategy}.
+ * Async equivalent of {@link ChainedKeyStorageStrategy}. {@link #put(String, KeyMaterial)} and {@link #remove(String)}
+ * calls will be applies to all {@link AsyncKeyStorageStrategy strategies} concurrently while {@link #get(String)} is
+ * applied to each strategy in order and returns the result of the first successful strategy.
  */
 public final class ChainedAsyncKeyStorageStrategy implements AsyncKeyStorageStrategy {
 

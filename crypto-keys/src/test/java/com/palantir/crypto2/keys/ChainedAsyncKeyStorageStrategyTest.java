@@ -35,7 +35,7 @@ import org.junit.Test;
 public final class ChainedAsyncKeyStorageStrategyTest {
 
     private static final Executor EXECUTOR = MoreExecutors.directExecutor();
-    private static final CompletableFuture<Void> VOID = CompletableFuture.allOf();
+    private static final CompletableFuture<Void> VOID = new CompletableFuture<>();
     private static final String KEY = "key";
 
     private KeyMaterial keyMaterial;
