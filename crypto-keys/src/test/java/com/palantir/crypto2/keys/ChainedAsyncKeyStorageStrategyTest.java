@@ -1,0 +1,113 @@
+/*
+ * Copyright 2017 Palantir Technologies, Inc. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.palantir.crypto2.keys;
+
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.util.concurrent.MoreExecutors;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.concurrent.Executor;
+import org.junit.Before;
+import org.junit.Test;
+
+public final class ChainedAsyncKeyStorageStrategyTest {
+
+    private static final Executor EXECUTOR = MoreExecutors.directExecutor();
+    private static final CompletableFuture<Void> VOID = CompletableFuture.completedFuture(null);
+    private static final String KEY = "key";
+
+    private KeyMaterial keyMaterial;
+    private AsyncKeyStorageStrategy failingStrategy;
+    private AsyncKeyStorageStrategy successfulStrategy;
+    private ChainedAsyncKeyStorageStrategy chained;
+
+    @Before
+    public void before() {
+        keyMaterial = mock(KeyMaterial.class);
+        failingStrategy = mock(AsyncKeyStorageStrategy.class);
+        successfulStrategy = mock(AsyncKeyStorageStrategy.class);
+
+        when(successfulStrategy.put(KEY, keyMaterial)).thenReturn(VOID);
+        when(failingStrategy.put(KEY, keyMaterial)).thenReturn(VOID);
+
+        when(successfulStrategy.remove(KEY)).thenReturn(VOID);
+        when(failingStrategy.remove(KEY)).thenReturn(VOID);
+
+        when(successfulStrategy.get(KEY)).thenReturn(CompletableFuture.completedFuture(keyMaterial));
+        when(failingStrategy.get(KEY)).thenThrow(IllegalStateException.class);
+
+        chained = new ChainedAsyncKeyStorageStrategy(EXECUTOR, successfulStrategy, failingStrategy);
+    }
+
+    @Test
+    public void testAllPutsCalled() {
+        chained.put(KEY, keyMaterial).join();
+
+        verify(successfulStrategy).put(KEY, keyMaterial);
+        verify(failingStrategy).put(KEY, keyMaterial);
+        verifyNoMoreInteractions(successfulStrategy, failingStrategy);
+    }
+
+    @Test
+    public void testGetSucceeds() {
+        assertThat(chained.get(KEY).join(), is(keyMaterial));
+
+        verify(successfulStrategy).get(KEY);
+        verifyNoMoreInteractions(successfulStrategy, failingStrategy);
+    }
+
+    @Test
+    public void testFailedGetIgnored() {
+        chained = new ChainedAsyncKeyStorageStrategy(EXECUTOR, failingStrategy, successfulStrategy);
+
+        assertThat(chained.get(KEY).join(), is(keyMaterial));
+
+        verify(failingStrategy).get(KEY);
+        verify(successfulStrategy).get(KEY);
+        verifyNoMoreInteractions(successfulStrategy, failingStrategy);
+    }
+
+    @Test
+    public void testAllStrategiesFail() {
+        chained = new ChainedAsyncKeyStorageStrategy(EXECUTOR, failingStrategy);
+
+        assertThatExceptionOfType(CompletionException.class)
+                .isThrownBy(() -> chained.get(KEY).join())
+                .withCauseInstanceOf(InternalError.class)
+                .withMessageContaining(String.format(
+                        "Unable to get key material using any of the provided strategies: %s",
+                        ImmutableList.of(failingStrategy.getClass().getCanonicalName())));
+    }
+
+    @Test
+    public void testAllDeletesCalled() {
+        chained.remove(KEY).join();
+
+        verify(successfulStrategy).remove(KEY);
+        verify(failingStrategy).remove(KEY);
+        verifyNoMoreInteractions(successfulStrategy, failingStrategy);
+    }
+
+}

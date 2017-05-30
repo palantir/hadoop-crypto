@@ -1,0 +1,82 @@
+/*
+ * Copyright 2017 Palantir Technologies, Inc. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.palantir.crypto2.keys;
+
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Collections2;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.function.Function;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * Async equivalent of {@link ChainedKeyStorageStrategy}.
+ */
+public final class ChainedAsyncKeyStorageStrategy implements AsyncKeyStorageStrategy {
+
+    private static final Logger log = LoggerFactory.getLogger(ChainedAsyncKeyStorageStrategy.class);
+
+    private final Executor executor;
+    private final List<AsyncKeyStorageStrategy> strategies;
+
+    public ChainedAsyncKeyStorageStrategy(Executor executor, AsyncKeyStorageStrategy... strategies) {
+        this(executor, Arrays.asList(strategies));
+    }
+
+    public ChainedAsyncKeyStorageStrategy(Executor executor, List<AsyncKeyStorageStrategy> strategies) {
+        Preconditions.checkArgument(strategies.size() > 0, "Must specify at least one storage strategy");
+        this.executor = executor;
+        this.strategies = strategies;
+    }
+
+    @Override
+    public CompletableFuture<Void> put(String fileKey, KeyMaterial keyMaterial) {
+        return applyToStrategies(strategy -> strategy.put(fileKey, keyMaterial));
+    }
+
+    @Override
+    public CompletableFuture<KeyMaterial> get(String fileKey) {
+        return CompletableFuture.supplyAsync(() -> {
+            for (AsyncKeyStorageStrategy strategy : strategies) {
+                try {
+                    return strategy.get(fileKey).join();
+                } catch (Exception e) {
+                    log.info("Failed to get key material using {}", strategy.getClass().getCanonicalName(), e);
+                }
+            }
+            throw new InternalError(String.format(
+                    "Unable to get key material using any of the provided strategies: %s",
+                    Collections2.transform(strategies, s -> s.getClass().getCanonicalName())));
+        }, executor);
+    }
+
+    @Override
+    public CompletableFuture<Void> remove(String fileKey) {
+        return applyToStrategies(strategy -> strategy.remove(fileKey));
+    }
+
+    private CompletableFuture<Void> applyToStrategies(Function<AsyncKeyStorageStrategy, CompletableFuture<?>> mapper) {
+        CompletableFuture[] futures = strategies.stream()
+                .map(mapper)
+                .toArray(CompletableFuture[]::new);
+        return CompletableFuture.allOf(futures);
+    }
+
+}
