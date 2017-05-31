@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -50,28 +51,37 @@ public final class ChainedAsyncKeyStorageStrategyTest {
         successfulStrategy = mock(AsyncKeyStorageStrategy.class);
 
         when(successfulStrategy.put(KEY, keyMaterial)).thenReturn(VOID);
-        when(failingStrategy.put(KEY, keyMaterial)).thenReturn(VOID);
+        when(failingStrategy.put(KEY, keyMaterial)).thenThrow(IllegalArgumentException.class);
 
         when(successfulStrategy.remove(KEY)).thenReturn(VOID);
-        when(failingStrategy.remove(KEY)).thenReturn(VOID);
+        when(failingStrategy.remove(KEY)).thenThrow(IllegalArgumentException.class);
 
         when(successfulStrategy.get(KEY)).thenReturn(CompletableFuture.completedFuture(keyMaterial));
-        when(failingStrategy.get(KEY)).thenThrow(IllegalStateException.class);
-
-        chained = new ChainedAsyncKeyStorageStrategy(EXECUTOR, successfulStrategy, failingStrategy);
+        when(failingStrategy.get(KEY)).thenThrow(IllegalArgumentException.class);
     }
 
     @Test
-    public void testAllPutsCalled() {
+    public void testPut_allCalled() {
+        chained = new ChainedAsyncKeyStorageStrategy(EXECUTOR, successfulStrategy, successfulStrategy);
+
         chained.put(KEY, keyMaterial).join();
 
-        verify(successfulStrategy).put(KEY, keyMaterial);
-        verify(failingStrategy).put(KEY, keyMaterial);
+        verify(successfulStrategy, times(2)).put(KEY, keyMaterial);
         verifyNoMoreInteractions(successfulStrategy, failingStrategy);
     }
 
     @Test
-    public void testGetSucceeds() {
+    public void testPut_fails() {
+        chained = new ChainedAsyncKeyStorageStrategy(EXECUTOR, successfulStrategy, failingStrategy);
+
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> chained.put(KEY, keyMaterial).join());
+    }
+
+    @Test
+    public void testGet_succeedsAfterFirstStrategy() {
+        chained = new ChainedAsyncKeyStorageStrategy(EXECUTOR, successfulStrategy, failingStrategy);
+
         assertThat(chained.get(KEY).join(), is(keyMaterial));
 
         verify(successfulStrategy).get(KEY);
@@ -79,7 +89,7 @@ public final class ChainedAsyncKeyStorageStrategyTest {
     }
 
     @Test
-    public void testFailedGetIgnored() {
+    public void testGet_FailedGetIgnored() {
         chained = new ChainedAsyncKeyStorageStrategy(EXECUTOR, failingStrategy, successfulStrategy);
 
         assertThat(chained.get(KEY).join(), is(keyMaterial));
@@ -90,7 +100,7 @@ public final class ChainedAsyncKeyStorageStrategyTest {
     }
 
     @Test
-    public void testAllStrategiesFail() {
+    public void testGet_AllStrategiesFail() {
         chained = new ChainedAsyncKeyStorageStrategy(EXECUTOR, failingStrategy);
 
         assertThatExceptionOfType(CompletionException.class)
@@ -102,14 +112,20 @@ public final class ChainedAsyncKeyStorageStrategyTest {
     }
 
     @Test
-    public void testAllDeletesCalled() {
-        chained = new ChainedAsyncKeyStorageStrategy(EXECUTOR, failingStrategy, successfulStrategy);
+    public void testRemove_allCalled() {
+        chained = new ChainedAsyncKeyStorageStrategy(EXECUTOR, successfulStrategy, successfulStrategy);
 
         chained.remove(KEY).join();
 
-        verify(successfulStrategy).remove(KEY);
-        verify(failingStrategy).remove(KEY);
+        verify(successfulStrategy, times(2)).remove(KEY);
         verifyNoMoreInteractions(successfulStrategy, failingStrategy);
     }
 
+    @Test
+    public void testDelete_fails() {
+        chained = new ChainedAsyncKeyStorageStrategy(EXECUTOR, successfulStrategy, failingStrategy);
+
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> chained.remove(KEY).join());
+    }
 }
