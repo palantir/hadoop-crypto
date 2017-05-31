@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -135,14 +136,13 @@ public final class ChainedAsyncKeyStorageStrategyTest {
         DeterministicExecutor executor = new DeterministicExecutor();
         chained = new ChainedAsyncKeyStorageStrategy(executor, successfulStrategy);
 
-        // verify strategy called when cancel is not invoked
-        chained.get(KEY);
+        chained.get(KEY).cancel(true);
         executor.runUntilIdle();
 
-        verify(successfulStrategy).get(KEY);
+        verify(successfulStrategy, never()).get(KEY);
 
-        // strategy has still only been called once when cancel is invoked
-        chained.get(KEY).cancel(true);
+        // sanity check that not cancelling invokes the strategy
+        chained.get(KEY);
         executor.runUntilIdle();
 
         verify(successfulStrategy).get(KEY);
