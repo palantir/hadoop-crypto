@@ -51,6 +51,7 @@ public final class StandaloneEncryptedFileSystemTest {
     private FileSystem rawFs;
     private Configuration conf;
     private Path path;
+    private Path pathWithScheme;
 
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
@@ -70,6 +71,7 @@ public final class StandaloneEncryptedFileSystemTest {
         efs = FileSystem.newInstance(EFS_URI, conf);
         rawFs = FileSystem.newInstance(URI.create("file:///"), conf);
         path = new Path(folder.newFile().getAbsolutePath());
+        pathWithScheme = new Path("efile://", this.path);
     }
 
     @Test
@@ -100,6 +102,11 @@ public final class StandaloneEncryptedFileSystemTest {
 
         // KeyMaterial file exists
         assertTrue(rawFs.exists(new Path(path + FileKeyStorageStrategy.EXTENSION)));
+    }
+
+    @Test
+    public void testMakeQualified() throws IOException {
+        assertThat(efs.makeQualified(pathWithScheme), is(pathWithScheme));
     }
 
     @Test
