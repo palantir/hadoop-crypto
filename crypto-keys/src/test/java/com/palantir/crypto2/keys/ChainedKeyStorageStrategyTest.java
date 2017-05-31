@@ -90,7 +90,7 @@ public final class ChainedKeyStorageStrategyTest {
     public void testAllStrategiesFail() {
         chained = new ChainedKeyStorageStrategy(failingStrategy);
 
-        expectedException.expect(InternalError.class);
+        expectedException.expect(RuntimeException.class);
         expectedException.expectMessage(String.format(
                 "Unable to get key material using any of the provided strategies: %s",
                 ImmutableList.of(failingStrategy.getClass().getCanonicalName())));

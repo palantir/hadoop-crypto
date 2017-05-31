@@ -7,6 +7,8 @@ dependencies {
     compile "com.google.guava:guava"
 
     testCompile "junit:junit"
+    testCompile "org.assertj:assertj-core"
     testCompile "org.hamcrest:hamcrest-all"
+    testCompile "org.jmock:jmock-junit4"
     testCompile "org.mockito:mockito-core"
 }

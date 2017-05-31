@@ -18,6 +18,7 @@ package com.palantir.crypto2.keys;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.ImmutableList;
 import java.util.Arrays;
 import java.util.List;
 import org.slf4j.Logger;
@@ -36,7 +37,7 @@ public final class ChainedKeyStorageStrategy implements KeyStorageStrategy {
 
     public ChainedKeyStorageStrategy(List<KeyStorageStrategy> strategies) {
         Preconditions.checkArgument(strategies.size() > 0, "Must specify at least one storage strategy");
-        this.strategies = strategies;
+        this.strategies = ImmutableList.copyOf(strategies);
     }
 
     public ChainedKeyStorageStrategy(KeyStorageStrategy... strategies) {
@@ -59,7 +60,7 @@ public final class ChainedKeyStorageStrategy implements KeyStorageStrategy {
                 logger.info("Failed to get key material using {}", strategy.getClass().getCanonicalName(), e);
             }
         }
-        throw new InternalError(String.format(
+        throw new RuntimeException(String.format(
                 "Unable to get key material using any of the provided strategies: %s",
                 Collections2.transform(strategies, s -> s.getClass().getCanonicalName())));
     }
