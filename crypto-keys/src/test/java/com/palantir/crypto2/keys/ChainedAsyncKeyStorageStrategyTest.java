@@ -35,7 +35,7 @@ import org.junit.Test;
 public final class ChainedAsyncKeyStorageStrategyTest {
 
     private static final Executor EXECUTOR = MoreExecutors.directExecutor();
-    private static final CompletableFuture<Void> VOID = new CompletableFuture<>();
+    private static final CompletableFuture VOID = CompletableFuture.allOf();
     private static final String KEY = "key";
 
     private KeyMaterial keyMaterial;
@@ -103,6 +103,8 @@ public final class ChainedAsyncKeyStorageStrategyTest {
 
     @Test
     public void testAllDeletesCalled() {
+        chained = new ChainedAsyncKeyStorageStrategy(EXECUTOR, failingStrategy, successfulStrategy);
+
         chained.remove(KEY).join();
 
         verify(successfulStrategy).remove(KEY);
