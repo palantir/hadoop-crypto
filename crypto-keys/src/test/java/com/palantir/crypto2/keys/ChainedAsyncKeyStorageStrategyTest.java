@@ -30,6 +30,7 @@ import com.google.common.util.concurrent.MoreExecutors;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.Executor;
+import org.jmock.lib.concurrent.DeterministicExecutor;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -128,4 +129,23 @@ public final class ChainedAsyncKeyStorageStrategyTest {
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> chained.remove(KEY).join());
     }
+
+    @Test
+    public void testCancelForwarded() {
+        DeterministicExecutor executor = new DeterministicExecutor();
+        chained = new ChainedAsyncKeyStorageStrategy(executor, successfulStrategy);
+
+        // verify strategy called when cancel is not invoked
+        chained.get(KEY);
+        executor.runUntilIdle();
+
+        verify(successfulStrategy).get(KEY);
+
+        // strategy has still only been called once when cancel is invoked
+        chained.get(KEY).cancel(true);
+        executor.runUntilIdle();
+
+        verify(successfulStrategy).get(KEY);
+    }
+
 }
