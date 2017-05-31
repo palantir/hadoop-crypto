@@ -37,19 +37,22 @@ public final class PathConvertingFileSystem extends FileSystem {
     private final FileSystem delegate;
     private final Function<Path, Path> toFunc;
     private final Function<Path, Path> fromFunc;
+    private Function<URI, URI> fromUriFunc;
 
     public PathConvertingFileSystem(FileSystem delegate,
             Function<Path, Path> toFunc,
-            Function<Path, Path> fromFunc) {
+            Function<Path, Path> fromFunc,
+            Function<URI, URI> fromUriFunc) {
         super.setConf(delegate.getConf());
         this.delegate = delegate;
         this.toFunc = toFunc;
         this.fromFunc = fromFunc;
+        this.fromUriFunc = fromUriFunc;
     }
 
     @Override
     public URI getUri() {
-        return delegate.getUri();
+        return fromUriFunc.apply(delegate.getUri());
     }
 
     @Override

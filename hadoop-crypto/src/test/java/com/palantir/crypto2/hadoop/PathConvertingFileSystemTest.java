@@ -38,7 +38,8 @@ public final class PathConvertingFileSystemTest {
     private static final Path PATH = new Path("/dummy/path");
     private static final Path DELEGATE_PATH = new Path("/delagate/path");
     private static final Path RETURN_PATH = new Path("/return/path");
-    private static final URI DUMMY_URI = URI.create("/dummy/uri");
+    private static final URI DELEGATE_URI = URI.create("/delegate/uri");
+    private static final URI RETURN_URI = URI.create("/return/uri");
 
     private FileSystem delegate;
     private FSDataInputStream inputStream;
@@ -50,15 +51,15 @@ public final class PathConvertingFileSystemTest {
         delegate = mock(FileSystem.class);
         inputStream = mock(FSDataInputStream.class);
         outputStream = mock(FSDataOutputStream.class);
-        convertingFs = new PathConvertingFileSystem(delegate, p -> DELEGATE_PATH, p -> RETURN_PATH);
+        convertingFs = new PathConvertingFileSystem(delegate, p -> DELEGATE_PATH, p -> RETURN_PATH, u -> RETURN_URI);
     }
 
     @Test
     public void getUri() throws Exception {
-        when(delegate.getUri()).thenReturn(DUMMY_URI);
+        when(delegate.getUri()).thenReturn(DELEGATE_URI);
         URI actualUri = convertingFs.getUri();
 
-        assertThat(actualUri, is(DUMMY_URI));
+        assertThat(actualUri, is(RETURN_URI));
     }
 
     @Test
