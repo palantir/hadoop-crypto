@@ -110,6 +110,24 @@ openssl pkcs8 -topk8 -inform pem -in rsa.key -outform pem -nocrypt | grep -v PRI
         <name>fs.efs.key.private</name>
         <value>MIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCpeRI5wHZSkuuUbexwAcNq8+dK5zE7BFYbXbChjkl6tiWrIibvFw27ItD+ss/F2UIaA5k6g/MpVdz/ekB4508zUtxcs1bx3tSG3e+jtrpJH+ZcyIJMyf73A7HjQGrSh+/H0rhFKlbaUquUk1Qkb5E/mU7s6EHmm94QEyf/w5HbIwuBLnysdDSetddQeptaIwjyT55grtqKZ7GRAOEhe1uqZDm0BcrKhIwMDJ64M1jxaxhpbXk4LAZIhEKU0CLA8QYtAJglCLjUjHBDHA3jaNCbt/ChVKs3iUB+LkHwQfEWCUBlwTydRN1OdcJtST1I/PxdeYriGYr1fgv7YC/i5w0vAgMBAAECggEASvSLhROEwbzNiRadLmT5Q4Kg19YtRgcC9pOXnbzK7wVE3835HmI55nzdpuj7UGxo+gyBZwoZMD0Tw8MUZOUZeH+7ixye5ddCdGwQo34cIl+DiaH9T20/4Yy2zuYc2QTanqyqZ5z0URejX9FRs9PMkC6EY+/NxetGaiGu3UZoalz7F/5wS8bCaKPkm3AjLvqXHL5KiSbPDPBQj4m+iFWLoWZL9FB1zyif+yBatU4cBCLHaTTgXroItEKcxTwFfyi2l059ItoP5E10djKHpMuPiPrTMS0FHAom3GZAYEFnjRgInR0sIotEwuSDObqcio1PdXRsi5Ul8MxfpXxLSuL+UQKBgQDcvmehBARNDksQJGzIyegKg10eLYdfXFCR+QDZeqJod/pCQ6gtW0aFYAoL0uXiMwQzSb6m7offmXH0JLLqOnjgcZlejHUDSTTWtNOYlGaO7OVgFcnG6/UnCE54eJcaw68auvPB9XW3gm5cfWSNpUI+6aJDBb6BKx8uNMoRreq9wwKBgQDEilhsCgUOIRkJfM5MYUzMT0gR8qt671q+lgTjBDwYvdoQ7BijG6Lbqbp9Xd4nODiw1t7e1Rexw+cuIeRs8NITU4f4Nfe25rRhZ+0n7g9OoCiRUoEsmd7cqDk6pubpw9hW1TKKLzTqExisGFy+bnUA8FFs2TbU9Xeb9kdm1GXgJQKBgAsN9f6YRubc+mFakaAUjGxKW9VxDkB2TQqiX6qEe7GjoILFBJ0Q3x06zAX/j8eeKm2vGb8eXuuRsaU6WUNlnjwPNFEJ06pQdjbyY05W0DQEJRCExtARbPuBbPyXfWm3twMtrZtfAYApJgG3vdtiFUk1Rgz5MqshT7RurFfqT8ElAoGAE2BEOVp/hxYSPtI0EGmjRZ0nUMWozDTesF1f2/Wl6xaEchikkSf/VUKVZRik9x7ez+hPDo7ZiCf1GaIzv926CDe69uhzJG/4JoY1ZjNdBPZbKYCFxZzh0MUw5yxfJXquUFkyY1cmE1GQpB6+vfNry4zlqiJ7+mC8yv5rqaKU7JUCgYBXPYpuQppR1EFj66LSrZ8ebXmt5TtwR839UkgEhLOBkO0cFP2BXVAMx9p0/MYLNIPk7vVpVtRCKYr6tBVdUWCin0obC5O+JzuhilQ0aH3xl5mbiasOvCNPjniaTViRt6zNlaq6RMS4x1LqYUyqc4LUrBbGMWJsdjYqVAi1Rq1FTw==</value>
     </property>
+    
+<!-- If configuring es3a -->
+
+    <property>
+        <name>fs.s3a.access.key</name>
+        <value>S3 BUCKET ACCESS KEY GOES HERE</value>
+    </property>
+    
+    <property>
+        <name>fs.s3a.secret.key</name>
+        <value>S3 BUCKET SECRET KEY GOES HERE</value>
+    </property>
+    
+    <property>
+        <name>fs.s3a.endpoint</name>
+        <value>s3-external-1.amazonaws.com</value>
+    </property>
+      
 </configuration>
 ```
 
