@@ -16,10 +16,7 @@
 
 package com.palantir.crypto2.hadoop.example;
 
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import com.palantir.crypto2.hadoop.EncryptedFileSystem;
 import com.palantir.crypto2.hadoop.FileKeyStorageStrategy;
@@ -68,15 +65,15 @@ public final class ExampleUsage {
         // Reading through the decrypted stream produces the original bytes
         InputStream ein = efs.open(path);
         IOUtils.readFully(ein, readData);
-        assertThat(data, is(readData));
+        assertThat(data).containsExactly(readData);
 
         // Reading through the raw stream produces the encrypted bytes
         InputStream in = fs.open(path);
         IOUtils.readFully(in, readData);
-        assertThat(data, is(not(readData)));
+        assertThat(data).isNotEqualTo(readData);
 
         // Wrapped symmetric key is stored next to the encrypted file
-        assertTrue(fs.exists(new Path(path + FileKeyStorageStrategy.EXTENSION)));
+        assertThat(fs.exists(new Path(path + FileKeyStorageStrategy.EXTENSION))).isTrue();
     }
 
 }

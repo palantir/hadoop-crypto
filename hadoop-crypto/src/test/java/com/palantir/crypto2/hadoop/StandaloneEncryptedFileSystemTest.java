@@ -16,10 +16,8 @@
 
 package com.palantir.crypto2.hadoop;
 
-import static org.hamcrest.Matchers.arrayContaining;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -76,7 +74,7 @@ public final class StandaloneEncryptedFileSystemTest {
 
     @Test
     public void testGetUri_schemeIsCorrect() {
-        assertThat(efs.getUri().getScheme(), is("efile"));
+        assertThat(efs.getUri().getScheme()).isEqualTo("efile");
     }
 
     @Test
@@ -93,20 +91,20 @@ public final class StandaloneEncryptedFileSystemTest {
         // Read encrypted data
         InputStream dis = efs.open(path);
         IOUtils.readFully(dis, readData);
-        assertThat(readData, is(dataBytes));
+        assertThat(readData).containsExactly(dataBytes);
 
         // Raw data is not the same
         dis = rawFs.open(path);
         IOUtils.readFully(dis, readData);
-        assertThat(readData, is(not(dataBytes)));
+        assertThat(readData).isNotEqualTo(dataBytes);
 
         // KeyMaterial file exists
-        assertTrue(rawFs.exists(new Path(path + FileKeyStorageStrategy.EXTENSION)));
+        assertThat(rawFs.exists(new Path(path + FileKeyStorageStrategy.EXTENSION))).isTrue();
     }
 
     @Test
     public void testMakeQualified() throws IOException {
-        assertThat(efs.makeQualified(pathWithScheme), is(pathWithScheme));
+        assertThat(efs.makeQualified(pathWithScheme)).isEqualTo(pathWithScheme);
     }
 
     @Test
@@ -126,23 +124,22 @@ public final class StandaloneEncryptedFileSystemTest {
         // Raw data is not the same
         InputStream dis = rawFs.open(path);
         IOUtils.readFully(dis, readData);
-        assertThat(readData, is(not(dataBytes)));
+        assertThat(readData).isNotEqualTo(dataBytes);
 
         // KeyMaterial file exists
         assertTrue(rawFs.exists(new Path(path + FileKeyStorageStrategy.EXTENSION)));
 
         // Unable to open files without Private Key
-        expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("Private key is absent but required to get key material");
-        efsPublic.open(path);
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> efsPublic.open(path))
+                .withMessage("Private key is absent but required to get key material");
     }
 
     @Test
     public void testNoPublicKey() throws IOException {
-        expectedException.expect(NullPointerException.class);
-        expectedException.expectMessage(String.format("Public Key must be configured for key %s",
-                StandaloneEncryptedFileSystem.PUBLIC_KEY_CONF));
-        FileSystem.newInstance(EFS_URI, getBaseConf());
+        assertThatExceptionOfType(NullPointerException.class)
+                .isThrownBy(() -> FileSystem.newInstance(EFS_URI, getBaseConf()))
+                .withMessage("Public Key must be configured for key %s", StandaloneEncryptedFileSystem.PUBLIC_KEY_CONF);
     }
 
     @Test
@@ -150,9 +147,9 @@ public final class StandaloneEncryptedFileSystemTest {
         conf = getBaseConf();
         conf.set("fs.nope.impl", StandaloneEncryptedFileSystem.class.getCanonicalName());
 
-        expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("URI scheme must begin with 'e' but received: nope");
-        FileSystem.newInstance(URI.create("nope:///"), conf);
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> FileSystem.newInstance(URI.create("nope:///"), conf))
+                .withMessage("URI scheme must begin with 'e' but received: nope");
     }
 
     @Test
@@ -169,14 +166,11 @@ public final class StandaloneEncryptedFileSystemTest {
         IOUtils.write(data, os);
         os.close();
 
-        // NOTE(jellis): This is the most likely exception, however if the first byte of the .keymaterial file is the
-        // same as the KeyMaterials version then any number of RuntimeExceptions may be thrown.
-        // expectedException.expect(IllegalArgumentException.class);
-        // expectedException.expectMessage(
-        //         String.format("Invalid KeyMaterials format version. Expected 1 but found"));
+        // NOTE(jellis): IllegalArgumentException is the most likely exception, however if the first byte of the
+        // .keymaterial file is the same as the KeyMaterials version then any number of RuntimeExceptions may be thrown.
 
-        expectedException.expect(RuntimeException.class);
-        efs.open(path);
+        assertThatExceptionOfType(RuntimeException.class)
+                .isThrownBy(() -> efs.open(path));
     }
 
     @Test
@@ -189,8 +183,8 @@ public final class StandaloneEncryptedFileSystemTest {
         FileStatus[] fileStatuses = efs.listStatus(path.getParent());
         FileStatus expectedStatus = fileStatus[0];
 
-        assertThat(fileStatus.length, is(1));
-        assertThat(fileStatuses, arrayContaining(expectedStatus));
+        assertThat(fileStatus.length).isEqualTo(1);
+        assertThat(fileStatuses).containsExactly(expectedStatus);
     }
 
     @Test // https://github.com/palantir/hadoop-crypto/issues/27
@@ -204,7 +198,7 @@ public final class StandaloneEncryptedFileSystemTest {
 
         FSDataInputStream input = efs.open(path);
         IOUtils.readFully(input, readBytes);
-        assertThat(readBytes, is(data));
+        assertThat(readBytes).containsExactly(data);
     }
 
     private static Configuration getBaseConf() {
