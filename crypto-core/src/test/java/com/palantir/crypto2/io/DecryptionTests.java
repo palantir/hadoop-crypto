@@ -24,18 +24,23 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.io.ByteStreams;
 import com.palantir.crypto2.cipher.AesCbcCipher;
 import com.palantir.crypto2.cipher.AesCtrCipher;
+import com.palantir.crypto2.cipher.ApacheCiphers;
 import com.palantir.crypto2.cipher.SeekableCipher;
 import com.palantir.crypto2.cipher.SeekableCipherFactory;
+import com.palantir.crypto2.keys.KeyMaterial;
 import com.palantir.seekio.InMemorySeekableDataInput;
 import com.palantir.seekio.SeekableInput;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Properties;
 import java.util.Random;
 import java.util.function.BiFunction;
 import javax.crypto.Cipher;
 import javax.crypto.CipherOutputStream;
+import org.apache.commons.crypto.stream.CtrCryptoOutputStream;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -44,8 +49,10 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
-public final class DecryptingSeekableInputTest {
+public final class DecryptionTests {
 
+    private static final String AES_CTR = AesCtrCipher.ALGORITHM;
+    private static final String AES_CBC = AesCbcCipher.ALGORITHM;
     private static final int NUM_BYTES = 1024 * 1024;
     private static final Random random = new Random(0);
     private static byte[] data;
@@ -63,44 +70,25 @@ public final class DecryptingSeekableInputTest {
     }
 
     @Parameterized.Parameters
-    public static Collection<Pair<String, BiFunction<SeekableCipher, SeekableInput, SeekableInput>>> ciphers() {
+    public static Collection<TestCase> ciphers() {
         return ImmutableList.of(
-                new Pair<>(AesCtrCipher.ALGORITHM, DecryptingSeekableInputTest::apacheStream),
-                new Pair<>(AesCtrCipher.ALGORITHM, DecryptingSeekableInputTest::jceStream),
-                new Pair<>(AesCbcCipher.ALGORITHM, DecryptingSeekableInputTest::jceStream));
+                new TestCase(AES_CTR, DecryptionTests::jceEncrypted, DecryptionTests::apacheDecrypted),
+                new TestCase(AES_CTR, DecryptionTests::jceEncrypted, DecryptionTests::jceDecrypted),
+                new TestCase(AES_CTR, DecryptionTests::apacheEncrypted, DecryptionTests::apacheDecrypted),
+                new TestCase(AES_CTR, DecryptionTests::apacheEncrypted, DecryptionTests::jceDecrypted),
+                new TestCase(AES_CBC, DecryptionTests::jceEncrypted, DecryptionTests::jceDecrypted));
     }
 
-    private static SeekableInput apacheStream(SeekableCipher cipher, SeekableInput input) {
-        if (cipher instanceof AesCtrCipher) {
-            return uncheckedApacheStream(cipher, input);
-        } else {
-            throw new IllegalArgumentException("Unsupported cipher type");
-        }
-    }
-
-    private static SeekableInput uncheckedApacheStream(SeekableCipher cipher, SeekableInput input) {
+    public DecryptionTests(TestCase testCase) {
         try {
-            return new ApacheCtrDecryptingSeekableInput(input, cipher.getKeyMaterial());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private static SeekableInput jceStream(SeekableCipher cipher, SeekableInput input) {
-        return new DecryptingSeekableInput(input, cipher);
-    }
-
-    public DecryptingSeekableInputTest(
-            Pair<String, BiFunction<SeekableCipher, SeekableInput, SeekableInput>> testCase) {
-        try {
-            SeekableCipher seekableCipher = SeekableCipherFactory.getCipher(testCase.key);
+            SeekableCipher seekableCipher = SeekableCipherFactory.getCipher(testCase.alg);
             ByteArrayOutputStream os = new ByteArrayOutputStream();
-            CipherOutputStream cos = new CipherOutputStream(os, seekableCipher.initCipher(Cipher.ENCRYPT_MODE));
+            OutputStream cos = testCase.encFactory.apply(seekableCipher, os);
             cos.write(data);
             cos.close();
 
             InMemorySeekableDataInput input = new InMemorySeekableDataInput(os.toByteArray());
-            cis = testCase.val.apply(seekableCipher, input);
+            cis = testCase.decFactory.apply(seekableCipher, input);
             blockSize = seekableCipher.getBlockSize();
         } catch (IOException e) {
             throw Throwables.propagate(e);
@@ -152,7 +140,7 @@ public final class DecryptingSeekableInputTest {
         testSeek(pos);
     }
 
-    public void testSeek(int seekPos) throws IOException {
+    private void testSeek(int seekPos) throws IOException {
         cis.seek(seekPos);
 
         assertThat(cis.getPos(), is((long) seekPos));
@@ -190,15 +178,65 @@ public final class DecryptingSeekableInputTest {
         ByteStreams.readFully(new DefaultSeekableInputStream(input), decrypted);
     }
 
-    @SuppressWarnings("VisibilityModifier")
-    private static final class Pair<K, V> {
-        K key;
-        V val;
+    // Marker interface
+    private interface EncryptedStreamFactory extends BiFunction<SeekableCipher, OutputStream, OutputStream> {}
 
-        Pair(K key, V val) {
-            this.key = key;
-            this.val = val;
+    // Marker interface
+    private interface DecryptedStreamFactory extends BiFunction<SeekableCipher, SeekableInput, SeekableInput> {}
+
+    @SuppressWarnings("VisibilityModifier")
+    private static final class TestCase {
+        String alg;
+        EncryptedStreamFactory encFactory;
+        DecryptedStreamFactory decFactory;
+
+        TestCase(String alg, EncryptedStreamFactory encFactory, DecryptedStreamFactory decFactory) {
+            this.alg = alg;
+            this.encFactory = encFactory;
+            this.decFactory = decFactory;
         }
+    }
+
+    private static OutputStream apacheEncrypted(SeekableCipher cipher, OutputStream output) {
+        if (cipher instanceof AesCtrCipher) {
+            return uncheckedApacheEncrypted(cipher, output);
+        } else {
+            throw new IllegalArgumentException("Unsupported cipher type");
+        }
+    }
+
+    private static OutputStream uncheckedApacheEncrypted(SeekableCipher cipher, OutputStream output) {
+        try {
+            Properties props = ApacheCiphers.forceOpenSsl(new Properties());
+            KeyMaterial km = cipher.getKeyMaterial();
+            return new CtrCryptoOutputStream(props, output, km.getSecretKey().getEncoded(), km.getIv());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static SeekableInput apacheDecrypted(SeekableCipher cipher, SeekableInput input) {
+        if (cipher instanceof AesCtrCipher) {
+            return uncheckedApacheDecrypted(cipher, input);
+        } else {
+            throw new IllegalArgumentException("Unsupported cipher type");
+        }
+    }
+
+    private static SeekableInput uncheckedApacheDecrypted(SeekableCipher cipher, SeekableInput input) {
+        try {
+            return new ApacheCtrDecryptingSeekableInput(input, cipher.getKeyMaterial());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static OutputStream jceEncrypted(SeekableCipher cipher, OutputStream output) {
+        return new CipherOutputStream(output, cipher.initCipher(Cipher.ENCRYPT_MODE));
+    }
+
+    private static SeekableInput jceDecrypted(SeekableCipher cipher, SeekableInput input) {
+        return new DecryptingSeekableInput(input, cipher);
     }
 
 }

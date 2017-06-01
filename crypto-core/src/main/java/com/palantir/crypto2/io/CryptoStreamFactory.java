@@ -17,6 +17,7 @@
 package com.palantir.crypto2.io;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.palantir.crypto2.cipher.ApacheCiphers;
 import com.palantir.crypto2.cipher.SeekableCipher;
 import com.palantir.crypto2.cipher.SeekableCipherFactory;
 import com.palantir.crypto2.keys.KeyMaterial;
@@ -27,7 +28,6 @@ import java.util.Properties;
 import javax.crypto.Cipher;
 import javax.crypto.CipherOutputStream;
 import javax.crypto.SecretKey;
-import org.apache.commons.crypto.cipher.CryptoCipherFactory;
 import org.apache.commons.crypto.stream.CtrCryptoOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
 public final class CryptoStreamFactory {
 
     private static final Logger log = LoggerFactory.getLogger(CryptoStreamFactory.class);
-    private static final Properties PROPS = initializeProps();
+    private static final Properties PROPS = ApacheCiphers.forceOpenSsl(new Properties());
     private static final String AES_ALGORITHM = "AES/CTR/NoPadding";
 
     private CryptoStreamFactory() {}
@@ -96,12 +96,6 @@ public final class CryptoStreamFactory {
             String algorithm) {
         SeekableCipher cipher = SeekableCipherFactory.getCipher(algorithm, keyMaterial);
         return new CipherOutputStream(output, cipher.initCipher(Cipher.ENCRYPT_MODE));
-    }
-
-    private static Properties initializeProps() {
-        Properties props = new Properties();
-        props.setProperty(CryptoCipherFactory.CLASSES_KEY, CryptoCipherFactory.CipherProvider.OPENSSL.getClassName());
-        return props;
     }
 
 }
