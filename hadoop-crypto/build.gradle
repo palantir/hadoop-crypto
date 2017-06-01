@@ -9,7 +9,6 @@ dependencies {
 
     testCompile "junit:junit"
     testCompile "org.assertj:assertj-core"
-    testCompile "org.hamcrest:hamcrest-all"
     testCompile "org.mockito:mockito-core"
 }
 

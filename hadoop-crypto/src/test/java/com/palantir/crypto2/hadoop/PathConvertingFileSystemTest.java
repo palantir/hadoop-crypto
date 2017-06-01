@@ -16,15 +16,12 @@
 
 package com.palantir.crypto2.hadoop;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.net.URI;
-import java.util.Arrays;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileStatus;
@@ -59,7 +56,7 @@ public final class PathConvertingFileSystemTest {
         when(delegate.getUri()).thenReturn(DELEGATE_URI);
         URI actualUri = convertingFs.getUri();
 
-        assertThat(actualUri, is(RETURN_URI));
+        assertThat(actualUri).isEqualTo(RETURN_URI);
     }
 
     @Test
@@ -67,7 +64,7 @@ public final class PathConvertingFileSystemTest {
         when(delegate.open(DELEGATE_PATH, 0)).thenReturn(inputStream);
         FSDataInputStream actualStream = convertingFs.open(PATH, 0);
 
-        assertThat(actualStream, is(inputStream));
+        assertThat(actualStream).isEqualTo(inputStream);
     }
 
     @Test
@@ -75,7 +72,7 @@ public final class PathConvertingFileSystemTest {
         when(delegate.create(DELEGATE_PATH, null, false, 0, (short) 0, 0, null)).thenReturn(outputStream);
         FSDataOutputStream actualStream = convertingFs.create(PATH, null, false, 0, (short) 0, 0, null);
 
-        assertThat(actualStream, is(outputStream));
+        assertThat(actualStream).isEqualTo(outputStream);
     }
 
     @Test
@@ -83,7 +80,7 @@ public final class PathConvertingFileSystemTest {
         when(delegate.append(DELEGATE_PATH, 0, null)).thenReturn(outputStream);
         FSDataOutputStream actualStream = convertingFs.append(PATH, 0, null);
 
-        assertThat(actualStream, is(outputStream));
+        assertThat(actualStream).isEqualTo(outputStream);
     }
 
     @Test
@@ -91,7 +88,7 @@ public final class PathConvertingFileSystemTest {
         when(delegate.rename(DELEGATE_PATH, DELEGATE_PATH)).thenReturn(false);
         boolean success = convertingFs.rename(PATH, PATH);
 
-        assertThat(success, is(false));
+        assertThat(success).isFalse();
     }
 
     @Test
@@ -99,7 +96,7 @@ public final class PathConvertingFileSystemTest {
         when(delegate.delete(DELEGATE_PATH, false)).thenReturn(false);
         boolean success = convertingFs.delete(PATH, false);
 
-        assertThat(success, is(false));
+        assertThat(success).isFalse();
     }
 
     @Test
@@ -107,7 +104,7 @@ public final class PathConvertingFileSystemTest {
         when(delegate.makeQualified(DELEGATE_PATH)).thenReturn(DELEGATE_PATH);
         Path path = convertingFs.makeQualified(PATH);
 
-        assertThat(path, is(RETURN_PATH));
+        assertThat(path).isEqualTo(RETURN_PATH);
     }
 
     @Test
@@ -115,7 +112,7 @@ public final class PathConvertingFileSystemTest {
         when(delegate.listStatus(DELEGATE_PATH)).thenReturn(new FileStatus[] {fileStatus(DELEGATE_PATH)});
         FileStatus[] fileStatuses = convertingFs.listStatus(PATH);
 
-        assertThat(Arrays.asList(fileStatuses), contains(fileStatus(RETURN_PATH)));
+        assertThat(fileStatuses).containsExactly(fileStatus(RETURN_PATH));
     }
 
     @Test
@@ -123,7 +120,7 @@ public final class PathConvertingFileSystemTest {
         when(delegate.getFileStatus(DELEGATE_PATH)).thenReturn(fileStatus(DELEGATE_PATH));
         FileStatus fileStatus = convertingFs.getFileStatus(PATH);
 
-        assertThat(fileStatus, is(fileStatus(RETURN_PATH)));
+        assertThat(fileStatus).isEqualTo(fileStatus(RETURN_PATH));
     }
 
     @Test
@@ -137,7 +134,7 @@ public final class PathConvertingFileSystemTest {
         when(delegate.getWorkingDirectory()).thenReturn(DELEGATE_PATH);
         Path workingDirectory = convertingFs.getWorkingDirectory();
 
-        assertThat(workingDirectory, is(RETURN_PATH));
+        assertThat(workingDirectory).isEqualTo(RETURN_PATH);
     }
 
     @Test
@@ -145,7 +142,7 @@ public final class PathConvertingFileSystemTest {
         when(delegate.mkdirs(DELEGATE_PATH, null)).thenReturn(false);
         boolean success = convertingFs.mkdirs(PATH, null);
 
-        assertThat(success, is(false));
+        assertThat(success).isFalse();
     }
 
     private static FileStatus fileStatus(Path path) {

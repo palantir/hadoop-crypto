@@ -16,10 +16,8 @@
 
 package com.palantir.crypto2.hadoop;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import com.palantir.crypto2.cipher.AesCtrCipher;
 import com.palantir.crypto2.keys.KeyMaterial;
@@ -66,8 +64,8 @@ public final class FileKeyStorageStrategyTest {
         keyStore.put(path, keyMaterial);
         KeyMaterial readKeyMaterial = keyStore.get(path);
 
-        assertThat(readKeyMaterial, equalTo(keyMaterial));
-        assertTrue(fs.exists(new Path(path + FileKeyStorageStrategy.EXTENSION)));
+        assertThat(readKeyMaterial).isEqualTo(keyMaterial);
+        assertThat(fs.exists(new Path(path + FileKeyStorageStrategy.EXTENSION))).isTrue();
     }
 
     @Test
@@ -75,7 +73,7 @@ public final class FileKeyStorageStrategyTest {
         keyStore.put(path, keyMaterial);
         keyStore.remove(path);
 
-        assertFalse(fs.exists(new Path(path + FileKeyStorageStrategy.EXTENSION)));
+        assertThat(fs.exists(new Path(path + FileKeyStorageStrategy.EXTENSION))).isFalse();
     }
 
     @Test
@@ -85,9 +83,9 @@ public final class FileKeyStorageStrategyTest {
         // Put still succeeds with only the public key
         strategy.put(path, keyMaterial);
 
-        expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("Private key is absent but required to get key material");
-        strategy.get("key");
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> strategy.get("key"))
+                .withMessage("Private key is absent but required to get key material");
     }
 
     @Test
@@ -98,9 +96,9 @@ public final class FileKeyStorageStrategyTest {
         // Put still succeeds with only the public key
         strategy.put(path, keyMaterial);
 
-        expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("Private key is absent but required to get key material");
-        strategy.get("key");
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> strategy.get("key"))
+                .withMessage("Private key is absent but required to get key material");
     }
 
 }

@@ -16,14 +16,8 @@
 
 package com.palantir.crypto2.hadoop;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -134,14 +128,14 @@ public final class EncryptedFileSystemTest {
         IOUtils.readFully(is, readData);
         is.close();
 
-        assertThat(data, is(readData));
+        assertThat(data).containsExactly(readData);
 
         // Read using delegate FileSystem does not yield input data
         is = delegateFs.open(path);
         IOUtils.readFully(is, readData);
         is.close();
 
-        assertThat(data, is(not(readData)));
+        assertThat(data).isNotEqualTo(readData);
     }
 
     @Test
@@ -160,7 +154,7 @@ public final class EncryptedFileSystemTest {
         IOUtils.readFully(is, readData);
 
         byte[] actualReadData = Arrays.copyOfRange(data, seekPos, MB);
-        assertThat(actualReadData, is(readData));
+        assertThat(actualReadData).containsExactly(readData);
     }
 
     @Test
@@ -195,37 +189,31 @@ public final class EncryptedFileSystemTest {
 
         efs.rename(path, newPath);
 
-        assertFalse(efs.exists(path));
-        assertTrue(efs.exists(newPath));
+        assertThat(efs.exists(path)).isFalse();
+        assertThat(efs.exists(newPath)).isTrue();
 
-        assertThat(keyStore.get(path.toString()), is(nullValue()));
-        assertThat(keyStore.get(newPath.toString()), is(actualKeyMaterial));
+        assertThat(keyStore.get(path.toString())).isNull();
+        assertThat(keyStore.get(newPath.toString())).isEqualTo(actualKeyMaterial);
     }
 
     @Test
     public void testRename_failedGet() throws IOException {
         doThrow(new IllegalArgumentException()).when(mockKeyStore).get(path.toString());
 
-        try {
-            mockedEfs.rename(path, newPath);
-            fail();
-        } catch (Exception e) {
-            verify(mockFs, never()).rename(path, newPath);
-            verify(mockKeyStore, never()).remove(path.toString());
-        }
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> mockedEfs.rename(path, newPath));
+        verify(mockFs, never()).rename(path, newPath);
+        verify(mockKeyStore, never()).remove(path.toString());
     }
 
     @Test
     public void testRename_failedPut() throws IOException {
         doThrow(new IllegalArgumentException()).when(mockKeyStore).put(newPath.toString(), keyMaterial);
 
-        try {
-            mockedEfs.rename(path, newPath);
-            fail();
-        } catch (Exception e) {
-            verify(mockFs, never()).rename(path, newPath);
-            verify(mockKeyStore, never()).remove(path.toString());
-        }
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> mockedEfs.rename(path, newPath));
+        verify(mockFs, never()).rename(path, newPath);
+        verify(mockKeyStore, never()).remove(path.toString());
     }
 
     @Test
@@ -234,7 +222,7 @@ public final class EncryptedFileSystemTest {
 
         boolean renamed = mockedEfs.rename(path, newPath);
 
-        assertFalse(renamed);
+        assertThat(renamed).isFalse();
         verify(mockKeyStore, never()).remove(path.toString());
         verify(mockKeyStore).remove(newPath.toString());
     }
@@ -244,7 +232,7 @@ public final class EncryptedFileSystemTest {
         when(mockFs.rename(path, newPath)).thenReturn(true);
         doThrow(new IllegalArgumentException()).when(mockKeyStore).remove(anyString());
 
-        assertTrue(mockedEfs.rename(path, newPath));
+        assertThat(mockedEfs.rename(path, newPath)).isTrue();
     }
 
     @Test
@@ -252,12 +240,12 @@ public final class EncryptedFileSystemTest {
         when(mockFs.rename(path, newPath)).thenReturn(false);
         doThrow(new IllegalArgumentException()).when(mockKeyStore).remove(anyString());
 
-        assertFalse(mockedEfs.rename(path, newPath));
+        assertThat(mockedEfs.rename(path, newPath)).isFalse();
     }
 
     @Test
     public void testGetCipherAlgorithm_default() {
-        assertThat(efs.getCipherAlgorithm(), is("AES/CTR/NoPadding"));
+        assertThat(efs.getCipherAlgorithm()).isEqualTo("AES/CTR/NoPadding");
     }
 
     @Test
@@ -269,7 +257,7 @@ public final class EncryptedFileSystemTest {
         delegateFs = FileSystem.newInstance(new URI(folder.getRoot().getAbsolutePath()), conf);
         efs = new EncryptedFileSystem(delegateFs, new InMemoryKeyStorageStrategy());
 
-        assertThat(efs.getCipherAlgorithm(), is(cipherAlg));
+        assertThat(efs.getCipherAlgorithm()).isEqualTo(cipherAlg);
     }
 
     @Test
@@ -281,7 +269,7 @@ public final class EncryptedFileSystemTest {
         delegateFs = FileSystem.newInstance(new URI(folder.getRoot().getAbsolutePath()), conf);
         efs = new EncryptedFileSystem(delegateFs, new InMemoryKeyStorageStrategy());
 
-        assertThat(efs.getCipherAlgorithm(), is(cipherAlg));
+        assertThat(efs.getCipherAlgorithm()).isEqualTo(cipherAlg);
     }
 
     @Test
@@ -294,13 +282,9 @@ public final class EncryptedFileSystemTest {
         conf.set(EncryptedFileSystem.DEPRECATED_CIPHER_ALGORITHM_KEY, deprecatedCipherAlg);
         delegateFs = FileSystem.newInstance(new URI(folder.getRoot().getAbsolutePath()), conf);
 
-        try {
-            efs = new EncryptedFileSystem(delegateFs, new InMemoryKeyStorageStrategy());
-            fail();
-        } catch (IllegalStateException e) {
-            assertThat(e.getMessage(),
-                    is("Two incompatible ciphers configured: 'cipherAlg' and 'deprecatedCipherAlg'"));
-        }
+        assertThatExceptionOfType(IllegalStateException.class)
+                .isThrownBy(() -> new EncryptedFileSystem(delegateFs, new InMemoryKeyStorageStrategy()))
+                .withMessage("Two incompatible ciphers configured: 'cipherAlg' and 'deprecatedCipherAlg'");
     }
 
     @Test
@@ -313,56 +297,51 @@ public final class EncryptedFileSystemTest {
         delegateFs = FileSystem.newInstance(new URI(folder.getRoot().getAbsolutePath()), conf);
         efs = new EncryptedFileSystem(delegateFs, new InMemoryKeyStorageStrategy());
 
-        assertThat(efs.getCipherAlgorithm(), is(cipherAlg));
+        assertThat(efs.getCipherAlgorithm()).isEqualTo(cipherAlg);
     }
 
     @Test
     public void testDelete_successful() throws IOException {
-        assertTrue(efs.delete(path, false));
+        assertThat(efs.delete(path, false)).isTrue();
 
-        assertFalse(efs.exists(path));
-        assertThat(keyStore.get(path.toString()), is(nullValue()));
+        assertThat(efs.exists(path)).isFalse();
+        assertThat(keyStore.get(path.toString())).isNull();
     }
 
     @Test
     public void testDelete_recursiveDelete() throws IOException {
         Path folderPath = new Path(folder.getRoot().getAbsolutePath());
-        try {
-            efs.delete(folderPath, true);
-            fail();
-        } catch (UnsupportedOperationException e) {
-            assertThat(e.getMessage(), is("EncryptedFileSystem does not support recursive deletes"));
-        }
+
+        assertThatExceptionOfType(UnsupportedOperationException.class)
+                .isThrownBy(() -> efs.delete(folderPath, true))
+                .withMessage("EncryptedFileSystem does not support recursive deletes");
     }
 
     @Test
     public void testDelete_nonRecursiveDeleteOnDir() throws IOException {
         Path folderPath = new Path(folder.getRoot().getAbsolutePath());
-        try {
-            efs.delete(folderPath, false);
-            fail();
-        } catch (IOException e) {
-            assertThat(e.getMessage(), is(String.format("Directory %s is not empty", folderPath)));
-        }
+
+        assertThatExceptionOfType(IOException.class)
+                .isThrownBy(() -> efs.delete(folderPath, false))
+                .withMessage("Directory %s is not empty", folderPath);
     }
 
     @Test
     public void testDelete_keyMaterialAlreadyDeleted() throws IOException {
         keyStore.remove(path.toString());
-        assertThat(keyStore.get(path.toString()), is(nullValue()));
 
-        assertTrue(efs.delete(path, false));
-
-        assertFalse(efs.exists(path));
+        assertThat(keyStore.get(path.toString())).isNull();
+        assertThat(efs.delete(path, false)).isTrue();
+        assertThat(efs.exists(path)).isFalse();
     }
 
     @Test
     public void testDelete_fileAlreadyDeleted() throws IOException {
         delegateFs.delete(path, false);
 
-        assertThat(keyStore.get(path.toString()), is(not(nullValue())));
-        assertFalse(efs.delete(path, false));
-        assertThat(keyStore.get(path.toString()), is(nullValue()));
+        assertThat(keyStore.get(path.toString())).isInstanceOf(KeyMaterial.class);
+        assertThat(efs.delete(path, false)).isFalse();
+        assertThat(keyStore.get(path.toString())).isNull();
     }
 
     @Test
@@ -432,7 +411,7 @@ public final class EncryptedFileSystemTest {
 
         FSDataInputStream input = efs.open(path);
         IOUtils.readFully(input, readBytes);
-        assertThat(readBytes, is(data));
+        assertThat(readBytes).containsExactly(data);
     }
 
 }
