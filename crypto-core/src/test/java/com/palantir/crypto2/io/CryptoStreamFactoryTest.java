@@ -16,9 +16,7 @@
 
 package com.palantir.crypto2.io;
 
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import com.palantir.crypto2.cipher.AesCtrCipher;
 import com.palantir.crypto2.keys.KeyMaterial;
@@ -43,8 +41,8 @@ public final class CryptoStreamFactoryTest {
         OutputStream encrypted = CryptoStreamFactory.encrypt(null, keyMaterial, AesCtrCipher.ALGORITHM);
         SeekableInput decrypted = CryptoStreamFactory.decrypt(null, keyMaterial, AesCtrCipher.ALGORITHM);
 
-        assertThat(encrypted, instanceOf(CtrCryptoOutputStream.class));
-        assertThat(decrypted, instanceOf(CtrCryptoInputStream.class));
+        assertThat(encrypted).isInstanceOf(CtrCryptoOutputStream.class);
+        assertThat(decrypted).isInstanceOf(CtrCryptoInputStream.class);
     }
 
     @Test
@@ -64,8 +62,8 @@ public final class CryptoStreamFactoryTest {
         byte[] readBytes = new byte[bytes.length];
         int bytesRead = decrypted.read(readBytes, 0, bytes.length);
 
-        assertThat(bytesRead, is(bytes.length));
-        assertThat(readBytes, is(bytes));
+        assertThat(bytesRead).isEqualTo(bytes.length);
+        assertThat(readBytes).isEqualTo(bytes);
     }
 
 }

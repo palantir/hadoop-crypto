@@ -16,7 +16,7 @@
 
 package com.palantir.crypto2.cipher;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
 import java.io.IOException;
@@ -45,12 +45,12 @@ public final class CipherStreamSupplierImplTest {
 
     @Test
     public void testGetCipherInputStream() throws IOException {
-        assertEquals(supplier.getInputStream(is, cipher).getClass(), CipherInputStream.class);
+        assertThat(supplier.getInputStream(is, cipher)).isInstanceOf(CipherInputStream.class);
     }
 
     @Test
     public void testGetCipherOutputStream() {
-        assertEquals(supplier.getOutputStream(os, cipher).getClass(), CipherOutputStream.class);
+        assertThat(supplier.getOutputStream(os, cipher)).isInstanceOf(CipherOutputStream.class);
     }
 
 }

@@ -16,9 +16,7 @@
 
 package com.palantir.crypto2.example;
 
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import com.palantir.crypto2.cipher.AesCtrCipher;
 import com.palantir.crypto2.cipher.SeekableCipher;
@@ -52,7 +50,7 @@ public final class ExampleUsage {
         byte[] encryptedBytes = os.toByteArray();
 
         // Bytes written to stream are encrypted
-        assertThat(encryptedBytes, is(not(bytes)));
+        assertThat(encryptedBytes).isNotEqualTo(bytes);
 
         SeekableInput is = new InMemorySeekableDataInput(encryptedBytes);
         DecryptingSeekableInput decryptedStream = new DecryptingSeekableInput(is, cipher);
@@ -61,12 +59,12 @@ public final class ExampleUsage {
         byte[] readBytes = new byte[bytes.length];
         decryptedStream.seek(bytes.length - 1);
         decryptedStream.read(readBytes, 0, 1);
-        assertThat(readBytes[0], is(bytes[bytes.length - 1]));
+        assertThat(readBytes[0]).isEqualTo(bytes[bytes.length - 1]);
 
         // Seek to the beginning of the decrypted stream and verify it's equal to the raw bytes
         decryptedStream.seek(0);
         decryptedStream.read(readBytes, 0, bytes.length);
-        assertThat(readBytes, is(bytes));
+        assertThat(readBytes).isEqualTo(bytes);
     }
 
 }

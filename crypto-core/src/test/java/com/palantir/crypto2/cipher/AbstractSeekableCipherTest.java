@@ -16,10 +16,8 @@
 
 package com.palantir.crypto2.cipher;
 
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import com.palantir.crypto2.keys.KeyMaterial;
 import java.util.Arrays;
@@ -97,33 +95,28 @@ public abstract class AbstractSeekableCipherTest {
         byte[] expected = new byte[blockSize];
         Arrays.fill(expected, val);
 
-        assertThat(lastBlockData, is(expected));
+        assertThat(lastBlockData).isEqualTo(expected);
     }
 
     @Test
     public final void testSeek_seekNegativeValue() {
         long negPos = -1;
-        try {
-            seekableCipher.seek(negPos);
-            fail();
-        } catch (IllegalArgumentException e) {
-            assertThat(e.getMessage(), is(String.format("Cannot seek to negative position: %d", negPos)));
-        }
+
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> seekableCipher.seek(negPos))
+                .withMessage("Cannot seek to negative position: %d", negPos);
     }
 
     @Test
     public final void testSeek_notInitialized() {
-        try {
-            getCipher(keyMaterial).seek(0);
-            fail();
-        } catch (IllegalStateException e) {
-            assertThat(e.getMessage(), is("Cipher not initialized"));
-        }
+        assertThatExceptionOfType(IllegalStateException.class)
+                .isThrownBy(() -> getCipher(keyMaterial).seek(0))
+                .withMessage("Cipher not initialized");
     }
 
     @Test
     public final void testGetKeyMaterial() {
-        assertThat(seekableCipher.getKeyMaterial(), is(keyMaterial));
+        assertThat(seekableCipher.getKeyMaterial()).isEqualTo(keyMaterial);
     }
 
     public final void testEncryptDecrypt(Cipher encryptingCipher, Cipher decryptingCipher)
@@ -133,8 +126,8 @@ public abstract class AbstractSeekableCipherTest {
         byte[] encryptedData = encryptingCipher.doFinal(data);
         byte[] decryptedData = decryptingCipher.update(encryptedData);
 
-        assertThat(data, is(not(encryptedData)));
-        assertThat(data, is(decryptedData));
+        assertThat(data).isNotEqualTo(encryptedData);
+        assertThat(data).isEqualTo(decryptedData);
     }
 
 }
