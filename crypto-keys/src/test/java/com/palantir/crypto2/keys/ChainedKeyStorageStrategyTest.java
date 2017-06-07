@@ -24,6 +24,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import com.google.common.collect.ImmutableList;
+import java.util.concurrent.CompletableFuture;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -107,4 +108,69 @@ public final class ChainedKeyStorageStrategyTest {
         verifyNoMoreInteractions(successfulStrategy, failingStrategy);
     }
 
+    @Test
+    public void testAsyncGetFirstSucceeds() {
+        KeyStorageStrategy first = mock(KeyStorageStrategy.class);
+        KeyStorageStrategy second = mock(KeyStorageStrategy.class);
+
+        CompletableFuture<KeyMaterial> firstMaterial = new CompletableFuture<>();
+        CompletableFuture<KeyMaterial> secondMaterial = new CompletableFuture<>();
+
+        chained = new ChainedKeyStorageStrategy(first, second);
+
+        when(first.getAsync(key)).thenReturn(firstMaterial);
+        when(second.getAsync(key)).thenReturn(secondMaterial);
+
+        CompletableFuture<KeyMaterial> combined = chained.getAsync(key);
+        assertThat(combined.isDone(), is(false));
+
+        firstMaterial.complete(keyMaterial);
+        assertThat(combined.join(), is(keyMaterial));
+    }
+
+    @Test
+    public void testAsyncGetFirstFailsSecondSucceeds() {
+        KeyStorageStrategy first = mock(KeyStorageStrategy.class);
+        KeyStorageStrategy second = mock(KeyStorageStrategy.class);
+
+        CompletableFuture<KeyMaterial> firstMaterial = new CompletableFuture<>();
+        CompletableFuture<KeyMaterial> secondMaterial = new CompletableFuture<>();
+
+        chained = new ChainedKeyStorageStrategy(first, second);
+
+        when(first.getAsync(key)).thenReturn(firstMaterial);
+        when(second.getAsync(key)).thenReturn(secondMaterial);
+
+        CompletableFuture<KeyMaterial> combined = chained.getAsync(key);
+
+        firstMaterial.completeExceptionally(new RuntimeException());
+        assertThat(combined.isDone(), is(false));
+        secondMaterial.complete(keyMaterial);
+        assertThat(combined.join(), is(keyMaterial));
+    }
+
+    @Test
+    public void testAsyncAllFail() {
+        KeyStorageStrategy first = mock(KeyStorageStrategy.class);
+        KeyStorageStrategy second = mock(KeyStorageStrategy.class);
+
+        CompletableFuture<KeyMaterial> firstMaterial = new CompletableFuture<>();
+        CompletableFuture<KeyMaterial> secondMaterial = new CompletableFuture<>();
+
+        chained = new ChainedKeyStorageStrategy(first, second);
+
+        when(first.getAsync(key)).thenReturn(firstMaterial);
+        when(second.getAsync(key)).thenReturn(secondMaterial);
+
+        CompletableFuture<KeyMaterial> combined = chained.getAsync(key);
+
+        RuntimeException exception = new RuntimeException();
+
+        firstMaterial.completeExceptionally(new RuntimeException());
+        assertThat(combined.isDone(), is(false));
+        secondMaterial.completeExceptionally(exception);
+
+        expectedException.expectCause(is(exception));
+        combined.join();
+    }
 }
