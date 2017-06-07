@@ -20,7 +20,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 import com.palantir.crypto2.keys.KeyMaterial;
 import com.palantir.crypto2.keys.serialization.KeyMaterials;
-import java.math.BigInteger;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -40,8 +39,8 @@ public final class AesCtrCipher implements SeekableCipher {
     static final String PROVIDER = "SunJCE";
     static final String KEY_ALGORITHM = "AES";
     static final int KEY_SIZE = 256;
-    static final int BLOCK_SIZE = 16;
-    static final int IV_SIZE = 16;
+    static final int BLOCK_SIZE = CounterMode.BLOCK_SIZE;
+    static final int IV_SIZE = CounterMode.IV_SIZE;
 
     private final KeyMaterial keyMaterial;
     private final SecretKey key;
@@ -73,21 +72,8 @@ public final class AesCtrCipher implements SeekableCipher {
         Preconditions.checkArgument(pos >= 0, "Cannot seek to negative position: %s", pos);
 
         // Compute the block that the byte 'pos' is located in
-        BigInteger block = BigInteger.valueOf(pos / BLOCK_SIZE);
-
-        // Compute the iv for the block to start decrypting. initIv needs to be treated as an unsigned int
-        BigInteger ivBuffer = new BigInteger(1, initIv).add(block);
-        byte[] ivBytes = ivBuffer.toByteArray();
-
-        // Ensure the iv is exactly BLOCK_SIZE bytes in length
-        final IvParameterSpec newIv;
-        if (ivBytes.length >= IV_SIZE) {
-            newIv = new IvParameterSpec(ivBytes, ivBytes.length - IV_SIZE, IV_SIZE);
-        } else {
-            final byte[] tmpIv = new byte[IV_SIZE];
-            System.arraycopy(ivBytes, 0, tmpIv, IV_SIZE - ivBytes.length, ivBytes.length);
-            newIv = new IvParameterSpec(tmpIv);
-        }
+        long block = pos / BLOCK_SIZE;
+        IvParameterSpec newIv = CounterMode.computeIv(initIv, block);
 
         Cipher cipher = getInstance();
 
