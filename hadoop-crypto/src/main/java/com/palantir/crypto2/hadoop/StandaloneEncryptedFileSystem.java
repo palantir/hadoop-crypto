@@ -129,6 +129,11 @@ public final class StandaloneEncryptedFileSystem extends FilterFileSystem {
         return fs.exists(path);
     }
 
+    @Override
+    public boolean exists(Path path) throws IOException {
+        return fs.exists(path);
+    }
+
     private static Function<Path, Path> setSchemeFunc(final String scheme) {
         return path -> new Path(setUriSchemeFunc(scheme).apply(path.toUri()));
     }

@@ -74,6 +74,11 @@ public final class EncryptedFileSystem extends FileSystem {
     }
 
     @Override
+    public boolean exists(Path path) throws IOException {
+        return fs.exists(path);
+    }
+
+    @Override
     public FSDataInputStream open(Path path, int bufferSize) throws IOException {
         FSDataInputStream encryptedStream = fs.open(path, bufferSize);
 
