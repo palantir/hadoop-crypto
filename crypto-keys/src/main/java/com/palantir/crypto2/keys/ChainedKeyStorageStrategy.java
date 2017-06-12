@@ -61,7 +61,8 @@ public final class ChainedKeyStorageStrategy implements KeyStorageStrategy {
             }
         }
         throw new RuntimeException(String.format(
-                "Unable to get key material using any of the provided strategies: %s",
+                "Unable to get key material for '%s' using any of the provided strategies: %s",
+                fileKey,
                 Collections2.transform(strategies, s -> s.getClass().getCanonicalName())));
     }
 
