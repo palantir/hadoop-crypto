@@ -16,8 +16,7 @@
 
 package com.palantir.crypto2.io;
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
@@ -97,13 +96,13 @@ public final class DecryptionTests {
 
     @Test
     public void testDecrypt() throws IOException {
-        assertThat(cis.getPos(), is(0L));
+        assertThat(cis.getPos()).isEqualTo(0);
 
         byte[] decrypted = new byte[NUM_BYTES];
         readFully(cis, decrypted);
 
-        assertThat(cis.getPos(), is((long) NUM_BYTES));
-        assertThat(decrypted, is(data));
+        assertThat(cis.getPos()).isEqualTo(NUM_BYTES);
+        assertThat(decrypted).isEqualTo(data);
     }
 
     @Test
@@ -131,7 +130,7 @@ public final class DecryptionTests {
     @Test
     public void testSeek_onePastEndOfData() throws IOException {
         cis.seek(NUM_BYTES);
-        assertThat(cis.read(new byte[1], 0, 1), is(-1));
+        assertThat(cis.read(new byte[1], 0, 1)).isEqualTo(-1);
     }
 
     @Test
@@ -143,15 +142,15 @@ public final class DecryptionTests {
     private void testSeek(int seekPos) throws IOException {
         cis.seek(seekPos);
 
-        assertThat(cis.getPos(), is((long) seekPos));
+        assertThat(cis.getPos()).isEqualTo(seekPos);
 
         byte[] decrypted = new byte[NUM_BYTES - seekPos];
         readFully(cis, decrypted);
 
         byte[] expected = Arrays.copyOfRange(data, seekPos, NUM_BYTES);
 
-        assertThat(decrypted.length, is(expected.length));
-        assertThat(decrypted, is(expected));
+        assertThat(decrypted.length).isEqualTo(expected.length);
+        assertThat(decrypted).isEqualTo(expected);
     }
 
     @Test
@@ -168,9 +167,9 @@ public final class DecryptionTests {
             offset += read;
         }
 
-        assertThat(cis.getPos(), is(startPos + buffer.length));
-        assertThat(buffer, is(data));
-        assertThat(offset, is(NUM_BYTES));
+        assertThat(cis.getPos()).isEqualTo(startPos + buffer.length);
+        assertThat(buffer).isEqualTo(data);
+        assertThat(offset).isEqualTo(NUM_BYTES);
         cis.close();
     }
 

@@ -128,7 +128,7 @@ public final class EncryptedFileSystemTest {
         IOUtils.readFully(is, readData);
         is.close();
 
-        assertThat(data).containsExactly(readData);
+        assertThat(data).isEqualTo(readData);
 
         // Read using delegate FileSystem does not yield input data
         is = delegateFs.open(path);
@@ -154,7 +154,7 @@ public final class EncryptedFileSystemTest {
         IOUtils.readFully(is, readData);
 
         byte[] actualReadData = Arrays.copyOfRange(data, seekPos, MB);
-        assertThat(actualReadData).containsExactly(readData);
+        assertThat(actualReadData).isEqualTo(readData);
     }
 
     @Test
@@ -411,7 +411,7 @@ public final class EncryptedFileSystemTest {
 
         FSDataInputStream input = efs.open(path);
         IOUtils.readFully(input, readBytes);
-        assertThat(readBytes).containsExactly(data);
+        assertThat(readBytes).isEqualTo(data);
     }
 
 }

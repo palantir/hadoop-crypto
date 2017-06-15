@@ -16,8 +16,7 @@
 
 package com.palantir.crypto2.cipher;
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.collect.Maps;
 import com.palantir.crypto2.keys.KeyMaterial;
@@ -85,7 +84,7 @@ public final class AesCtrCipherTest extends AbstractSeekableCipherTest {
         Cipher cipher = seekableCipher.seek(blockNumber * (long) AesCtrCipher.BLOCK_SIZE);
 
         byte[] finalBytes = cipher.update(inputBytes);
-        assertThat(outputBytes, is(finalBytes));
+        assertThat(outputBytes).isEqualTo(finalBytes);
     }
 
     @Test

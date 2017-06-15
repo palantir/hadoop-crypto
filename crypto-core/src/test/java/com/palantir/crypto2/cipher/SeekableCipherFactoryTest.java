@@ -16,9 +16,8 @@
 
 package com.palantir.crypto2.cipher;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.Mockito.mock;
 
 import com.palantir.crypto2.keys.KeyMaterial;
@@ -37,48 +36,47 @@ public final class SeekableCipherFactoryTest {
     @Test
     public void testGetAesCtr_noKeyMaterial() {
         SeekableCipher cipher = SeekableCipherFactory.getCipher(AES_CTR);
-        assertTrue(cipher instanceof AesCtrCipher);
-        assertNotEquals(cipher.getKeyMaterial(), null);
+        assertThat(cipher).isInstanceOf(AesCtrCipher.class);
+        assertThat(cipher.getKeyMaterial()).isNotNull();
     }
 
     @Test
     public void testGetAesCtr_keyMaterial() {
         KeyMaterial keyMaterial = mock(KeyMaterial.class);
         SeekableCipher cipher = SeekableCipherFactory.getCipher(AES_CTR, keyMaterial);
-        assertTrue(cipher instanceof AesCtrCipher);
-        assertEquals(cipher.getKeyMaterial(), keyMaterial);
+        assertThat(cipher).isInstanceOf(AesCtrCipher.class);
+        assertThat(cipher.getKeyMaterial()).isEqualTo(keyMaterial);
     }
 
     @Test
     public void testGetAesCbc_noKeyMaterial() {
         SeekableCipher cipher = SeekableCipherFactory.getCipher(AES_CBC);
-        assertTrue(cipher instanceof AesCbcCipher);
-        assertNotEquals(cipher.getKeyMaterial(), null);
+        assertThat(cipher).isInstanceOf(AesCbcCipher.class);
+        assertThat(cipher.getKeyMaterial()).isNotNull();
     }
 
     @Test
     public void testGetAesCbc_keyMaterial() {
         KeyMaterial keyMaterial = mock(KeyMaterial.class);
         SeekableCipher cipher = SeekableCipherFactory.getCipher(AES_CBC, keyMaterial);
-        assertTrue(cipher instanceof AesCbcCipher);
-        assertEquals(cipher.getKeyMaterial(), keyMaterial);
+        assertThat(cipher).isInstanceOf(AesCbcCipher.class);
+        assertThat(cipher.getKeyMaterial()).isEqualTo(keyMaterial);
     }
 
     @Test
     public void testGetCipher_invalidName() {
-        expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage(
-                    String.format("No known SeekableCipher with algorithm: %s", "doesnt_exist"));
-        SeekableCipherFactory.getCipher("doesnt_exist");
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> SeekableCipherFactory.getCipher("doesnt_exist"))
+                .withMessage("No known SeekableCipher with algorithm: doesnt_exist");
     }
 
     @Test
     public void testGetCipher_invalidNameKeyMaterial() {
         KeyMaterial keyMaterial = mock(KeyMaterial.class);
-        expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage(
-                    String.format("No known SeekableCipher with algorithm: %s", "doesnt_exist"));
-        SeekableCipherFactory.getCipher("doesnt_exist", keyMaterial);
+
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> SeekableCipherFactory.getCipher("doesnt_exist", keyMaterial))
+                .withMessage("No known SeekableCipher with algorithm: %s", "doesnt_exist");
     }
 
 }

@@ -65,7 +65,7 @@ public final class ExampleUsage {
         // Reading through the decrypted stream produces the original bytes
         InputStream ein = efs.open(path);
         IOUtils.readFully(ein, readData);
-        assertThat(data).containsExactly(readData);
+        assertThat(data).isEqualTo(readData);
 
         // Reading through the raw stream produces the encrypted bytes
         InputStream in = fs.open(path);
