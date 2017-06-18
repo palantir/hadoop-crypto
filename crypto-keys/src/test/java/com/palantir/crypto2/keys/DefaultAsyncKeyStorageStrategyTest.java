@@ -16,9 +16,7 @@
 
 package com.palantir.crypto2.keys;
 
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -68,7 +66,7 @@ public final class DefaultAsyncKeyStorageStrategyTest {
     public void testGet() {
         when(delegate.get(KEY)).thenReturn(keyMaterial);
 
-        assertThat(keys.get(KEY).join(), is(keyMaterial));
+        assertThat(keys.get(KEY).join()).isEqualTo(keyMaterial);
     }
 
     @Test
@@ -99,7 +97,7 @@ public final class DefaultAsyncKeyStorageStrategyTest {
     }
 
     private Void verifyIllegalStateThrown(Throwable throwable) {
-        assertThat(throwable.getCause(), instanceOf(IllegalStateException.class));
+        assertThat(throwable).hasCauseInstanceOf(IllegalStateException.class);
         return null;
     }
 

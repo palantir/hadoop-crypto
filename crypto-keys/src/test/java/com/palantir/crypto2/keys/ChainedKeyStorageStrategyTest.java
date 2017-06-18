@@ -16,8 +16,8 @@
 
 package com.palantir.crypto2.keys;
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -25,9 +25,7 @@ import static org.mockito.Mockito.when;
 
 import com.google.common.collect.ImmutableList;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.mockito.InOrder;
 
 public final class ChainedKeyStorageStrategyTest {
@@ -37,9 +35,6 @@ public final class ChainedKeyStorageStrategyTest {
     private KeyStorageStrategy failingStrategy;
     private KeyMaterial keyMaterial;
     private String key;
-
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
 
     @Before
     public void before() {
@@ -67,7 +62,7 @@ public final class ChainedKeyStorageStrategyTest {
 
     @Test
     public void testGetSucceeds() {
-        assertThat(chained.get(key), is(keyMaterial));
+        assertThat(chained.get(key)).isEqualTo(keyMaterial);
 
         InOrder inOrder = inOrder(successfulStrategy, failingStrategy);
         inOrder.verify(successfulStrategy).get(key);
@@ -78,7 +73,7 @@ public final class ChainedKeyStorageStrategyTest {
     public void testFailedGetIgnored() {
         chained = new ChainedKeyStorageStrategy(failingStrategy, successfulStrategy);
 
-        assertThat(chained.get(key), is(keyMaterial));
+        assertThat(chained.get(key)).isEqualTo(keyMaterial);
 
         InOrder inOrder = inOrder(successfulStrategy, failingStrategy);
         inOrder.verify(failingStrategy).get(key);
@@ -90,11 +85,10 @@ public final class ChainedKeyStorageStrategyTest {
     public void testAllStrategiesFail() {
         chained = new ChainedKeyStorageStrategy(failingStrategy);
 
-        expectedException.expect(RuntimeException.class);
-        expectedException.expectMessage(String.format(
-                "Unable to get key material for 'key' using any of the provided strategies: %s",
-                ImmutableList.of(failingStrategy.getClass().getCanonicalName())));
-        assertThat(chained.get(key), is(keyMaterial));
+        assertThatExceptionOfType(RuntimeException.class)
+                .isThrownBy(() -> chained.get(key))
+                .withMessage("Unable to get key material for 'key' using any of the provided strategies: %s",
+                        ImmutableList.of(failingStrategy.getClass().getCanonicalName()));
     }
 
     @Test

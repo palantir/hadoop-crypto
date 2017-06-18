@@ -16,9 +16,8 @@
 
 package com.palantir.crypto2.keys.serialization;
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import com.palantir.crypto2.keys.KeyMaterial;
 import com.palantir.crypto2.keys.TestKeyPairs;
@@ -44,13 +43,10 @@ public abstract class KeySerializerTest {
         byte[] wrapped = getSerializer().wrap(keyMaterial, keyPair.getPublic());
         wrapped[0] = 0x00;
 
-        try {
-            getSerializer().unwrap(wrapped, keyPair.getPrivate());
-            fail();
-        } catch (IllegalArgumentException e) {
-            assertThat(e.getMessage(), is(String.format(
-                    "Invalid serialization format version. Expected %s but found 0", getSerializer().getVersion())));
-        }
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> getSerializer().unwrap(wrapped, keyPair.getPrivate()))
+                .withMessage("Invalid serialization format version. Expected %s but found 0",
+                        getSerializer().getVersion());
     }
 
     final void testWrapAndUnwrap(Set<Integer> symmetricKeySizes, Set<Integer> wrappingKeySizes) {
@@ -67,7 +63,7 @@ public abstract class KeySerializerTest {
 
         byte[] wrapped = getSerializer().wrap(keyMaterial, keyPair.getPublic());
         KeyMaterial unwrapped = getSerializer().unwrap(wrapped, keyPair.getPrivate());
-        assertThat(keyMaterial, is(unwrapped));
+        assertThat(keyMaterial).isEqualTo(unwrapped);
     }
 
 }

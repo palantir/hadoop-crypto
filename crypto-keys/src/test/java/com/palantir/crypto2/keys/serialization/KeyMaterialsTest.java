@@ -16,9 +16,8 @@
 
 package com.palantir.crypto2.keys.serialization;
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import com.palantir.crypto2.keys.KeyMaterial;
 import com.palantir.crypto2.keys.TestKeyPairs;
@@ -49,13 +48,13 @@ public final class KeyMaterialsTest {
     @Test
     public void testGenerateKey() {
         SecretKey secretKey = KeyMaterials.generateKey(KEY_ALG, KEY_SIZE);
-        assertThat(secretKey.getAlgorithm(), is(KEY_ALG));
+        assertThat(secretKey.getAlgorithm()).isEqualTo(KEY_ALG);
     }
 
     @Test
     public void testGenerateIv() {
         byte[] iv = KeyMaterials.generateIv(IV_SIZE);
-        assertThat(iv.length, is(IV_SIZE));
+        assertThat(iv.length).isEqualTo(IV_SIZE);
     }
 
     @Test
@@ -63,7 +62,7 @@ public final class KeyMaterialsTest {
         byte[] wrapped = KeyMaterials.wrap(keyMaterial, keyPair.getPublic());
         KeyMaterial unwrapped = KeySerializerV2.INSTANCE.unwrap(wrapped, keyPair.getPrivate());
 
-        assertThat(unwrapped, is(keyMaterial));
+        assertThat(unwrapped).isEqualTo(keyMaterial);
     }
 
     @Test
@@ -71,7 +70,7 @@ public final class KeyMaterialsTest {
         byte[] wrapped = KeyMaterials.wrap(keyMaterial, keyPair.getPublic());
         KeyMaterial unwrapped = KeyMaterials.unwrap(wrapped, keyPair.getPrivate());
 
-        assertThat(unwrapped, is(keyMaterial));
+        assertThat(unwrapped).isEqualTo(keyMaterial);
     }
 
     @Test
@@ -84,7 +83,7 @@ public final class KeyMaterialsTest {
     private void testUnwrapWhenSerializedBy(KeySerializer keySerializer) {
         byte[] wrapped = keySerializer.wrap(keyMaterial, keyPair.getPublic());
         KeyMaterial unwrapped = KeyMaterials.unwrap(wrapped, keyPair.getPrivate());
-        assertThat(unwrapped, is(keyMaterial));
+        assertThat(unwrapped).isEqualTo(keyMaterial);
     }
 
     @Test
@@ -92,14 +91,10 @@ public final class KeyMaterialsTest {
         byte[] wrapped = KeyMaterials.wrap(keyMaterial, keyPair.getPublic());
         wrapped[0] = 0x00;
 
-        try {
-            KeyMaterials.unwrap(wrapped, keyPair.getPrivate());
-            fail();
-        } catch (IllegalArgumentException e) {
-            assertThat(e.getMessage(), is(String.format(
-                    "Invalid serialization format version. Expected version in %s but found 0",
-                    KeySerializers.getSerializers().keySet())));
-        }
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> KeyMaterials.unwrap(wrapped, keyPair.getPrivate()))
+                .withMessage("Invalid serialization format version. Expected version in %s but found 0",
+                    KeySerializers.getSerializers().keySet());
     }
 
     @Test
@@ -108,7 +103,7 @@ public final class KeyMaterialsTest {
         String algorithm = secretKey.getAlgorithm();
         byte[] encoded = secretKey.getEncoded();
         byte[] iv = keyMaterial.getIv();
-        assertThat(KeyMaterials.from(algorithm, encoded, iv), is(keyMaterial));
+        assertThat(KeyMaterials.from(algorithm, encoded, iv)).isEqualTo(keyMaterial);
     }
 
 }
