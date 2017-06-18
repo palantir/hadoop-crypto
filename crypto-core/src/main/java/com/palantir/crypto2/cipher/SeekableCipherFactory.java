@@ -23,8 +23,8 @@ public final class SeekableCipherFactory {
     private SeekableCipherFactory() {}
 
     /**
-     * Generates {@link KeyMaterial} appropriate for the given cipher algorithm. Currently only supports {@value
-     * AesCtrCipher#ALGORITHM} and {@value AesCbcCipher#ALGORITHM}.
+     * Generates {@link KeyMaterial} appropriate for the given cipher algorithm. Currently only supports
+     * {@value AesCtrCipher#ALGORITHM} and {@value AesCbcCipher#ALGORITHM}.
      */
     public static KeyMaterial generateKeyMaterial(String cipherAlgorithm) {
         switch (cipherAlgorithm) {
