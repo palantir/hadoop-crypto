@@ -89,7 +89,8 @@ public final class EncryptedFileSystem extends FileSystem {
         FSDataOutputStream encryptedStream =
                 fs.create(path, permission, overwrite, bufferSize, replication, blockSize, progress);
 
-        SeekableCipher cipher = SeekableCipherFactory.getCipher(cipherAlgorithm);
+        KeyMaterial keyMaterial = SeekableCipherFactory.generateKeyMaterial(cipherAlgorithm);
+        SeekableCipher cipher = SeekableCipherFactory.getCipher(cipherAlgorithm, keyMaterial);
 
         // Ensure we can open the stream before storing keys that would be irrelevant
         OutputStream encryptedOs =

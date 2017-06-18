@@ -34,6 +34,20 @@ public final class SeekableCipherFactoryTest {
     public ExpectedException expectedException = ExpectedException.none();
 
     @Test
+    public void testGenerateKeyMaterial_aesCtr() {
+        KeyMaterial keyMaterial = SeekableCipherFactory.generateKeyMaterial(AES_CTR);
+        String algorithm = keyMaterial.getSecretKey().getAlgorithm();
+        assertThat(algorithm).isEqualTo("AES");
+    }
+
+    @Test
+    public void testGenerateKeyMaterial_aesCbc() {
+        KeyMaterial keyMaterial = SeekableCipherFactory.generateKeyMaterial(AES_CBC);
+        String algorithm = keyMaterial.getSecretKey().getAlgorithm();
+        assertThat(algorithm).isEqualTo("AES");
+    }
+
+    @Test
     public void testGetAesCtr_noKeyMaterial() {
         SeekableCipher cipher = SeekableCipherFactory.getCipher(AES_CTR);
         assertThat(cipher).isInstanceOf(AesCtrCipher.class);

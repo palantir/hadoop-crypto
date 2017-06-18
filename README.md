@@ -21,12 +21,12 @@ Source for examples can be found [here](crypto-core/src/test/java/com/palantir/c
 
 ```java
 byte[] bytes = "0123456789".getBytes(StandardCharsets.UTF_8);
-SeekableCipher cipher = SeekableCipherFactory.getCipher(AesCtrCipher.ALGORITHM);
-ByteArrayOutputStream os = new ByteArrayOutputStream(bytes.length);
-Cipher encrypt = cipher.initCipher(Cipher.ENCRYPT_MODE);
 
 // Store this key material for future decryption
-// KeyMaterial keyMaterial = cipher.getKeyMaterial();
+KeyMaterial keyMaterial = SeekableCipherFactory.generateKeyMaterial(AesCtrCipher.ALGORITHM);
+SeekableCipher cipher = SeekableCipherFactory.getCipher(AesCtrCipher.ALGORITHM, keyMaterial);
+ByteArrayOutputStream os = new ByteArrayOutputStream(bytes.length);
+Cipher encrypt = cipher.initCipher(Cipher.ENCRYPT_MODE);
 
 // Encrypt some bytes
 CipherOutputStream encryptedStream = new CipherOutputStream(os, encrypt);
