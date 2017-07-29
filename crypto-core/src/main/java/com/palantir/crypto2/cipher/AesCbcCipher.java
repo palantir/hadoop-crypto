@@ -23,7 +23,6 @@ import com.palantir.crypto2.keys.serialization.KeyMaterials;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
@@ -36,7 +35,6 @@ import javax.crypto.spec.IvParameterSpec;
 public final class AesCbcCipher implements SeekableCipher {
 
     public static final String ALGORITHM = "AES/CBC/PKCS5Padding";
-    private static final String PROVIDER = "SunJCE";
     private static final String KEY_ALGORITHM = "AES";
     private static final int KEY_SIZE = 256;
     private static final int BLOCK_SIZE = 16;
@@ -96,8 +94,8 @@ public final class AesCbcCipher implements SeekableCipher {
 
     private Cipher getInstance() {
         try {
-            return Cipher.getInstance(ALGORITHM, PROVIDER);
-        } catch (NoSuchAlgorithmException | NoSuchProviderException | NoSuchPaddingException e) {
+            return Cipher.getInstance(ALGORITHM);
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
             throw Throwables.propagate(e);
         }
     }
