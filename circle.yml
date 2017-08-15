@@ -13,7 +13,7 @@ dependencies:
 
 test:
   override:
-      #- ./gradlew --parallel build
+    - ./gradlew --parallel build
     - ./verify-ibmjvm.sh
 
 deployment:
