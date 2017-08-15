@@ -18,7 +18,6 @@ package com.palantir.crypto2.cipher;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
-import com.google.common.collect.ImmutableList;
 import com.palantir.crypto2.keys.KeyMaterial;
 import com.palantir.crypto2.keys.serialization.KeyMaterials;
 import java.math.BigInteger;
@@ -38,8 +37,7 @@ import javax.crypto.spec.IvParameterSpec;
 public final class AesCtrCipher implements SeekableCipher {
 
     public static final String ALGORITHM = "AES/CTR/NoPadding";
-    private static final ImmutableList<String> ACCEPTABLE_PROVIDERS = ImmutableList.of("SunJCE", "IBMJCE");
-    static final String PROVIDER = Ciphers.getProvider(ACCEPTABLE_PROVIDERS);
+    static final String PROVIDER = Ciphers.getProvider();
     static final String KEY_ALGORITHM = "AES";
     static final int KEY_SIZE = 256;
     static final int BLOCK_SIZE = 16;

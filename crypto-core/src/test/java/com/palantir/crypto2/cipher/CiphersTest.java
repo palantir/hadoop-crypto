@@ -26,12 +26,12 @@ public final class CiphersTest {
 
     @Test
     public void testProvider_exists() {
-        assertThat(Ciphers.getProvider(ImmutableList.of("SunJCE"))).isEqualTo("SunJCE");
+        assertThat(Ciphers.getProvider()).isIn("SunJCE", "IBMJCE");
     }
 
     @Test
     public void testProvider_ignoresUnavailable() {
-        assertThat(Ciphers.getProvider(ImmutableList.of("Invalid", "SunJCE"))).isEqualTo("SunJCE");
+        assertThat(Ciphers.getProvider(ImmutableList.of("Invalid", "SunJCE", "IBMJCE"))).doesNotContain("Invalid");
     }
 
     @Test

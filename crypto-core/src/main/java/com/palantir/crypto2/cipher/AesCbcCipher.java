@@ -18,7 +18,6 @@ package com.palantir.crypto2.cipher;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
-import com.google.common.collect.ImmutableList;
 import com.palantir.crypto2.keys.KeyMaterial;
 import com.palantir.crypto2.keys.serialization.KeyMaterials;
 import java.security.InvalidAlgorithmParameterException;
@@ -37,9 +36,8 @@ import javax.crypto.spec.IvParameterSpec;
 public final class AesCbcCipher implements SeekableCipher {
 
     public static final String ALGORITHM = "AES/CBC/PKCS5Padding";
-    private static final ImmutableList<String> ACCEPTABLE_PROVIDERS = ImmutableList.of("SunJCE", "IBMJCE");
-    private static final String PROVIDER = Ciphers.getProvider(ACCEPTABLE_PROVIDERS);
     private static final String KEY_ALGORITHM = "AES";
+    private static final String PROVIDER = Ciphers.getProvider();
     private static final int KEY_SIZE = 256;
     private static final int BLOCK_SIZE = 16;
     private static final int IV_SIZE = 16;
