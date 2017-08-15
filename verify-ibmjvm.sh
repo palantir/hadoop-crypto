@@ -1,3 +1,4 @@
+# Runs the crypto-core tests on an ibm jvm
 docker run --rm \
     -w '/workspace' \
     -v "$(pwd):/workspace" \

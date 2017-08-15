@@ -23,6 +23,9 @@ final class Ciphers {
 
     private Ciphers() {}
 
+    /**
+     * Returns the first provider that is installed on the system.
+     */
     static String getProvider(List<String> providers) {
         for (String provider : providers) {
             if (Security.getProvider(provider) != null) {
@@ -30,7 +33,7 @@ final class Ciphers {
             }
         }
         throw new IllegalStateException(
-                String.format("None of the available JCE providers are acceptable: %s", providers));
+                String.format("None of the requested JCE providers are acceptable: %s", providers));
     }
 
 }
