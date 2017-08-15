@@ -12,10 +12,10 @@ dependencies:
 test:
   override:
     - ./gradlew --parallel build
+    - ./verify-ibmjvm.sh
 
 deployment:
   release:
     tag: /[0-9]+(\.[0-9]+)+(-rc[0-9]+)?/
     commands:
       - ./gradlew -i bintrayUpload
-      - ./test-ibmjvm.sh
