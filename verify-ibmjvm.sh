@@ -1,4 +1,5 @@
 # Runs the crypto-core tests on an ibm jvm
+docker build -t ibm .
 docker run --rm \
     -w '/workspace' \
     -v "$(pwd):/workspace" \
@@ -6,5 +7,5 @@ docker run --rm \
     -v "$HOME/.docker:/root/.docker" \
     -v "$HOME/.m2:/root/.m2" \
     -e OVERRIDE_KEY_SAFETY_PROTECTIONS=true \
-    ibmjava:8-sdk \
+    ibm \
     ./gradlew crypto-core:test
