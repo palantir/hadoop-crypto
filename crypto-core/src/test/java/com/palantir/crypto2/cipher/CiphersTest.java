@@ -38,7 +38,7 @@ public final class CiphersTest {
     public void testProvider_noneAvailable() {
         assertThatExceptionOfType(IllegalStateException.class)
                 .isThrownBy(() -> Ciphers.getProvider(ImmutableList.of("Invalid")))
-                .withMessage("None of the acceptable JCE providers are acceptable: [Invalid]");
+                .withMessage("None of the acceptable JCE providers are available: [Invalid]");
     }
 
 }
