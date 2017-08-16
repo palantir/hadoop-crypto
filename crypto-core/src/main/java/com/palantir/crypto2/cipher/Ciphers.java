@@ -45,7 +45,7 @@ final class Ciphers {
             }
         }
         throw new IllegalStateException(
-                String.format("None of the requested JCE providers are acceptable: %s", providers));
+                String.format("None of the acceptable JCE providers are acceptable: %s", providers));
     }
 
 }
