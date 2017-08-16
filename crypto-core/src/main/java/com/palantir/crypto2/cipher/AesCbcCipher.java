@@ -36,8 +36,8 @@ import javax.crypto.spec.IvParameterSpec;
 public final class AesCbcCipher implements SeekableCipher {
 
     public static final String ALGORITHM = "AES/CBC/PKCS5Padding";
-    private static final String PROVIDER = "SunJCE";
     private static final String KEY_ALGORITHM = "AES";
+    private static final String PROVIDER = Ciphers.getProvider();
     private static final int KEY_SIZE = 256;
     private static final int BLOCK_SIZE = 16;
     private static final int IV_SIZE = 16;

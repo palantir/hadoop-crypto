@@ -1,4 +1,6 @@
 machine:
+  services:
+    - docker
   java:
     version: oraclejdk8
   environment:
@@ -12,6 +14,7 @@ dependencies:
 test:
   override:
     - ./gradlew --parallel build
+    - ./verify-ibmjvm.sh
 
 deployment:
   release:

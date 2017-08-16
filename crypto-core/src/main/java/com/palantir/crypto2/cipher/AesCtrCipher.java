@@ -37,7 +37,7 @@ import javax.crypto.spec.IvParameterSpec;
 public final class AesCtrCipher implements SeekableCipher {
 
     public static final String ALGORITHM = "AES/CTR/NoPadding";
-    static final String PROVIDER = "SunJCE";
+    static final String PROVIDER = Ciphers.getProvider();
     static final String KEY_ALGORITHM = "AES";
     static final int KEY_SIZE = 256;
     static final int BLOCK_SIZE = 16;
