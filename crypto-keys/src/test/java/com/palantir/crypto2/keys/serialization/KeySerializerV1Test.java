@@ -16,10 +16,7 @@
 
 package com.palantir.crypto2.keys.serialization;
 
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import com.google.common.collect.ImmutableSet;
 import java.security.InvalidKeyException;
@@ -42,13 +39,10 @@ public final class KeySerializerV1Test extends KeySerializerTest {
 
     @Test // Expected to fail due to array length bug where only a single byte was written
     public void testWrapAndUnwrap_2048bitKeyFails() {
-        try {
-            testWrapAndUnwrap(128, 2048);
-            fail();
-        } catch (Exception e) {
-            assertThat(e.getCause(), instanceOf(InvalidKeyException.class));
-            assertThat(e.getCause().getMessage(), is("Unwrapping failed"));
-        }
+        assertThatExceptionOfType(Exception.class)
+                .isThrownBy(() -> testWrapAndUnwrap(128, 2048))
+                .withCauseInstanceOf(InvalidKeyException.class)
+                .withMessageContaining("Unwrapping failed");
     }
 
 }

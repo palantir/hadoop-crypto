@@ -16,8 +16,7 @@
 
 package com.palantir.crypto2.keys;
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.security.PublicKey;
 import org.junit.Test;
@@ -28,7 +27,7 @@ public final class PublicKeysTest {
     public void testFrom_generatesEquivalent() {
         PublicKey expectedKey = TestKeyPairs.generateKeyPair().getPublic();
         PublicKey actualKey = PublicKeys.from(expectedKey.getAlgorithm(), expectedKey.getEncoded());
-        assertThat(actualKey, is(expectedKey));
+        assertThat(actualKey).isEqualTo(expectedKey);
     }
 
 }

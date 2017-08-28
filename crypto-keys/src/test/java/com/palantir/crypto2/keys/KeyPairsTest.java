@@ -16,8 +16,7 @@
 
 package com.palantir.crypto2.keys;
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.security.KeyPair;
 import java.security.PrivateKey;
@@ -46,8 +45,8 @@ public final class KeyPairsTest {
         KeyPair deserialized = KeyPairs.fromStrings(privateEncoded, publicEncoded, "RSA");
 
         // KeyPair does not implement equals so check each key individually
-        assertThat(deserialized.getPrivate(), is(privateKey));
-        assertThat(deserialized.getPublic(), is(publicKey));
+        assertThat(deserialized.getPrivate()).isEqualTo(privateKey);
+        assertThat(deserialized.getPublic()).isEqualTo(publicKey);
     }
 
     private static String encode(byte[] bytes) {

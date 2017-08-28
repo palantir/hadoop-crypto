@@ -16,9 +16,8 @@
 
 package com.palantir.crypto2.keys;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -84,7 +83,7 @@ public final class ChainedAsyncKeyStorageStrategyTest {
     public void testGet_succeedsAfterFirstStrategy() {
         chained = new ChainedAsyncKeyStorageStrategy(EXECUTOR, successfulStrategy, failingStrategy);
 
-        assertThat(chained.get(KEY).join(), is(keyMaterial));
+        assertThat(chained.get(KEY).join()).isEqualTo(keyMaterial);
 
         verify(successfulStrategy).get(KEY);
         verifyNoMoreInteractions(successfulStrategy, failingStrategy);
@@ -94,7 +93,7 @@ public final class ChainedAsyncKeyStorageStrategyTest {
     public void testGet_FailedGetIgnored() {
         chained = new ChainedAsyncKeyStorageStrategy(EXECUTOR, failingStrategy, successfulStrategy);
 
-        assertThat(chained.get(KEY).join(), is(keyMaterial));
+        assertThat(chained.get(KEY).join()).isEqualTo(keyMaterial);
 
         verify(failingStrategy).get(KEY);
         verify(successfulStrategy).get(KEY);
