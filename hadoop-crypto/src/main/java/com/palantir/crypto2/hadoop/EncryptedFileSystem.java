@@ -189,8 +189,8 @@ public final class EncryptedFileSystem extends FileSystem {
     }
 
     @Override
-    public BlockLocation[] getFileBlockLocations(Path p, long start, long len) throws IOException  {
-        return fs.getFileBlockLocations(p, start, len);
+    public BlockLocation[] getFileBlockLocations(Path path, long start, long len) throws IOException  {
+        return fs.getFileBlockLocations(path, start, len);
     }
 
     @Override
