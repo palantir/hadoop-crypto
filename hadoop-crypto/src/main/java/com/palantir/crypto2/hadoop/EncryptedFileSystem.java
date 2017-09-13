@@ -163,6 +163,16 @@ public final class EncryptedFileSystem extends FileSystem {
     }
 
     @Override
+    public short getDefaultReplication() {
+        return fs.getDefaultReplication();
+    }
+
+    @Override
+    public short getDefaultReplication(Path path) {
+        return fs.getDefaultReplication(path);
+    }
+
+    @Override
     public FileStatus getFileStatus(Path path) throws IOException {
         return fs.getFileStatus(path);
     }
