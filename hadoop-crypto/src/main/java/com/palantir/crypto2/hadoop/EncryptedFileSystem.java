@@ -29,6 +29,7 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.util.Optional;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.BlockLocation;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileStatus;
@@ -170,6 +171,26 @@ public final class EncryptedFileSystem extends FileSystem {
     @Override
     public short getDefaultReplication(Path path) {
         return fs.getDefaultReplication(path);
+    }
+
+    @Override
+    public long getDefaultBlockSize() {
+        return fs.getDefaultBlockSize();
+    }
+
+    @Override
+    public long getDefaultBlockSize(Path path) {
+        return fs.getDefaultBlockSize(path);
+    }
+
+    @Override
+    public BlockLocation[] getFileBlockLocations(FileStatus file, long start, long len) throws IOException {
+        return fs.getFileBlockLocations(file, start, len);
+    }
+
+    @Override
+    public BlockLocation[] getFileBlockLocations(Path p, long start, long len) throws IOException  {
+        return fs.getFileBlockLocations(p, start, len);
     }
 
     @Override
