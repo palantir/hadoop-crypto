@@ -380,6 +380,20 @@ public final class EncryptedFileSystemTest {
     }
 
     @Test
+    public void testGetDefaultReplication() {
+        mockedEfs.getDefaultReplication();
+
+        verify(mockFs).getDefaultReplication();
+    }
+
+    @Test
+    public void testGetDefaultReplicationPath() {
+        mockedEfs.getDefaultReplication(path);
+
+        verify(mockFs).getDefaultReplication(path);
+    }
+
+    @Test
     public void testGetFileStatus() throws IOException {
         mockedEfs.getFileStatus(path);
 
