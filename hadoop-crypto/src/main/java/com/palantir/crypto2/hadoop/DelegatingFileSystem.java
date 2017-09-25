@@ -36,7 +36,7 @@ public abstract class DelegatingFileSystem extends FilterFileSystem {
         try {
             super.initialize(delegate.getUri(), delegate.getConf());
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Failed to initialize the delegating filesystem", e);
         }
     }
 
