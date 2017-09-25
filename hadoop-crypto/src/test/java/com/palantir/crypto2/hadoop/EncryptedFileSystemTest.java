@@ -74,7 +74,7 @@ public final class EncryptedFileSystemTest {
     @Before
     public void before()
             throws NoSuchAlgorithmException, NoSuchProviderException, IOException, URISyntaxException {
-        delegateFs = FileSystem.get(new URI(folder.getRoot().getAbsolutePath()), new Configuration());
+        delegateFs = FileSystem.get(new URI("file://" + folder.getRoot().getAbsolutePath()), new Configuration());
         keyStore = new InMemoryKeyStorageStrategy();
         efs = new EncryptedFileSystem(delegateFs, keyStore);
         path = new Path(folder.newFile().getAbsolutePath());
@@ -90,6 +90,7 @@ public final class EncryptedFileSystemTest {
 
         // Mock a successful rename operation
         when(mockFs.getConf()).thenReturn(new Configuration());
+        when(mockFs.getUri()).thenReturn(URI.create("foo://bar"));
         when(mockFs.rename(any(Path.class), any(Path.class))).thenReturn(true);
         when(mockKeyStore.get(anyString())).thenReturn(keyMaterial);
 
