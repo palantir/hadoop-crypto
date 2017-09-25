@@ -24,6 +24,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
@@ -58,6 +59,7 @@ public final class DelegatingFileSystemTest {
     @Before
     public void before() throws IOException {
         when(delegate.getConf()).thenReturn(new Configuration());
+        when(delegate.getUri()).thenReturn(URI.create("foo://bar"));
         when(delegate.getFileStatus(remotePath)).thenReturn(new FileStatus(0, false, 0, 0, 0, remotePath));
         delegatingFs = new DelegatingFileSystem(delegate) {};
     }

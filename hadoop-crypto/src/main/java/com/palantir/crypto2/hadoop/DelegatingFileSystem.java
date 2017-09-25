@@ -33,7 +33,11 @@ public abstract class DelegatingFileSystem extends FilterFileSystem {
 
     public DelegatingFileSystem(FileSystem delegate) {
         super(delegate);
-        super.setConf(delegate.getConf());
+        try {
+            super.initialize(delegate.getUri(), delegate.getConf());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void copyFromLocalFile(Path src, Path dst) throws IOException {
