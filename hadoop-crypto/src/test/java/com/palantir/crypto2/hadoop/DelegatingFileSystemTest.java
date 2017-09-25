@@ -64,10 +64,10 @@ public final class DelegatingFileSystemTest {
 
     @Test
     public void testCopyFromLocal() throws IOException {
-        testCopyFromLocal(source -> delegatingFs.copyFromLocalFile(source, remotePath));
-        testCopyFromLocal(source -> delegatingFs.copyFromLocalFile(false, source, remotePath));
-        testCopyFromLocal(source -> delegatingFs.copyFromLocalFile(false, true, source, remotePath));
-        testCopyFromLocal(source -> delegatingFs.copyFromLocalFile(false, true, new Path[] {source}, remotePath));
+        testCopyFromLocal(src -> delegatingFs.copyFromLocalFile(src, remotePath));
+        testCopyFromLocal(src -> delegatingFs.copyFromLocalFile(false, src, remotePath));
+        testCopyFromLocal(src -> delegatingFs.copyFromLocalFile(false, true, src, remotePath));
+        testCopyFromLocal(src -> delegatingFs.copyFromLocalFile(false, true, new Path[] {src}, remotePath));
     }
 
     private interface ThrowingConsumer<T> {
@@ -95,9 +95,9 @@ public final class DelegatingFileSystemTest {
 
     @Test
     public void testCopyToLocal() throws IOException {
-        testCopyToLocal(dest -> delegatingFs.copyToLocalFile(remotePath, dest));
-        testCopyToLocal(dest -> delegatingFs.copyToLocalFile(false, remotePath, dest));
-        testCopyToLocal(dest -> delegatingFs.copyToLocalFile(false, remotePath, dest, false));
+        testCopyToLocal(dst -> delegatingFs.copyToLocalFile(remotePath, dst));
+        testCopyToLocal(dst -> delegatingFs.copyToLocalFile(false, remotePath, dst));
+        testCopyToLocal(dst -> delegatingFs.copyToLocalFile(false, remotePath, dst, false));
     }
 
     private void testCopyToLocal(ThrowingConsumer<Path> copyToLocal) throws IOException {
