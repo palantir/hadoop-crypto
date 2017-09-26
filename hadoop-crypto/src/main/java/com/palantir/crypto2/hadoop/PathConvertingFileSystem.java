@@ -32,7 +32,7 @@ import org.apache.hadoop.util.Progressable;
  * {@link Path}s passed into methods are converted using {@link #toFunc} before being forwarded.
  * {@link Path}s returned from the delegate are converted using {@link #fromFunc} before being returned.
  */
-public final class PathConvertingFileSystem extends FileSystem {
+public final class PathConvertingFileSystem extends DelegatingFileSystem {
 
     private final FileSystem delegate;
     private final Function<Path, Path> toFunc;
@@ -43,7 +43,7 @@ public final class PathConvertingFileSystem extends FileSystem {
             Function<Path, Path> toFunc,
             Function<Path, Path> fromFunc,
             Function<URI, URI> fromUriFunc) {
-        super.setConf(delegate.getConf());
+        super(delegate);
         this.delegate = delegate;
         this.toFunc = toFunc;
         this.fromFunc = fromFunc;

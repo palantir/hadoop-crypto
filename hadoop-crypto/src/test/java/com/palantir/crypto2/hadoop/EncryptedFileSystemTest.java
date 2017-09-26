@@ -48,7 +48,6 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.fs.permission.FsPermission;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -75,7 +74,7 @@ public final class EncryptedFileSystemTest {
     @Before
     public void before()
             throws NoSuchAlgorithmException, NoSuchProviderException, IOException, URISyntaxException {
-        delegateFs = FileSystem.get(new URI(folder.getRoot().getAbsolutePath()), new Configuration());
+        delegateFs = FileSystem.get(new URI("file://" + folder.getRoot().getAbsolutePath()), new Configuration());
         keyStore = new InMemoryKeyStorageStrategy();
         efs = new EncryptedFileSystem(delegateFs, keyStore);
         path = new Path(folder.newFile().getAbsolutePath());
@@ -91,6 +90,7 @@ public final class EncryptedFileSystemTest {
 
         // Mock a successful rename operation
         when(mockFs.getConf()).thenReturn(new Configuration());
+        when(mockFs.getUri()).thenReturn(URI.create("foo://bar"));
         when(mockFs.rename(any(Path.class), any(Path.class))).thenReturn(true);
         when(mockKeyStore.get(anyString())).thenReturn(keyMaterial);
 
@@ -342,69 +342,6 @@ public final class EncryptedFileSystemTest {
         assertThat(keyStore.get(path.toString())).isInstanceOf(KeyMaterial.class);
         assertThat(efs.delete(path, false)).isFalse();
         assertThat(keyStore.get(path.toString())).isNull();
-    }
-
-    @Test
-    public void testExists() throws IOException {
-        mockedEfs.exists(path);
-
-        verify(mockFs).exists(path);
-    }
-
-    @Test
-    public void testListStatus() throws IOException {
-        mockedEfs.listStatus(path);
-
-        verify(mockFs).listStatus(path);
-    }
-
-    @Test
-    public void testSetWorkingDirectory() {
-        mockedEfs.setWorkingDirectory(path);
-
-        verify(mockFs).setWorkingDirectory(path);
-    }
-
-    @Test
-    public void testGetWorkingDirectory() {
-        mockedEfs.getWorkingDirectory();
-
-        verify(mockFs).getWorkingDirectory();
-    }
-
-    @Test
-    public void testMkdirs() throws IOException {
-        mockedEfs.mkdirs(path, FsPermission.getDefault());
-
-        verify(mockFs).mkdirs(path, FsPermission.getDefault());
-    }
-
-    @Test
-    public void testGetDefaultReplication() {
-        mockedEfs.getDefaultReplication();
-
-        verify(mockFs).getDefaultReplication();
-    }
-
-    @Test
-    public void testGetDefaultReplicationPath() {
-        mockedEfs.getDefaultReplication(path);
-
-        verify(mockFs).getDefaultReplication(path);
-    }
-
-    @Test
-    public void testGetFileStatus() throws IOException {
-        mockedEfs.getFileStatus(path);
-
-        verify(mockFs).getFileStatus(path);
-    }
-
-    @Test
-    public void testGetUri() {
-        mockedEfs.getUri();
-
-        verify(mockFs).getUri();
     }
 
     @Test
