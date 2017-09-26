@@ -40,6 +40,7 @@ public abstract class DelegatingFileSystem extends FilterFileSystem {
         }
     }
 
+    @Override
     public void copyFromLocalFile(Path src, Path dst) throws IOException {
         copyFromLocalFile(false, src, dst);
     }
