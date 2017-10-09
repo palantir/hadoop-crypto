@@ -14,7 +14,7 @@ Supported Ciphers
 -----------------
 Currently `AES/CTR/NoPadding` and `AES/CBC/PKCS5Padding` are supported.
 
-**Disclaimer** Neither of these ciphers support (Authenticated Encryption)[https://en.wikipedia.org/wiki/Authenticated_encryption].
+**Disclaimer** Neither of these ciphers support [Authenticated Encryption](https://en.wikipedia.org/wiki/Authenticated_encryption).
 Data integrity must be managed by the consumer of this library.
 
 Programatic Example
