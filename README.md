@@ -14,6 +14,12 @@ Supported Ciphers
 -----------------
 Currently `AES/CTR/NoPadding` and `AES/CBC/PKCS5Padding` are supported.
 
+**Disclaimer** Neither supported AES mode is [authenticated](https://en.wikipedia.org/wiki/Authenticated_encryption).
+Authentication should be performed by consumers of this library via an
+external cryptographic mechanism such as Encrypt-then-MAC. Failure to
+properly authenticate ciphertext breaks security in some scenarios where an
+attacker can manipulate ciphertext inputs.
+
 Programatic Example
 -------------------
 
