@@ -67,7 +67,7 @@ public final class ChainedKeyStorageStrategy implements KeyStorageStrategy {
                 "Unable to get key material for '%s' using any of the provided strategies: %s",
                 fileKey,
                 Collections2.transform(strategies, s -> s.getClass().getCanonicalName())));
-        suppressedExceptions.forEach(toThrow::addSuppressed);
+        suppressedExceptions.stream().forEach(toThrow::addSuppressed);
         throw toThrow;
     }
 
