@@ -19,6 +19,7 @@ package com.palantir.crypto2.keys;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.slf4j.Logger;
@@ -53,17 +54,21 @@ public final class ChainedKeyStorageStrategy implements KeyStorageStrategy {
 
     @Override
     public KeyMaterial get(String fileKey) {
+        List<Exception> suppressedExceptions = new ArrayList<>();
         for (KeyStorageStrategy strategy : strategies) {
             try {
                 return strategy.get(fileKey);
             } catch (Exception e) {
+                suppressedExceptions.add(e);
                 logger.info("Failed to get key material using {}", strategy.getClass().getCanonicalName(), e);
             }
         }
-        throw new RuntimeException(String.format(
+        RuntimeException toThrow = new RuntimeException(String.format(
                 "Unable to get key material for '%s' using any of the provided strategies: %s",
                 fileKey,
                 Collections2.transform(strategies, s -> s.getClass().getCanonicalName())));
+        suppressedExceptions.forEach(toThrow::addSuppressed);
+        throw toThrow;
     }
 
     @Override

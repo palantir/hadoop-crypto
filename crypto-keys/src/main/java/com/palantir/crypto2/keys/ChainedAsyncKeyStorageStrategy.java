@@ -19,6 +19,7 @@ package com.palantir.crypto2.keys;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -57,16 +58,20 @@ public final class ChainedAsyncKeyStorageStrategy implements AsyncKeyStorageStra
     @Override
     public CompletableFuture<KeyMaterial> get(String fileKey) {
         return CompletableFuture.supplyAsync(() -> {
+            List<Exception> suppressedExceptions = new ArrayList<>();
             for (AsyncKeyStorageStrategy strategy : strategies) {
                 try {
                     return strategy.get(fileKey).join();
                 } catch (Exception e) {
+                    suppressedExceptions.add(e);
                     log.info("Failed to get key material using {}", strategy.getClass().getCanonicalName(), e);
                 }
             }
-            throw new RuntimeException(String.format(
+            RuntimeException toThrow = new RuntimeException(String.format(
                     "Unable to get key material using any of the provided strategies: %s",
                     Collections2.transform(strategies, s -> s.getClass().getCanonicalName())));
+            suppressedExceptions.forEach(toThrow::addSuppressed);
+            throw toThrow;
         }, executor);
     }
 
