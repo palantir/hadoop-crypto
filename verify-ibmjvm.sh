@@ -8,4 +8,4 @@ docker run --rm \
     -v "$HOME/.m2:/root/.m2" \
     -e OVERRIDE_KEY_SAFETY_PROTECTIONS=true \
     ibm \
-    ./gradlew crypto-core:test
+    ./gradlew --no-daemon crypto-core:test
