@@ -32,40 +32,41 @@ public abstract class DelegatingFileSystem extends FilterFileSystem {
     }
 
     @Override
-    public void copyFromLocalFile(Path src, Path dst) throws IOException {
+    public final void copyFromLocalFile(Path src, Path dst) throws IOException {
         copyFromLocalFile(false, src, dst);
     }
 
     @Override
-    public void copyFromLocalFile(boolean delSrc, Path src, Path dst)
+    public final void copyFromLocalFile(boolean delSrc, Path src, Path dst)
             throws IOException {
         copyFromLocalFile(delSrc, true, src, dst);
     }
 
     @Override
-    public void copyFromLocalFile(boolean delSrc, boolean overwrite, Path[] srcs, Path dst) throws IOException {
+    public final void copyFromLocalFile(boolean delSrc, boolean overwrite, Path[] srcs, Path dst) throws IOException {
         Configuration conf = getConf();
         FileUtil.copy(getLocal(conf), srcs, this, dst, delSrc, overwrite, conf);
     }
 
     @Override
-    public void copyFromLocalFile(boolean delSrc, boolean overwrite, Path src, Path dst) throws IOException {
+    public final void copyFromLocalFile(boolean delSrc, boolean overwrite, Path src, Path dst) throws IOException {
         Configuration conf = getConf();
         FileUtil.copy(getLocal(conf), src, this, dst, delSrc, overwrite, conf);
     }
 
     @Override
-    public void copyToLocalFile(Path src, Path dst) throws IOException {
+    public final void copyToLocalFile(Path src, Path dst) throws IOException {
         copyToLocalFile(false, src, dst);
     }
 
     @Override
-    public void copyToLocalFile(boolean delSrc, Path src, Path dst) throws IOException {
+    public final void copyToLocalFile(boolean delSrc, Path src, Path dst) throws IOException {
         copyToLocalFile(delSrc, src, dst, false);
     }
 
     @Override
-    public void copyToLocalFile(boolean delSrc, Path src, Path dst, boolean useRawLocalFileSystem) throws IOException {
+    public final void copyToLocalFile(boolean delSrc, Path src, Path dst, boolean useRawLocalFileSystem)
+            throws IOException {
         Configuration conf = getConf();
         FileSystem local = useRawLocalFileSystem
                 ? getLocal(conf).getRaw()
