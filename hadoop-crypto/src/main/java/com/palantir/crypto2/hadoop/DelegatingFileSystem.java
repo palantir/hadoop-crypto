@@ -18,6 +18,7 @@ package com.palantir.crypto2.hadoop;
 
 import java.io.IOException;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.BlockLocation;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.fs.FilterFileSystem;
@@ -80,5 +81,10 @@ public abstract class DelegatingFileSystem extends FilterFileSystem {
                 ? getLocal(conf).getRaw()
                 : getLocal(conf);
         FileUtil.copy(this, src, local, dst, delSrc, conf);
+    }
+
+    @Override
+    public BlockLocation[] getFileBlockLocations(Path p, long start, long len) throws IOException {
+        return fs.getFileBlockLocations(p, start, len);
     }
 }

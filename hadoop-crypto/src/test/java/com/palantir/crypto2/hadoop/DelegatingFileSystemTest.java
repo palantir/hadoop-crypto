@@ -17,6 +17,10 @@
 package com.palantir.crypto2.hadoop;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.google.common.io.Files;
@@ -27,6 +31,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.BlockLocation;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FSInputStream;
@@ -110,6 +115,19 @@ public final class DelegatingFileSystemTest {
 
         copyToLocal.accept(dst);
         assertThat(Files.toByteArray(localFile)).isEqualTo(bytes);
+    }
+
+    @Test
+    public void testGetFileBlockLocations() throws IOException {
+        Path p = new Path("test-path");
+        BlockLocation location = new BlockLocation(
+                new String[] {"some-host:50010"}, new String[] {"some-host"}, 0L, 0L);
+        when(delegate.getFileBlockLocations(eq(p), anyLong(), anyLong()))
+                .thenReturn(new BlockLocation[]{location});
+
+        assertThat(delegatingFs.getFileBlockLocations(p, 0L, 0L)).containsExactly(location);
+        verify(delegate).getFileBlockLocations(p, 0L, 0L);
+
     }
 
     private static final class ByteArrayFsInputStream extends FSInputStream {
