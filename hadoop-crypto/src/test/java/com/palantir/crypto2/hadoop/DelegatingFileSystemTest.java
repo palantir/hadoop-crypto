@@ -127,7 +127,6 @@ public final class DelegatingFileSystemTest {
 
         assertThat(delegatingFs.getFileBlockLocations(path, 0L, 0L)).containsExactly(location);
         verify(delegate).getFileBlockLocations(path, 0L, 0L);
-
     }
 
     private static final class ByteArrayFsInputStream extends FSInputStream {
