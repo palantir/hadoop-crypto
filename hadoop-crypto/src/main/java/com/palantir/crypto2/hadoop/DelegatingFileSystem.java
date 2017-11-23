@@ -28,6 +28,8 @@ import org.apache.hadoop.fs.Path;
  * Equivalent to {@link FilterFileSystem} but invokes {@link #create} and {@link #open} on this class when calling
  * {@link #copyFromLocalFile} and {@link #copyToLocalFile}.
  * <p>
+ * Additionally delegates (@link getFileBlockLocations(Path, long, long)} to the underlying filesystem.
+ * <p>
  * Solves: https://issues.apache.org/jira/browse/HADOOP-13870
  */
 public abstract class DelegatingFileSystem extends FilterFileSystem {
