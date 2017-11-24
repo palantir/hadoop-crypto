@@ -18,6 +18,7 @@ package com.palantir.crypto2.hadoop;
 
 import java.io.IOException;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.BlockLocation;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.fs.FilterFileSystem;
@@ -26,6 +27,8 @@ import org.apache.hadoop.fs.Path;
 /**
  * Equivalent to {@link FilterFileSystem} but invokes {@link #create} and {@link #open} on this class when calling
  * {@link #copyFromLocalFile} and {@link #copyToLocalFile}.
+ * <p>
+ * Additionally delegates (@link getFileBlockLocations(Path, long, long)} to the underlying filesystem.
  * <p>
  * Solves: https://issues.apache.org/jira/browse/HADOOP-13870
  */
@@ -80,5 +83,10 @@ public abstract class DelegatingFileSystem extends FilterFileSystem {
                 ? getLocal(conf).getRaw()
                 : getLocal(conf);
         FileUtil.copy(this, src, local, dst, delSrc, conf);
+    }
+
+    @Override
+    public BlockLocation[] getFileBlockLocations(Path path, long start, long len) throws IOException {
+        return fs.getFileBlockLocations(path, start, len);
     }
 }
