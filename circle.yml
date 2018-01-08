@@ -9,15 +9,15 @@ machine:
 
 dependencies:
   override:
-    - ./gradlew --parallel --no-daemon resolveConfigurations
+    - ./gradlew --parallel resolveConfigurations
 
 test:
   override:
-    - ./gradlew --parallel --no-daemon build
+    - ./gradlew --parallel build
     - ./verify-ibmjvm.sh
 
 deployment:
   release:
     tag: /[0-9]+(\.[0-9]+)+(-rc[0-9]+)?/
     commands:
-        - ./gradlew -i --no-daemon bintrayUpload
+      - ./gradlew -i bintrayUpload
