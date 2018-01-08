@@ -9,4 +9,4 @@ docker run --rm \
     -e OVERRIDE_KEY_SAFETY_PROTECTIONS=true \
     -e DISABLE_ERROR_PRONE=true \
     ibm \
-    ./gradlew crypto-core:test
+    ./gradlew --no-daemon crypto-core:test
