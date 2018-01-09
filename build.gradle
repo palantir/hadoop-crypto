@@ -9,22 +9,26 @@ buildscript {
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.6'
         classpath 'com.netflix.nebula:nebula-dependency-recommender:5.0.0'
         classpath 'com.netflix.nebula:nebula-publishing-plugin:5.1.4'
-        classpath 'com.palantir:gradle-baseline-java:0.9.0'
+        classpath 'com.palantir.baseline:gradle-baseline-java:0.17.1'
     }
 }
 
 plugins {
-    id 'com.palantir.configuration-resolver' version '0.1.0'
+    id 'com.palantir.configuration-resolver' version '0.2.0'
     id 'com.palantir.git-version' version '0.2.0'
     id 'org.inferred.processors' version '1.2.2'
+}
+
+repositories {
+    // needed for baselineUpdateConfig task
+    maven { url  "http://palantir.bintray.com/releases" }
 }
 
 apply plugin: 'com.palantir.baseline-config' // provides baselineUpdateConfig task
 apply plugin: 'com.palantir.baseline-idea'
 
-repositories {
-    // needed for baselineUpdateConfig task
-    maven { url  "http://palantir.bintray.com/releases" }
+dependencies {
+    baseline "com.palantir.baseline:gradle-baseline-java-config:0.17.1@zip"
 }
 
 allprojects {
@@ -50,25 +54,30 @@ subprojects {
     apply plugin: 'java'
     apply plugin: 'com.palantir.baseline-checkstyle'
     apply plugin: 'com.palantir.baseline-eclipse'
-    apply plugin: 'com.palantir.baseline-findbugs'
     apply plugin: 'com.palantir.baseline-idea'
+    apply plugin: 'org.inferred.processors'
 
     repositories {
+        maven { url  "http://palantir.bintray.com/releases" }
         jcenter()
     }
 
-    sourceCompatibility = 1.8
-
-    tasks.withType(Javadoc) {
-        // suppress Javadoc doclint warnings in Java 8+
-        if (!System.getProperty("java.version").startsWith("1.7")) {
-            options.addStringOption('Xdoclint:none', '-quiet')
-        }
-    }
     tasks.check.dependsOn(javadoc)
+
+    sourceCompatibility = 1.8
 
     if (System.env.CIRCLE_TEST_REPORTS) {
         test.reports.junitXml.destination = new File(System.env.CIRCLE_TEST_REPORTS, it.getName())
     }
-}
 
+    // The IBM JVM doesn't play nicely with error-prone
+    // This configuration difference forces us to run gradle with --no-daemon
+    if (!System.env.DISABLE_ERROR_PRONE) {
+        apply plugin: 'com.palantir.baseline-error-prone'
+        configurations.errorprone {
+            resolutionStrategy {
+                force 'com.google.guava:guava:21.0'
+            }
+        }
+    }
+}

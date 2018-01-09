@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Palantir Technologies, Inc. All rights reserved.
+ * (c) Copyright 2017 Palantir Technologies Inc. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ import org.apache.hadoop.fs.FSDataOutputStream;
  * @deprecated use {@link javax.crypto.CipherOutputStream} directly.
  */
 @Deprecated
-public class FsCipherOutputStream extends FilterOutputStream {
+public final class FsCipherOutputStream extends FilterOutputStream {
 
     public FsCipherOutputStream(FSDataOutputStream delegate, SeekableCipher cipher) {
         this(delegate, cipher, new CipherStreamSupplierImpl());
