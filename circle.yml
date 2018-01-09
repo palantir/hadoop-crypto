@@ -9,6 +9,7 @@ machine:
 
 dependencies:
   override:
+    # Cannot use daemon mode since standard build and verify-ibmjvm.sh build use different plugins and classpaths, see build.gradle
     - ./gradlew --parallel --no-daemon resolveConfigurations
 
 test:
