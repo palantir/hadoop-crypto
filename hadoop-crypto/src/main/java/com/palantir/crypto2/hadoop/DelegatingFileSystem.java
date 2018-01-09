@@ -87,7 +87,7 @@ public abstract class DelegatingFileSystem extends FilterFileSystem {
     }
 
     @Override
-    public BlockLocation[] getFileBlockLocations(Path path, long start, long len) throws IOException {
+    public final BlockLocation[] getFileBlockLocations(Path path, long start, long len) throws IOException {
         return fs.getFileBlockLocations(path, start, len);
     }
 }
