@@ -48,6 +48,7 @@ import org.openjdk.jmh.annotations.Warmup;
 public class EncryptionBenchmark {
 
     @org.openjdk.jmh.annotations.State(Scope.Benchmark)
+    @SuppressWarnings("DesignForExtension") // JMH needs public non-final State classes
     public static class State {
         private static final Random random = new Random();
 
@@ -64,7 +65,7 @@ public class EncryptionBenchmark {
     }
 
     @Benchmark
-    public void gcmEncrypt(State state) throws NoSuchPaddingException, NoSuchAlgorithmException {
+    public final void gcmEncrypt(State state) throws NoSuchPaddingException, NoSuchAlgorithmException {
         Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
         KeyMaterial key = KeyMaterials.generateKeyMaterial("AES", 256, 16);
         GCMParameterSpec gcmSpec = new GCMParameterSpec(8 * 16, key.getIv());
@@ -73,7 +74,7 @@ public class EncryptionBenchmark {
     }
 
     @Benchmark
-    public void ctrEncrypt(State state) throws NoSuchPaddingException, NoSuchAlgorithmException {
+    public final void ctrEncrypt(State state) throws NoSuchPaddingException, NoSuchAlgorithmException {
         Cipher cipher = Cipher.getInstance("AES/CTR/NoPadding");
         KeyMaterial key = KeyMaterials.generateKeyMaterial("AES", 256, 16);
         IvParameterSpec ivSpec = new IvParameterSpec(key.getIv());
@@ -82,7 +83,7 @@ public class EncryptionBenchmark {
     }
 
     @Benchmark
-    public void apacheEncrypt(State state) throws IOException {
+    public final void apacheEncrypt(State state) throws IOException {
         Properties props = ApacheCiphers.forceOpenSsl(new Properties());
         KeyMaterial key = KeyMaterials.generateKeyMaterial("AES", 256, 16);
 
@@ -93,7 +94,7 @@ public class EncryptionBenchmark {
         output.write(state.data);
     }
 
-    public void encrypt(byte[] bytes, Cipher cipher, Key key, AlgorithmParameterSpec spec) {
+    private void encrypt(byte[] bytes, Cipher cipher, Key key, AlgorithmParameterSpec spec) {
         try {
             cipher.init(Cipher.ENCRYPT_MODE, key, spec);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
