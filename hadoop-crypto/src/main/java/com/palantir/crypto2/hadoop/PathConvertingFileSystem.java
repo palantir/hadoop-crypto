@@ -23,6 +23,7 @@ import java.util.function.Function;
 import org.apache.hadoop.fs.CreateFlag;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FSDataOutputStream;
+import org.apache.hadoop.fs.FileChecksum;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Options.ChecksumOpt;
@@ -123,6 +124,11 @@ public final class PathConvertingFileSystem extends DelegatingFileSystem {
     @Override
     public boolean mkdirs(Path path, FsPermission permission) throws IOException {
         return delegate.mkdirs(to(path), permission);
+    }
+
+    @Override
+    public FileChecksum getFileChecksum(Path path) throws IOException {
+        return fs.getFileChecksum(to(path));
     }
 
     private Path to(Path path) {
