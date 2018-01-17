@@ -34,7 +34,7 @@ import org.apache.hadoop.fs.CreateFlag;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Options;
+import org.apache.hadoop.fs.Options.ChecksumOpt;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.util.Progressable;
@@ -91,24 +91,19 @@ public final class EncryptedFileSystem extends DelegatingFileSystem {
         FSDataOutputStream encryptedStream =
                 fs.create(path, permission, overwrite, bufferSize, replication, blockSize, progress);
 
-        KeyMaterial keyMaterial = SeekableCipherFactory.generateKeyMaterial(cipherAlgorithm);
-        SeekableCipher cipher = SeekableCipherFactory.getCipher(cipherAlgorithm, keyMaterial);
-
-        // Ensure we can open the stream before storing keys that would be irrelevant
-        OutputStream encryptedOs =
-                CryptoStreamFactory.encrypt(encryptedStream, cipher.getKeyMaterial(), cipherAlgorithm);
-        FSDataOutputStream os = new FSDataOutputStream(encryptedOs, statistics);
-        keyStore.put(path.toString(), cipher.getKeyMaterial());
-
-        return os;
+        return storeKey(encryptedStream, path);
     }
 
     @Override
     public FSDataOutputStream create(Path path, FsPermission permission, EnumSet<CreateFlag> flags, int bufferSize,
-            short replication, long blockSize, Progressable progress, Options.ChecksumOpt checksumOpt) throws IOException {
+            short replication, long blockSize, Progressable progress, ChecksumOpt checksumOpt) throws IOException {
         FSDataOutputStream encryptedStream =
                 fs.create(path, permission, flags, bufferSize, replication, blockSize, progress, checksumOpt);
 
+        return storeKey(encryptedStream, path);
+    }
+
+    private FSDataOutputStream storeKey(FSDataOutputStream encryptedStream, Path path) throws IOException {
         KeyMaterial keyMaterial = SeekableCipherFactory.generateKeyMaterial(cipherAlgorithm);
         SeekableCipher cipher = SeekableCipherFactory.getCipher(cipherAlgorithm, keyMaterial);
 
