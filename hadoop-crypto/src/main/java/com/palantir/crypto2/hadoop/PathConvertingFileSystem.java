@@ -18,11 +18,14 @@ package com.palantir.crypto2.hadoop;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.EnumSet;
 import java.util.function.Function;
+import org.apache.hadoop.fs.CreateFlag;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Options.ChecksumOpt;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.util.Progressable;
@@ -65,6 +68,12 @@ public final class PathConvertingFileSystem extends DelegatingFileSystem {
             short replication, long blockSize, Progressable progress) throws IOException {
         return delegate.create(to(path), permission, overwrite, bufferSize, replication, blockSize,
                 progress);
+    }
+
+    @Override
+    public FSDataOutputStream create(Path path, FsPermission permission, EnumSet<CreateFlag> flags, int bufferSize,
+            short replication, long blockSize, Progressable progress, ChecksumOpt checksumOpt) throws IOException {
+        return delegate.create(to(path), permission, flags, bufferSize, replication, blockSize, progress, checksumOpt);
     }
 
     @Override
