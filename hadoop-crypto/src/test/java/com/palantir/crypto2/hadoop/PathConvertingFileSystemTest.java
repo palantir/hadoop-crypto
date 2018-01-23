@@ -78,8 +78,8 @@ public final class PathConvertingFileSystemTest {
         when(delegate.create(DELEGATE_PATH, null, false, 0, (short) 0, 0, null)).thenReturn(outputStream);
         FSDataOutputStream actualStream = convertingFs.create(PATH, null, false, 0, (short) 0, 0, null);
 
-        when(delegate.create(DELEGATE_PATH, null, null, 0, (short)0, 0, null, null)).thenReturn(outputStream);
-        FSDataOutputStream actualStream1 = convertingFs.create(PATH, null, null, 0, (short)0, 0, null, null);
+        when(delegate.create(DELEGATE_PATH, null, null, 0, (short) 0, 0, null, null)).thenReturn(outputStream);
+        FSDataOutputStream actualStream1 = convertingFs.create(PATH, null, null, 0, (short) 0, 0, null, null);
 
         assertThat(actualStream).isEqualTo(outputStream);
         assertThat(actualStream1).isEqualTo(outputStream);
