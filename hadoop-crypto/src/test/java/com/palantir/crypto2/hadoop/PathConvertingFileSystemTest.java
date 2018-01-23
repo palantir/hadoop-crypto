@@ -160,7 +160,7 @@ public final class PathConvertingFileSystemTest {
         when(delegate.getFileChecksum(DELEGATE_PATH)).thenReturn(fileChecksum);
         FileChecksum checksum = convertingFs.getFileChecksum(PATH);
 
-        assertThat(checksum.equals(fileChecksum));
+        assertThat(checksum).isEqualTo(fileChecksum);
     }
 
     private static FileStatus fileStatus(Path path) {
