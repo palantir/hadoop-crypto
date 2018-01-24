@@ -97,10 +97,10 @@ public final class EncryptedFileSystem extends DelegatingFileSystem {
     @Override
     public FSDataOutputStream create(Path path, FsPermission permission, EnumSet<CreateFlag> flags, int bufferSize,
             short replication, long blockSize, Progressable progress, ChecksumOpt checksumOpt) throws IOException {
-        FSDataOutputStream encryptedStream =
+        FSDataOutputStream outputStream =
                 fs.create(path, permission, flags, bufferSize, replication, blockSize, progress, checksumOpt);
 
-        return encrypt(encryptedStream, path);
+        return encrypt(outputStream, path);
     }
 
     private FSDataOutputStream encrypt(FSDataOutputStream encryptedStream, Path path) throws IOException {
