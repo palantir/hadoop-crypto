@@ -25,6 +25,7 @@ import java.net.URI;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FSDataOutputStream;
+import org.apache.hadoop.fs.FileChecksum;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -34,7 +35,7 @@ import org.junit.Test;
 public final class PathConvertingFileSystemTest {
 
     private static final Path PATH = new Path("/dummy/path");
-    private static final Path DELEGATE_PATH = new Path("/delagate/path");
+    private static final Path DELEGATE_PATH = new Path("/delegate/path");
     private static final Path RETURN_PATH = new Path("/return/path");
     private static final URI DELEGATE_URI = URI.create("/delegate/uri");
     private static final URI RETURN_URI = URI.create("/return/uri");
@@ -42,6 +43,7 @@ public final class PathConvertingFileSystemTest {
     private FileSystem delegate;
     private FSDataInputStream inputStream;
     private FSDataOutputStream outputStream;
+    private FileChecksum fileChecksum;
     private PathConvertingFileSystem convertingFs;
 
     @Before
@@ -49,6 +51,7 @@ public final class PathConvertingFileSystemTest {
         delegate = mock(FileSystem.class);
         inputStream = mock(FSDataInputStream.class);
         outputStream = mock(FSDataOutputStream.class);
+        fileChecksum = mock(FileChecksum.class);
         when(delegate.getConf()).thenReturn(new Configuration());
         when(delegate.getUri()).thenReturn(URI.create("foo://bar"));
         convertingFs = new PathConvertingFileSystem(delegate, p -> DELEGATE_PATH, p -> RETURN_PATH, u -> RETURN_URI);
@@ -75,7 +78,11 @@ public final class PathConvertingFileSystemTest {
         when(delegate.create(DELEGATE_PATH, null, false, 0, (short) 0, 0, null)).thenReturn(outputStream);
         FSDataOutputStream actualStream = convertingFs.create(PATH, null, false, 0, (short) 0, 0, null);
 
+        when(delegate.create(DELEGATE_PATH, null, null, 0, (short) 0, 0, null, null)).thenReturn(outputStream);
+        FSDataOutputStream actualStream1 = convertingFs.create(PATH, null, null, 0, (short) 0, 0, null, null);
+
         assertThat(actualStream).isEqualTo(outputStream);
+        assertThat(actualStream1).isEqualTo(outputStream);
     }
 
     @Test
@@ -146,6 +153,14 @@ public final class PathConvertingFileSystemTest {
         boolean success = convertingFs.mkdirs(PATH, null);
 
         assertThat(success).isFalse();
+    }
+
+    @Test
+    public void getFileChecksum() throws Exception {
+        when(delegate.getFileChecksum(DELEGATE_PATH)).thenReturn(fileChecksum);
+        FileChecksum checksum = convertingFs.getFileChecksum(PATH);
+
+        assertThat(checksum).isEqualTo(fileChecksum);
     }
 
     private static FileStatus fileStatus(Path path) {
