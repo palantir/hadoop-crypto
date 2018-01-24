@@ -91,7 +91,7 @@ public final class EncryptedFileSystem extends DelegatingFileSystem {
         FSDataOutputStream encryptedStream =
                 fs.create(path, permission, overwrite, bufferSize, replication, blockSize, progress);
 
-        return storeKey(encryptedStream, path);
+        return encrypt(encryptedStream, path);
     }
 
     @Override
@@ -100,10 +100,10 @@ public final class EncryptedFileSystem extends DelegatingFileSystem {
         FSDataOutputStream encryptedStream =
                 fs.create(path, permission, flags, bufferSize, replication, blockSize, progress, checksumOpt);
 
-        return storeKey(encryptedStream, path);
+        return encrypt(encryptedStream, path);
     }
 
-    private FSDataOutputStream storeKey(FSDataOutputStream encryptedStream, Path path) throws IOException {
+    private FSDataOutputStream encrypt(FSDataOutputStream encryptedStream, Path path) throws IOException {
         KeyMaterial keyMaterial = SeekableCipherFactory.generateKeyMaterial(cipherAlgorithm);
         SeekableCipher cipher = SeekableCipherFactory.getCipher(cipherAlgorithm, keyMaterial);
 
