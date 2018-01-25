@@ -39,15 +39,17 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.Random;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.CreateFlag;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.RawLocalFileSystem;
+import org.apache.hadoop.fs.permission.FsPermission;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -72,9 +74,9 @@ public final class EncryptedFileSystemTest {
     public TemporaryFolder folder = new TemporaryFolder();
 
     @Before
-    public void before()
-            throws NoSuchAlgorithmException, NoSuchProviderException, IOException, URISyntaxException {
-        delegateFs = FileSystem.get(new URI("file://" + folder.getRoot().getAbsolutePath()), new Configuration());
+    public void before() throws IOException, URISyntaxException {
+        delegateFs = new RawLocalFileSystem();
+        delegateFs.initialize(new URI("file://" + folder.getRoot().getAbsolutePath()), new Configuration());
         keyStore = new InMemoryKeyStorageStrategy();
         efs = new EncryptedFileSystem(delegateFs, keyStore);
         path = new Path(folder.newFile().getAbsolutePath());
@@ -114,12 +116,45 @@ public final class EncryptedFileSystemTest {
     }
 
     @Test
-    public void testEncryptDecrypt_sucess() throws IllegalArgumentException, IOException {
+    public void testEncryptDecrypt_success() throws IllegalArgumentException, IOException {
         byte[] data = new byte[MB];
         byte[] readData = new byte[MB];
         random.nextBytes(data);
 
         OutputStream os = efs.create(path);
+        IOUtils.write(data, os);
+        os.close();
+
+        // Read using EncryptedFileSystem yields input data
+        InputStream is = efs.open(path);
+        IOUtils.readFully(is, readData);
+        is.close();
+
+        assertThat(data).isEqualTo(readData);
+
+        // Read using delegate FileSystem does not yield input data
+        is = delegateFs.open(path);
+        IOUtils.readFully(is, readData);
+        is.close();
+
+        assertThat(data).isNotEqualTo(readData);
+    }
+
+    @Test
+    public void testEncryptDecrypt_secondaryCreateMethod() throws IOException {
+        byte[] data = new byte[MB];
+        byte[] readData = new byte[MB];
+        random.nextBytes(data);
+
+        OutputStream os = efs.create(
+                path,
+                FsPermission.getDefault(),
+                EnumSet.of(CreateFlag.OVERWRITE),
+                8192,
+                (short) 3,
+                64 * 1024 * 1024,
+                null,
+                null);
         IOUtils.write(data, os);
         os.close();
 
