@@ -32,6 +32,11 @@ public interface KeyStorageStrategy {
     KeyMaterial get(String fileKey);
 
     /**
+     * Retrieves the {@link KeyMaterial} for a file with the given {@code logicalPath} by checking validity of and permissions on the {@code endRef} only.
+     */
+    KeyMaterial get(String logicalPath, Ref endRef);
+
+    /**
      * Removes the {@link KeyMaterial} for a file with the given {@code fileKey}.
      */
     void remove(String fileKey);
