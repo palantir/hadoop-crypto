@@ -48,7 +48,7 @@ import org.slf4j.LoggerFactory;
  * {@link #DEFAULT_CIPHER_ALGORITHM} will be used. The symmetric key used to encrypt each file is stored and retrieved
  * using the provided {@link KeyStorageStrategy}.
  */
-public final class EncryptedFileSystem extends DelegatingFileSystem {
+public class EncryptedFileSystem extends DelegatingFileSystem {
 
     private static final Logger log = LoggerFactory.getLogger(EncryptedFileSystem.class);
     private static final String DEFAULT_CIPHER_ALGORITHM = AesCtrCipher.ALGORITHM;
