@@ -77,7 +77,7 @@ public final class KeyMaterialsTest {
     @Test
     public void testUnwrapFailsWhenUsedWithWrongKeyPair() {
         KeyPair invalidKeyPair = TestKeyPairs.generateKeyPair();
-        byte[] wrapped = KeyMaterials.wrap(keyMaterial, this.keyPair.getPublic());
+        byte[] wrapped = KeyMaterials.wrap(keyMaterial, keyPair.getPublic());
 
         assertThatExceptionOfType(RuntimeException.class)
                 .isThrownBy(() -> KeyMaterials.unwrap(wrapped, invalidKeyPair.getPrivate()))
