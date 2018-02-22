@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import com.palantir.crypto2.keys.KeyMaterial;
 import com.palantir.crypto2.keys.TestKeyPairs;
+import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -74,6 +75,17 @@ public final class KeyMaterialsTest {
     }
 
     @Test
+    public void testUnwrapFailsWhenUsedWithWrongKeyPair() {
+        KeyPair invalidKeyPair = TestKeyPairs.generateKeyPair();
+        byte[] wrapped = KeyMaterials.wrap(keyMaterial, keyPair.getPublic());
+
+        assertThatExceptionOfType(RuntimeException.class)
+                .isThrownBy(() -> KeyMaterials.unwrap(wrapped, invalidKeyPair.getPrivate()))
+                .withCauseInstanceOf(InvalidKeyException.class)
+                .withMessageContaining("Unwrapping failed");
+    }
+
+    @Test
     public void testWrapAndUnwrap_serializedByAllVersions() {
         for (KeySerializer keySerializer : KeySerializers.getSerializers().values()) {
             testUnwrapWhenSerializedBy(keySerializer);
@@ -94,7 +106,7 @@ public final class KeyMaterialsTest {
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> KeyMaterials.unwrap(wrapped, keyPair.getPrivate()))
                 .withMessage("Invalid serialization format version. Expected version in %s but found 0",
-                    KeySerializers.getSerializers().keySet());
+                        KeySerializers.getSerializers().keySet());
     }
 
     @Test
