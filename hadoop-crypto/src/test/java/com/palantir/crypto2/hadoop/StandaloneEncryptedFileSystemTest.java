@@ -31,6 +31,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.security.KeyPair;
 import java.util.Base64;
+import java.util.UUID;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
@@ -152,6 +153,22 @@ public final class StandaloneEncryptedFileSystemTest {
 
     @Test
     public void testRename() throws IOException {
+        File rootFolder = folder.newFolder();
+        Path rootPath = new Path(rootFolder.getAbsolutePath());
+        Path dstPath = new Path(rootPath, UUID.randomUUID().toString());
+
+        Path srcPath = writeData(rootFolder);
+
+        assertThat(efs.exists(srcPath)).isTrue();
+
+        efs.rename(srcPath, dstPath);
+
+        assertThat(efs.exists(srcPath)).isFalse();
+        assertThat(readData(dstPath)).isEqualTo(DATA_BYTES);
+    }
+
+    @Test
+    public void testRecursiveRename() throws IOException {
         File rootFolder = folder.newFolder();
         File dstFolder = folder.newFolder();
         Path rootPath = new Path(rootFolder.getAbsolutePath());
