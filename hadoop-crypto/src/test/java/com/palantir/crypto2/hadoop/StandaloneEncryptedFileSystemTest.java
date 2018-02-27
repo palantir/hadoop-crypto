@@ -123,6 +123,7 @@ public final class StandaloneEncryptedFileSystemTest {
     @Test
     public void testRecursiveDelete() throws IOException {
         File rootFolder = folder.newFolder();
+        Path rootPath = new Path(rootFolder.getAbsolutePath());
 
         Path path1 = writeData(rootFolder);
         Path path2 = writeData(rootFolder);
@@ -135,7 +136,9 @@ public final class StandaloneEncryptedFileSystemTest {
         assertThat(rawFs.exists(path2)).isTrue();
         assertThat(rawFs.exists(keyMaterialPath(path2))).isTrue();
 
-        efs.delete(new Path(rootFolder.getAbsolutePath()), true);
+        efs.delete(rootPath, true);
+
+        assertThat(rawFs.exists(rootPath)).isFalse();
 
         assertThat(efs.exists(path1)).isFalse();
         assertThat(rawFs.exists(path1)).isFalse();

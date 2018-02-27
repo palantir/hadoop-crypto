@@ -75,6 +75,7 @@ public final class StandaloneEncryptedFileSystem extends FilterFileSystem {
     public static final String KEY_ALGORITHM_CONF = "fs.efs.key.algorithm";
 
     private String encryptedScheme;
+    // The raw underlying FileSystem that encrypted bytes and key material is stored on
     private FileSystem delegate;
     private KeyStorageStrategy keyStore;
 
