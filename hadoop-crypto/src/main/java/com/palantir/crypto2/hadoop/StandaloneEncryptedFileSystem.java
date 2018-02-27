@@ -76,6 +76,7 @@ public final class StandaloneEncryptedFileSystem extends FilterFileSystem {
 
     private String encryptedScheme;
     private FileSystem delegate;
+    private KeyStorageStrategy keyStore;
 
     @Override
     public void initialize(URI uri, Configuration conf) throws IOException {
@@ -86,7 +87,7 @@ public final class StandaloneEncryptedFileSystem extends FilterFileSystem {
         delegate = getDelegateFileSystem(uri, conf);
 
         KeyPair keyPair = getKeyPair(conf);
-        KeyStorageStrategy keyStore = new FileKeyStorageStrategy(delegate, keyPair);
+        keyStore = new FileKeyStorageStrategy(delegate, keyPair);
 
         this.fs = new EncryptedFileSystem(delegate, keyStore);
     }
@@ -135,7 +136,11 @@ public final class StandaloneEncryptedFileSystem extends FilterFileSystem {
     public boolean delete(Path path, boolean recursive) throws IOException {
         // EncryptedFileSystem does not handle recursive deletes because it needs to rely on the KeyStorageStrategy.
         // Here we know we are using the FileKeyStorageStrategy and can therefore delegate deletes to the FileSystem
-        // which will remove both the data and key material files.
+        // which will remove both the data and key material files. If the path is a directory then the recursive delete
+        // will handle removing the key material files, otherwise we will explicitly delete the key material here.
+        if (fs.isFile(path)) {
+            keyStore.remove(path.toString());
+        }
         return delegate.delete(path, recursive);
     }
 
