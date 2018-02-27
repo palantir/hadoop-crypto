@@ -73,7 +73,9 @@ public final class StandaloneEncryptedFileSystem extends FilterFileSystem {
      * Key mapping to the public/private key algorithm (ex: RSA).
      */
     public static final String KEY_ALGORITHM_CONF = "fs.efs.key.algorithm";
+
     private String encryptedScheme;
+    private FileSystem delegate;
 
     @Override
     public void initialize(URI uri, Configuration conf) throws IOException {
@@ -81,7 +83,7 @@ public final class StandaloneEncryptedFileSystem extends FilterFileSystem {
         Preconditions.checkArgument(encryptedScheme.startsWith("e"),
                 "URI scheme must begin with 'e' but received: %s", encryptedScheme);
 
-        FileSystem delegate = getDelegateFileSystem(uri, conf);
+        delegate = getDelegateFileSystem(uri, conf);
 
         KeyPair keyPair = getKeyPair(conf);
         KeyStorageStrategy keyStore = new FileKeyStorageStrategy(delegate, keyPair);
@@ -127,6 +129,14 @@ public final class StandaloneEncryptedFileSystem extends FilterFileSystem {
     @Override
     public boolean exists(Path path) throws IOException {
         return fs.exists(path);
+    }
+
+    @Override
+    public boolean delete(Path path, boolean recursive) throws IOException {
+        // EncryptedFileSystem does not handle recursive deletes because it needs to rely on the KeyStorageStrategy.
+        // Here we know we are using the FileKeyStorageStrategy and can therefore delegate deletes to the FileSystem
+        // which will remove both the data and key material files.
+        return delegate.delete(path, recursive);
     }
 
     private static Function<Path, Path> setSchemeFunc(final String scheme) {

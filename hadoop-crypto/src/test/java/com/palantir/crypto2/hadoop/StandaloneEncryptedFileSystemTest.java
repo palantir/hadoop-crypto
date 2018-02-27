@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.security.KeyPair;
 import java.util.Base64;
 import org.apache.commons.io.IOUtils;
@@ -100,6 +101,49 @@ public final class StandaloneEncryptedFileSystemTest {
 
         // KeyMaterial file exists
         assertThat(rawFs.exists(new Path(path + FileKeyStorageStrategy.EXTENSION))).isTrue();
+    }
+
+    @Test
+    public void testDelete() throws IOException {
+        File rootFolder = folder.newFolder();
+
+        Path path1 = writeData(rootFolder);
+        Path path2 = writeData(rootFolder);
+
+        assertThat(efs.exists(path1)).isTrue();
+        assertThat(efs.exists(path2)).isTrue();
+
+        efs.delete(new Path(path1.toString()), false);
+
+        assertThat(efs.exists(path1)).isFalse();
+        assertThat(efs.exists(path2)).isTrue();
+    }
+
+    @Test
+    public void testRecursiveDelete() throws IOException {
+        File rootFolder = folder.newFolder();
+
+        Path path1 = writeData(rootFolder);
+        Path path2 = writeData(rootFolder);
+
+        assertThat(efs.exists(path1)).isTrue();
+        assertThat(efs.exists(path2)).isTrue();
+
+        efs.delete(new Path(rootFolder.getAbsolutePath()), true);
+
+        assertThat(efs.exists(path1)).isFalse();
+        assertThat(efs.exists(path2)).isFalse();
+    }
+
+    private Path writeData(File rootFolder) throws IOException {
+        // Write encrypted data
+        java.nio.file.Path filePath = Files.createTempFile(rootFolder.toPath(), "prefix", "suffix");
+        Path newPath = new Path(filePath.toAbsolutePath().toString());
+        OutputStream os = efs.create(path);
+        IOUtils.write("data", os);
+        os.close();
+
+        return newPath;
     }
 
     @Test
