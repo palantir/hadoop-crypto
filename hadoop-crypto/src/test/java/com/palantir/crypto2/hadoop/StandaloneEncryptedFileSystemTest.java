@@ -83,24 +83,22 @@ public final class StandaloneEncryptedFileSystemTest {
 
     @Test
     public void testReadWrite() throws IOException {
-        String data = DATA;
-        byte[] dataBytes = data.getBytes(StandardCharsets.UTF_8);
-        byte[] readData = new byte[data.length()];
+        byte[] readData = new byte[DATA.length()];
 
         // Write encrypted data
         OutputStream os = efs.create(path);
-        IOUtils.write(data, os);
+        IOUtils.write(DATA, os);
         os.close();
 
         // Read encrypted data
         InputStream dis = efs.open(path);
         IOUtils.readFully(dis, readData);
-        assertThat(readData).containsExactly(dataBytes);
+        assertThat(readData).containsExactly(DATA_BYTES);
 
         // Raw data is not the same
         dis = rawFs.open(path);
         IOUtils.readFully(dis, readData);
-        assertThat(readData).isNotEqualTo(dataBytes);
+        assertThat(readData).isNotEqualTo(DATA_BYTES);
 
         // KeyMaterial file exists
         assertThat(rawFs.exists(keyMaterialPath(path))).isTrue();
