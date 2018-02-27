@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.Assert.assertTrue;
 
+import com.google.common.io.ByteStreams;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -45,6 +46,8 @@ import org.junit.rules.TemporaryFolder;
 public final class StandaloneEncryptedFileSystemTest {
 
     private static final URI EFS_URI = URI.create("efile:///");
+    private static final String DATA = "data";
+    private static final byte[] DATA_BYTES = DATA.getBytes(StandardCharsets.UTF_8);
 
     private FileSystem efs;
     private FileSystem rawFs;
@@ -80,7 +83,7 @@ public final class StandaloneEncryptedFileSystemTest {
 
     @Test
     public void testReadWrite() throws IOException {
-        String data = "data";
+        String data = DATA;
         byte[] dataBytes = data.getBytes(StandardCharsets.UTF_8);
         byte[] readData = new byte[data.length()];
 
@@ -149,12 +152,44 @@ public final class StandaloneEncryptedFileSystemTest {
         assertThat(rawFs.exists(keyMaterialPath(path2))).isFalse();
     }
 
+    @Test
+    public void testRename() throws IOException {
+        File rootFolder = folder.newFolder();
+        File dstFolder = folder.newFolder();
+        Path rootPath = new Path(rootFolder.getAbsolutePath());
+        Path dstPath = new Path(dstFolder.getAbsolutePath());
+
+        Path path1 = writeData(rootFolder);
+        Path path2 = writeData(rootFolder);
+
+        // files exist in original position
+        assertThat(efs.exists(path1)).isTrue();
+        assertThat(efs.exists(path2)).isTrue();
+
+        efs.rename(rootPath, dstPath);
+
+        Path dstPath1 = new Path(dstPath, path1.getName());
+        Path dstPath2 = new Path(dstPath, path2.getName());
+
+        // files exist in renamed position
+        assertThat(efs.exists(path1)).isFalse();
+        assertThat(efs.exists(path2)).isFalse();
+
+        // files are still able to be decrypted
+        assertThat(readData(dstPath1)).isEqualTo(DATA_BYTES);
+        assertThat(readData(dstPath2)).isEqualTo(DATA_BYTES);
+    }
+
+    private byte[] readData(Path readPath) throws IOException {
+        return ByteStreams.toByteArray(efs.open(readPath));
+    }
+
     private Path writeData(File rootFolder) throws IOException {
         // Write encrypted data
         java.nio.file.Path filePath = Files.createTempFile(rootFolder.toPath(), "prefix", "suffix");
         Path newPath = new Path(filePath.toAbsolutePath().toString());
         OutputStream os = efs.create(newPath);
-        IOUtils.write("data", os);
+        IOUtils.write(DATA, os);
         os.close();
 
         return newPath;
@@ -167,16 +202,15 @@ public final class StandaloneEncryptedFileSystemTest {
 
     @Test
     public void testOnlyPublicKey() throws IOException {
-        String data = "data";
-        byte[] dataBytes = data.getBytes(StandardCharsets.UTF_8);
-        byte[] readData = new byte[data.length()];
+        byte[] dataBytes = DATA.getBytes(StandardCharsets.UTF_8);
+        byte[] readData = new byte[DATA.length()];
 
         conf.unset(StandaloneEncryptedFileSystem.PRIVATE_KEY_CONF);
         FileSystem efsPublic = FileSystem.newInstance(EFS_URI, conf);
 
         // Write encrypted data
         OutputStream os = efsPublic.create(path);
-        IOUtils.write(data, os);
+        IOUtils.write(DATA, os);
         os.close();
 
         // Raw data is not the same
@@ -212,16 +246,14 @@ public final class StandaloneEncryptedFileSystemTest {
 
     @Test
     public void testFileNameCollidesWithKeyMaterial() throws IOException {
-        String data = "data";
-
         // Write encrypted data
         OutputStream os = efs.create(path);
-        IOUtils.write(data, os);
+        IOUtils.write(DATA, os);
         os.close();
 
         // Write encrypted data
         os = efs.create(keyMaterialPath(path));
-        IOUtils.write(data, os);
+        IOUtils.write(DATA, os);
         os.close();
 
         // NOTE(jellis): IllegalArgumentException is the most likely exception, however if the first byte of the
@@ -248,15 +280,14 @@ public final class StandaloneEncryptedFileSystemTest {
     @Test // https://github.com/palantir/hadoop-crypto/issues/27
     public void testCopyFromLocalFile() throws IOException {
         File file = folder.newFile();
-        byte[] data = "data".getBytes(StandardCharsets.UTF_8);
-        byte[] readBytes = new byte[data.length];
+        byte[] readBytes = new byte[DATA_BYTES.length];
 
-        IOUtils.write(data, new FileOutputStream(file));
+        IOUtils.write(DATA_BYTES, new FileOutputStream(file));
         efs.copyFromLocalFile(new Path(file.getAbsolutePath()), path);
 
         FSDataInputStream input = efs.open(path);
         IOUtils.readFully(input, readBytes);
-        assertThat(readBytes).containsExactly(data);
+        assertThat(readBytes).containsExactly(DATA_BYTES);
     }
 
     private static Configuration getBaseConf() {

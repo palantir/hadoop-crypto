@@ -145,6 +145,13 @@ public final class StandaloneEncryptedFileSystem extends FilterFileSystem {
         }
     }
 
+    @Override
+    public boolean rename(Path src, Path dst) throws IOException {
+        // Similarly to delete, rename is able to rely on the underlying FileSystem properly moving data and key
+        // material files.
+        return delegate.rename(src, dst);
+    }
+
     private static Function<Path, Path> setSchemeFunc(final String scheme) {
         return path -> new Path(setUriSchemeFunc(scheme).apply(path.toUri()));
     }
