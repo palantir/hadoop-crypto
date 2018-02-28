@@ -136,7 +136,7 @@ public final class StandaloneEncryptedFileSystem extends FilterFileSystem {
     @Override
     public boolean delete(Path path, boolean recursive) throws IOException {
         // Since StandaloneEncryptedFileSystem uses a FileKeyStorageStrategy, the delegate delete call on folders
-        // deletes both the payload files and the adjacent encryption materials. For files we can continue to allow
+        // deletes both the payload files and the adjacent encryption materials. For files we can
         // rely on the EncryptedFileSystem handling removal of both the file and the key material.
         if (fs.isFile(path)) {
             return fs.delete(path, false);
