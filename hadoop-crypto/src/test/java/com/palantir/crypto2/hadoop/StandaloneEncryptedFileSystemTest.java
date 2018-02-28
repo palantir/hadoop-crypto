@@ -70,7 +70,7 @@ public final class StandaloneEncryptedFileSystemTest {
         efs = FileSystem.newInstance(EFS_URI, conf);
         rawFs = FileSystem.newInstance(URI.create("file:///"), conf);
         path = new Path(folder.newFile().getAbsolutePath());
-        pathWithScheme = new Path("efile://", this.path);
+        pathWithScheme = new Path("efile://", path);
     }
 
     @Test
@@ -100,7 +100,7 @@ public final class StandaloneEncryptedFileSystemTest {
         assertThat(readData).isNotEqualTo(dataBytes);
 
         // KeyMaterial file exists
-        assertThat(rawFs.exists(new Path(path + FileKeyStorageStrategy.EXTENSION))).isTrue();
+        assertThat(rawFs.exists(keyMaterialPath(path))).isTrue();
     }
 
     @Test
@@ -108,38 +108,52 @@ public final class StandaloneEncryptedFileSystemTest {
         File rootFolder = folder.newFolder();
 
         Path path1 = writeData(rootFolder);
-        Path path2 = writeData(rootFolder);
 
         assertThat(efs.exists(path1)).isTrue();
-        assertThat(efs.exists(path2)).isTrue();
+        assertThat(rawFs.exists(path1)).isTrue();
+        assertThat(rawFs.exists(keyMaterialPath(path1))).isTrue();
 
         efs.delete(new Path(path1.toString()), false);
 
         assertThat(efs.exists(path1)).isFalse();
-        assertThat(efs.exists(path2)).isTrue();
+        assertThat(rawFs.exists(path1)).isFalse();
+        assertThat(rawFs.exists(keyMaterialPath(path1))).isFalse();
     }
 
     @Test
     public void testRecursiveDelete() throws IOException {
         File rootFolder = folder.newFolder();
+        Path rootPath = new Path(rootFolder.getAbsolutePath());
 
         Path path1 = writeData(rootFolder);
         Path path2 = writeData(rootFolder);
 
         assertThat(efs.exists(path1)).isTrue();
-        assertThat(efs.exists(path2)).isTrue();
+        assertThat(rawFs.exists(path1)).isTrue();
+        assertThat(rawFs.exists(keyMaterialPath(path1))).isTrue();
 
-        efs.delete(new Path(rootFolder.getAbsolutePath()), true);
+        assertThat(efs.exists(path2)).isTrue();
+        assertThat(rawFs.exists(path2)).isTrue();
+        assertThat(rawFs.exists(keyMaterialPath(path2))).isTrue();
+
+        efs.delete(rootPath, true);
+
+        assertThat(rawFs.exists(rootPath)).isFalse();
 
         assertThat(efs.exists(path1)).isFalse();
+        assertThat(rawFs.exists(path1)).isFalse();
+        assertThat(rawFs.exists(keyMaterialPath(path1))).isFalse();
+
         assertThat(efs.exists(path2)).isFalse();
+        assertThat(rawFs.exists(path2)).isFalse();
+        assertThat(rawFs.exists(keyMaterialPath(path2))).isFalse();
     }
 
     private Path writeData(File rootFolder) throws IOException {
         // Write encrypted data
         java.nio.file.Path filePath = Files.createTempFile(rootFolder.toPath(), "prefix", "suffix");
         Path newPath = new Path(filePath.toAbsolutePath().toString());
-        OutputStream os = efs.create(path);
+        OutputStream os = efs.create(newPath);
         IOUtils.write("data", os);
         os.close();
 
@@ -171,7 +185,7 @@ public final class StandaloneEncryptedFileSystemTest {
         assertThat(readData).isNotEqualTo(dataBytes);
 
         // KeyMaterial file exists
-        assertTrue(rawFs.exists(new Path(path + FileKeyStorageStrategy.EXTENSION)));
+        assertTrue(rawFs.exists(keyMaterialPath(path)));
 
         // Unable to open files without Private Key
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -206,7 +220,7 @@ public final class StandaloneEncryptedFileSystemTest {
         os.close();
 
         // Write encrypted data
-        os = efs.create(new Path(path + FileKeyStorageStrategy.EXTENSION));
+        os = efs.create(keyMaterialPath(path));
         IOUtils.write(data, os);
         os.close();
 
@@ -249,6 +263,10 @@ public final class StandaloneEncryptedFileSystemTest {
         Configuration conf = new Configuration();
         conf.set("fs.efile.impl", StandaloneEncryptedFileSystem.class.getCanonicalName());
         return conf;
+    }
+
+    private Path keyMaterialPath(Path dataPath) {
+        return new Path(dataPath + FileKeyStorageStrategy.EXTENSION);
     }
 
 }

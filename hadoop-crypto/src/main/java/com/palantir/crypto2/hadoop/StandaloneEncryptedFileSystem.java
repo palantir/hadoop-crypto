@@ -75,7 +75,9 @@ public final class StandaloneEncryptedFileSystem extends FilterFileSystem {
     public static final String KEY_ALGORITHM_CONF = "fs.efs.key.algorithm";
 
     private String encryptedScheme;
+    // The raw underlying FileSystem that encrypted bytes and key material is stored on
     private FileSystem delegate;
+    private KeyStorageStrategy keyStore;
 
     @Override
     public void initialize(URI uri, Configuration conf) throws IOException {
@@ -86,7 +88,7 @@ public final class StandaloneEncryptedFileSystem extends FilterFileSystem {
         delegate = getDelegateFileSystem(uri, conf);
 
         KeyPair keyPair = getKeyPair(conf);
-        KeyStorageStrategy keyStore = new FileKeyStorageStrategy(delegate, keyPair);
+        keyStore = new FileKeyStorageStrategy(delegate, keyPair);
 
         this.fs = new EncryptedFileSystem(delegate, keyStore);
     }
@@ -133,10 +135,14 @@ public final class StandaloneEncryptedFileSystem extends FilterFileSystem {
 
     @Override
     public boolean delete(Path path, boolean recursive) throws IOException {
-        // EncryptedFileSystem does not handle recursive deletes because it needs to rely on the KeyStorageStrategy.
-        // Here we know we are using the FileKeyStorageStrategy and can therefore delegate deletes to the FileSystem
-        // which will remove both the data and key material files.
-        return delegate.delete(path, recursive);
+        // Since StandaloneEncryptedFileSystem uses a FileKeyStorageStrategy, the delegate delete call on folders
+        // deletes both the payload files and the adjacent encryption materials. For files we can
+        // rely on the EncryptedFileSystem handling removal of both the file and the key material.
+        if (fs.isFile(path)) {
+            return fs.delete(path, false);
+        } else {
+            return delegate.delete(path, recursive);
+        }
     }
 
     private static Function<Path, Path> setSchemeFunc(final String scheme) {
