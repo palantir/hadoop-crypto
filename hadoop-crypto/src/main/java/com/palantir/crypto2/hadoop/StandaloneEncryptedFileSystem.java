@@ -145,6 +145,18 @@ public final class StandaloneEncryptedFileSystem extends FilterFileSystem {
         }
     }
 
+    @Override
+    public boolean rename(Path src, Path dst) throws IOException {
+        // Since StandaloneEncryptedFileSystem uses a FileKeyStorageStrategy, the delegate rename call on folders
+        // renames both the payload files and the adjacent encryption materials. For files we can
+        // rely on the EncryptedFileSystem handling renaming both the file and the key material.
+        if (fs.isFile(src)) {
+            return fs.rename(src, dst);
+        } else {
+            return delegate.rename(src, dst);
+        }
+    }
+
     private static Function<Path, Path> setSchemeFunc(final String scheme) {
         return path -> new Path(setUriSchemeFunc(scheme).apply(path.toUri()));
     }
