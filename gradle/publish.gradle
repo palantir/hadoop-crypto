@@ -16,3 +16,11 @@ bintray {
         publications = ['nebula']
     }
 }
+
+publishing {
+    publications {
+        nebula(MavenPublication) {
+            from components.java
+        }
+    }
+}
