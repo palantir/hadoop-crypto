@@ -27,7 +27,6 @@ import com.palantir.crypto2.keys.KeyStorageStrategy;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
-import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.Optional;
 import org.apache.hadoop.conf.Configuration;
