@@ -33,6 +33,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.CreateFlag;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FSDataOutputStream;
+import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Options.ChecksumOpt;
 import org.apache.hadoop.fs.Path;
@@ -143,8 +144,16 @@ public final class EncryptedFileSystem extends DelegatingFileSystem {
 
     @Override
     public boolean delete(Path path, boolean recursive) throws IOException {
-        if (recursive) {
-            throw new UnsupportedOperationException("EncryptedFileSystem does not support recursive deletes");
+        if (recursive && isDirectory(path)) {
+            FileStatus[] children = listStatus(path);
+
+            for (FileStatus child : children) {
+                boolean deleteSuccessful = delete(child.getPath(), true);
+
+                if (!deleteSuccessful) {
+                    return false;
+                }
+            }
         }
         keyStore.remove(path.toString());
         return fs.delete(path, false);
