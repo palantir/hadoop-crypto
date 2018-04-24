@@ -39,6 +39,11 @@
         <property name="format" value="\s+$"/>
         <property name="message" value="Whitespace at end-of-line"/>
     </module>
+    <module name="RegexpMultiline"> <!-- Java Style Guide: Vertical Whitespace -->
+	<property name="fileExtensions" value="java"/>
+        <property name="format" value="^\n\n$"/>
+        <property name="message" value="Two consecutive blank lines are not permitted."/>
+    </module>
     <module name="SuppressionFilter"> <!-- baseline-gradle: README.md -->
         <property name="file" value="${config_loc}/checkstyle-suppressions.xml"/>
     </module>
@@ -74,15 +79,10 @@
         <module name="AvoidStarImport"/> <!-- Java Style Guide: No wildcard imports -->
         <module name="AvoidStaticImport"> <!-- Java Style Guide: No static imports -->
             <property name="excludes" value="
-                java.util.Collections.*,java.util.stream.Collectors.*,
-                org.junit.Assert.*,org.junit.Assume.*,
-                org.hamcrest.CoreMatchers.*,org.hamcrest.Matchers.*,org.hamcrest.MatcherAssert.*,
-                org.hamcrest.core.AllOf.*,org.hamcrest.core.Is.*,org.hamcrest.core.StringContains.*,org.hamcrest.core.IsEqual.*,
-                org.hamcrest.collection.IsMapContaining.*,
-                org.mockito.ArgumentMatchers.*,org.mockito.Mockito.*,org.mockito.Matchers.*,
-                org.assertj.core.api.Assertions.*,
-                org.assertj.guava.api.Assertions.*,
-                com.google.common.base.Preconditions.*,com.google.common.truth.Truth.*,
+                java.util.Collections.*,
+                java.util.stream.Collectors.*,
+                com.palantir.logsafe.Preconditions.*,
+                com.google.common.base.Preconditions.*,
                 org.apache.commons.lang3.Validate.*"/>
         </module>
         <module name="ClassTypeParameterName"> <!-- Java Style Guide: Type variable names -->
@@ -298,11 +298,6 @@
             <property name="message" value="Use ? rather than ? extends Object."/>
         </module>
         <module name="RegexpSinglelineJava">
-            <property name="format" value="\bPreconditions\.check.*\{\}"/>
-            <property name="message" value="Use printf-style formatting in Preconditions, not '{}' style formatting."/>
-            <property name="ignoreComments" value="true"/>
-        </module>
-        <module name="RegexpSinglelineJava">
             <property name="format" value="(?i)log(ger)?\.(debug|info|warn|error)\(.*%[sd]"/>
             <property name="message" value="SLF4J loggers support '{}' style formatting."/>
             <property name="ignoreComments" value="true"/>
@@ -333,7 +328,7 @@
             <property name="message" value="TODO format: // TODO(flastname): explanation"/>
         </module>
         <module name="RegexpSinglelineJava">
-            <property name="format" value="(void setUp\(\))|(void setupStatic\(\))|(void setUpStatic\(\))|(void beforeTest\(\))|(void teardown\(\))|(void tearDown\(\))|(void beforeStatic\(\))|(void afterStatic\(\))"/>
+            <property name="format" value="(void setUp\(\))|(void setup\(\))|(void setupStatic\(\))|(void setUpStatic\(\))|(void beforeTest\(\))|(void teardown\(\))|(void tearDown\(\))|(void beforeStatic\(\))|(void afterStatic\(\))"/>
             <property name="message" value="Test setup/teardown methods are called before(), beforeClass(), after(), afterClass(), but not setUp, teardown, etc."/>
         </module>
         <module name="RightCurly"> <!-- Java Style Guide: Nonempty blocks: K & R style -->
