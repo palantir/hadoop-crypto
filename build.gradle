@@ -5,6 +5,7 @@ buildscript {
     }
 
     dependencies {
+        classpath 'gradle.plugin.com.palantir:gradle-circle-style:1.1.2'
         classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.3'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.6'
         classpath 'com.netflix.nebula:nebula-dependency-recommender:5.0.0'
@@ -26,6 +27,7 @@ repositories {
 
 apply plugin: 'com.palantir.baseline-config' // provides baselineUpdateConfig task
 apply plugin: 'com.palantir.baseline-idea'
+apply plugin: 'com.palantir.circle.style'
 
 dependencies {
     baseline "com.palantir.baseline:gradle-baseline-java-config:0.18.0@zip"
