@@ -28,8 +28,8 @@ import javax.crypto.NoSuchPaddingException;
 final class KeySerializers {
 
     private static final Map<Integer, ? extends KeySerializer> SERIALIZERS = ImmutableMap.of(
-            KeySerializerV1.VERSION, KeySerializerV1.INSTANCE,
-            KeySerializerV2.VERSION, KeySerializerV2.INSTANCE);
+            KeySerializerV1.INSTANCE.getVersion(), KeySerializerV1.INSTANCE,
+            KeySerializerV2.INSTANCE.getVersion(), KeySerializerV2.INSTANCE);
 
     private KeySerializers() {}
 
