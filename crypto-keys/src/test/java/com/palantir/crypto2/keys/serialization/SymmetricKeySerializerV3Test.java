@@ -29,12 +29,22 @@ public final class SymmetricKeySerializerV3Test {
     private static final int IV_SIZE = 16;
 
     @Test
-    public void test() {
+    public void testWrapUnwrap() {
         KeyMaterial wrappingKeyMaterial = KeyMaterials.generateKeyMaterial(KEY_ALG, KEY_SIZE, IV_SIZE);
         KeyMaterial keyMaterial = KeyMaterials.generateKeyMaterial(KEY_ALG, KEY_SIZE, IV_SIZE);
 
         byte[] wrapped = SERIALIZER.wrap(keyMaterial, wrappingKeyMaterial.getSecretKey());
         KeyMaterial unwrapped = SERIALIZER.unwrap(wrapped, wrappingKeyMaterial.getSecretKey());
         assertThat(keyMaterial).isEqualTo(unwrapped);
+    }
+
+    @Test
+    public void testNewIvUsed() {
+        KeyMaterial wrappingKeyMaterial = KeyMaterials.generateKeyMaterial(KEY_ALG, KEY_SIZE, IV_SIZE);
+        KeyMaterial keyMaterial = KeyMaterials.generateKeyMaterial(KEY_ALG, KEY_SIZE, IV_SIZE);
+
+        byte[] wrapped1 = SERIALIZER.wrap(keyMaterial, wrappingKeyMaterial.getSecretKey());
+        byte[] wrapped2 = SERIALIZER.wrap(keyMaterial, wrappingKeyMaterial.getSecretKey());
+        assertThat(wrapped1).isNotEqualTo(wrapped2);
     }
 }

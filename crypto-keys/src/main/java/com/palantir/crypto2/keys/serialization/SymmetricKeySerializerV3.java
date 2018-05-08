@@ -86,7 +86,7 @@ enum SymmetricKeySerializerV3 implements SymmetricKeySerializer {
             stream.close();
             return byteStream.toByteArray();
         } catch (IOException | InvalidKeyException | IllegalBlockSizeException e) {
-            throw Throwables.propagate(e);
+            throw new RuntimeException("Unable to wrap key", e);
         }
     }
 
@@ -119,7 +119,7 @@ enum SymmetricKeySerializerV3 implements SymmetricKeySerializer {
             SecretKey secretKey = (SecretKey) keyUnwrappingCipher.unwrap(secretKeyBytes, algorithm, Cipher.SECRET_KEY);
             return KeyMaterial.of(secretKey, iv);
         } catch (InvalidKeyException | NoSuchAlgorithmException | IOException e) {
-            throw Throwables.propagate(e);
+            throw new RuntimeException("Unable to unwrap key", e);
         }
     }
 
@@ -133,7 +133,10 @@ enum SymmetricKeySerializerV3 implements SymmetricKeySerializer {
             Cipher cipher = Cipher.getInstance(AES_CTR_NO_PADDING);
             cipher.init(cipherMode, key, new IvParameterSpec(iv));
             return cipher;
-        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | InvalidAlgorithmParameterException e) {
+        } catch (NoSuchAlgorithmException
+                | NoSuchPaddingException
+                | InvalidKeyException
+                | InvalidAlgorithmParameterException e) {
             throw Throwables.propagate(e);
         }
     }
