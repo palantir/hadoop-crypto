@@ -45,7 +45,7 @@ final class KeySerializers {
         }
     }
 
-    static Map<Integer, ? extends KeySerializer> getSerializers() {
+    static Map<Integer, ? extends KeySerializer> getAsymmetricSerializers() {
         return SERIALIZERS;
     }
 

@@ -23,7 +23,7 @@ import org.junit.Test;
 
 public final class KeySerializersTest {
 
-    private static final Map<Integer, ? extends KeySerializer> SERIALIZERS = KeySerializers.getSerializers();
+    private static final Map<Integer, ? extends KeySerializer> SERIALIZERS = KeySerializers.getAsymmetricSerializers();
     private static final Map<Integer, ? extends SymmetricKeySerializer> SYMMETRIC_SERIALIZERS =
             KeySerializers.getSymmetricSerializers();
 

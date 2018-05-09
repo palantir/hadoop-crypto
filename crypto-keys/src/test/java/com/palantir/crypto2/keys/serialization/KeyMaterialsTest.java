@@ -87,7 +87,7 @@ public final class KeyMaterialsTest {
 
     @Test
     public void testWrapAndUnwrap_serializedByAllVersions() {
-        for (KeySerializer keySerializer : KeySerializers.getSerializers().values()) {
+        for (KeySerializer keySerializer : KeySerializers.getAsymmetricSerializers().values()) {
             testUnwrapWhenSerializedBy(keySerializer);
         }
     }
@@ -106,7 +106,7 @@ public final class KeyMaterialsTest {
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> KeyMaterials.unwrap(wrapped, keyPair.getPrivate()))
                 .withMessage("Invalid serialization format version. Expected version in %s but found 0",
-                        KeySerializers.getSerializers().keySet());
+                        KeySerializers.getAsymmetricSerializers().keySet());
     }
 
     @Test
@@ -120,9 +120,10 @@ public final class KeyMaterialsTest {
     public void testSymmetric_unwrapInvalidWithWrongKey() {
         SecretKey wrongKey = KeyMaterials.generateKey(KEY_ALG, KEY_SIZE);
         byte[] wrapped = KeyMaterials.symmetricWrap(keyMaterial, symmetricKey);
-        KeyMaterial unwrapped = KeyMaterials.symmetricUnwrap(wrapped, wrongKey);
-
-        assertThat(unwrapped).isNotEqualTo(wrapped);
+        assertThatExceptionOfType(RuntimeException.class)
+                .isThrownBy(() -> KeyMaterials.symmetricUnwrap(wrapped, wrongKey))
+                .withCauseInstanceOf(InvalidKeyException.class)
+                .withMessageContaining("Unable to unwrap key");
     }
 
     @Test

@@ -43,7 +43,7 @@ import org.slf4j.LoggerFactory;
 public final class KeyMaterials {
 
     private static final Logger log = LoggerFactory.getLogger(KeyMaterials.class);
-    private static final Map<Integer, ? extends KeySerializer> SERIALIZERS = KeySerializers.getSerializers();
+    private static final Map<Integer, ? extends KeySerializer> ASYMMETRIC_SERIALIZERS = KeySerializers.getAsymmetricSerializers();
     private static final Map<Integer, ? extends SymmetricKeySerializer> SYMMETRIC_SERIALIZERS =
             KeySerializers.getSymmetricSerializers();
 
@@ -77,12 +77,15 @@ public final class KeyMaterials {
         return KeyMaterial.of(secretKey, iv);
     }
 
+    /**
+     * See {@link KeySerializer} to understand when to use {@link #wrap} vs. {@link #symmetricWrap}.
+     */
     public static byte[] wrap(KeyMaterial keyMaterial, PublicKey key) {
         return KeySerializerV2.INSTANCE.wrap(keyMaterial, key);
     }
 
     /**
-     * See {@link SymmetricKeySerializer} to understand when it is acceptable to use symmetric key wrapping.
+     * See {@link SymmetricKeySerializer} to understand when to use {@link #wrap} vs. {@link #symmetricWrap}.
      */
     public static byte[] symmetricWrap(KeyMaterial keyMaterial, SecretKey key) {
         return SymmetricKeySerializerV3.INSTANCE.wrap(keyMaterial, key);
@@ -90,11 +93,11 @@ public final class KeyMaterials {
 
     public static KeyMaterial unwrap(byte[] wrappedKeyMaterial, PrivateKey key) {
         int version = version(wrappedKeyMaterial);
-        checkArgument(SERIALIZERS.containsKey(version),
+        checkArgument(ASYMMETRIC_SERIALIZERS.containsKey(version),
                 "Invalid serialization format version. Expected version in %s but found %s",
-                SERIALIZERS.keySet(), version);
+                ASYMMETRIC_SERIALIZERS.keySet(), version);
 
-        return SERIALIZERS.get(version).unwrap(wrappedKeyMaterial, key);
+        return ASYMMETRIC_SERIALIZERS.get(version).unwrap(wrappedKeyMaterial, key);
     }
 
     public static KeyMaterial symmetricUnwrap(byte[] wrappedKeyMaterial, SecretKey key) {

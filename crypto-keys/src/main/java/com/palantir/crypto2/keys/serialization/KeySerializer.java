@@ -17,9 +17,17 @@
 package com.palantir.crypto2.keys.serialization;
 
 import com.palantir.crypto2.keys.KeyMaterial;
+import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 
+/**
+ * Provides key wrapping functionality in order to use a single master {@link KeyPair} to encrypt many
+ * {@link KeyMaterial}s. These serializes are not as performant {@link SymmetricKeySerializer}s, but do allow
+ * {@link #wrap} and {@link #unwrap} calls to be done by entities with different levels of trust. eg: {@link #wrap} may
+ * be called by anyone with access to the publicly available {@link PublicKey} while {@link #unwrap} may only be called
+ * by the trusted entity with access to the {@link PrivateKey}.
+ */
 interface KeySerializer {
 
     /**
