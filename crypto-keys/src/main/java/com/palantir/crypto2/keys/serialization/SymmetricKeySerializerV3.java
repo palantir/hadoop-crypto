@@ -52,7 +52,7 @@ import javax.crypto.spec.GCMParameterSpec;
 enum SymmetricKeySerializerV3 implements SymmetricKeySerializer {
     INSTANCE;
 
-    private static final String AES_CTR_NO_PADDING = "AES/GCM/NoPadding";
+    private static final String AES_GCM_NO_PADDING = "AES/GCM/NoPadding";
     private static final int IV_SIZE = 12;
     // 128 bit tag length as recommended by:
     // https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf
@@ -132,7 +132,7 @@ enum SymmetricKeySerializerV3 implements SymmetricKeySerializer {
 
     static Cipher getCipher(int cipherMode, SecretKey key, byte[] iv) {
         try {
-            Cipher cipher = Cipher.getInstance(AES_CTR_NO_PADDING);
+            Cipher cipher = Cipher.getInstance(AES_GCM_NO_PADDING);
             cipher.init(cipherMode, key, new GCMParameterSpec(TAG_LENGTH, iv));
             return cipher;
         } catch (NoSuchAlgorithmException
