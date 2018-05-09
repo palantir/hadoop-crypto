@@ -30,6 +30,8 @@ final class KeySerializers {
     private static final Map<Integer, ? extends KeySerializer> SERIALIZERS = ImmutableMap.of(
             KeySerializerV1.INSTANCE.getVersion(), KeySerializerV1.INSTANCE,
             KeySerializerV2.INSTANCE.getVersion(), KeySerializerV2.INSTANCE);
+    private static final Map<Integer, ? extends SymmetricKeySerializer> SYMMETRIC_SERIALIZERS = ImmutableMap.of(
+            SymmetricKeySerializerV3.INSTANCE.getVersion(), SymmetricKeySerializerV3.INSTANCE);
 
     private KeySerializers() {}
 
@@ -47,4 +49,7 @@ final class KeySerializers {
         return SERIALIZERS;
     }
 
+    static Map<Integer, ? extends SymmetricKeySerializer> getSymmetricSerializers() {
+        return SYMMETRIC_SERIALIZERS;
+    }
 }

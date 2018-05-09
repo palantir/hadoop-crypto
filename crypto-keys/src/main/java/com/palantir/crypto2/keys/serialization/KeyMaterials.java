@@ -16,7 +16,8 @@
 
 package com.palantir.crypto2.keys.serialization;
 
-import com.google.common.base.Preconditions;
+import static com.google.common.base.Preconditions.checkArgument;
+
 import com.google.common.base.Throwables;
 import com.palantir.crypto2.keys.KeyMaterial;
 import java.io.ByteArrayInputStream;
@@ -43,6 +44,8 @@ public final class KeyMaterials {
 
     private static final Logger log = LoggerFactory.getLogger(KeyMaterials.class);
     private static final Map<Integer, ? extends KeySerializer> SERIALIZERS = KeySerializers.getSerializers();
+    private static final Map<Integer, ? extends SymmetricKeySerializer> SYMMETRIC_SERIALIZERS =
+            KeySerializers.getSymmetricSerializers();
 
     private KeyMaterials() {}
 
@@ -78,18 +81,37 @@ public final class KeyMaterials {
         return KeySerializerV2.INSTANCE.wrap(keyMaterial, key);
     }
 
+    /**
+     * See {@link SymmetricKeySerializer} to understand when it is acceptable to use symmetric key wrapping.
+     */
+    public static byte[] symmetricWrap(KeyMaterial keyMaterial, SecretKey key) {
+        return SymmetricKeySerializerV3.INSTANCE.wrap(keyMaterial, key);
+    }
+
     public static KeyMaterial unwrap(byte[] wrappedKeyMaterial, PrivateKey key) {
-        DataInputStream stream = new DataInputStream(new ByteArrayInputStream(wrappedKeyMaterial));
+        int version = version(wrappedKeyMaterial);
+        checkArgument(SERIALIZERS.containsKey(version),
+                "Invalid serialization format version. Expected version in %s but found %s",
+                SERIALIZERS.keySet(), version);
 
+        return SERIALIZERS.get(version).unwrap(wrappedKeyMaterial, key);
+    }
+
+    public static KeyMaterial symmetricUnwrap(byte[] wrappedKeyMaterial, SecretKey key) {
+        int version = version(wrappedKeyMaterial);
+        checkArgument(SYMMETRIC_SERIALIZERS.containsKey(version),
+                "Invalid serialization format version. Expected version in %s but found %s",
+                SYMMETRIC_SERIALIZERS.keySet(), version);
+
+        return SYMMETRIC_SERIALIZERS.get(version).unwrap(wrappedKeyMaterial, key);
+    }
+
+    private static int version(byte[] wrappedKeyMaterial) {
         try {
-            int version = stream.read();
-            Preconditions.checkArgument(SERIALIZERS.containsKey(version),
-                    "Invalid serialization format version. Expected version in %s but found %s",
-                    SERIALIZERS.keySet(), version);
-
-            return SERIALIZERS.get(version).unwrap(wrappedKeyMaterial, key);
+            DataInputStream stream = new DataInputStream(new ByteArrayInputStream(wrappedKeyMaterial));
+            return stream.read();
         } catch (IOException e) {
-            throw Throwables.propagate(e);
+            throw new RuntimeException("Unable to read version from wrapped key", e);
         }
     }
 

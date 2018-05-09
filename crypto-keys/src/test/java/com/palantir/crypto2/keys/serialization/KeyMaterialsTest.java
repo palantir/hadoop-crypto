@@ -23,8 +23,6 @@ import com.palantir.crypto2.keys.KeyMaterial;
 import com.palantir.crypto2.keys.TestKeyPairs;
 import java.security.InvalidKeyException;
 import java.security.KeyPair;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import javax.crypto.SecretKey;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,10 +35,12 @@ public final class KeyMaterialsTest {
 
     private KeyMaterial keyMaterial;
     private KeyPair keyPair;
+    private SecretKey symmetricKey;
 
     @Before
-    public void before() throws NoSuchAlgorithmException, NoSuchProviderException {
+    public void before() {
         keyPair = TestKeyPairs.generateKeyPair();
+        symmetricKey = KeyMaterials.generateKey(KEY_ALG, KEY_SIZE);
         SecretKey secretKey = KeyMaterials.generateKey(KEY_ALG, KEY_SIZE);
         byte[] iv = KeyMaterials.generateIv(IV_SIZE);
         keyMaterial = KeyMaterial.of(secretKey, iv);
@@ -107,6 +107,22 @@ public final class KeyMaterialsTest {
                 .isThrownBy(() -> KeyMaterials.unwrap(wrapped, keyPair.getPrivate()))
                 .withMessage("Invalid serialization format version. Expected version in %s but found 0",
                         KeySerializers.getSerializers().keySet());
+    }
+
+    @Test
+    public void testSymmetricWrapAndUnwrap() {
+        byte[] wrapped = KeyMaterials.symmetricWrap(keyMaterial, symmetricKey);
+        KeyMaterial unwrapped = KeyMaterials.symmetricUnwrap(wrapped, symmetricKey);
+        assertThat(unwrapped).isEqualTo(keyMaterial);
+    }
+
+    @Test
+    public void testSymmetricUnwrapInvalidWithWrongKey() {
+        SecretKey wrongKey = KeyMaterials.generateKey(KEY_ALG, KEY_SIZE);
+        byte[] wrapped = KeyMaterials.symmetricWrap(keyMaterial, symmetricKey);
+        KeyMaterial unwrapped = KeyMaterials.symmetricUnwrap(wrapped, wrongKey);
+
+        assertThat(unwrapped).isNotEqualTo(wrapped);
     }
 
     @Test
