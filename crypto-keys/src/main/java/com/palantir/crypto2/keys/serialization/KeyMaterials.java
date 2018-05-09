@@ -43,7 +43,8 @@ import org.slf4j.LoggerFactory;
 public final class KeyMaterials {
 
     private static final Logger log = LoggerFactory.getLogger(KeyMaterials.class);
-    private static final Map<Integer, ? extends KeySerializer> ASYMMETRIC_SERIALIZERS = KeySerializers.getAsymmetricSerializers();
+    private static final Map<Integer, ? extends KeySerializer> ASYMMETRIC_SERIALIZERS =
+            KeySerializers.getAsymmetricSerializers();
     private static final Map<Integer, ? extends SymmetricKeySerializer> SYMMETRIC_SERIALIZERS =
             KeySerializers.getSymmetricSerializers();
 
