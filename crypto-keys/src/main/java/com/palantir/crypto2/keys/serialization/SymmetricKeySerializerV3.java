@@ -55,7 +55,7 @@ enum SymmetricKeySerializerV3 implements SymmetricKeySerializer {
     private static final String AES_CTR_NO_PADDING = "AES/CTR/NoPadding";
     private static final int IV_SIZE = 16;
 
-    static final int VERSION = 3;
+    private static final int VERSION = 3;
 
     @Override
     public byte[] wrap(KeyMaterial keyMaterial, SecretKey key) {

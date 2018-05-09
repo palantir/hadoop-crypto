@@ -50,7 +50,7 @@ import javax.crypto.SecretKey;
 enum KeySerializerV1 implements KeySerializer {
     INSTANCE;
 
-    static final int VERSION = 1;
+    private static final int VERSION = 1;
 
     @Override
     public byte[] wrap(KeyMaterial keyMaterial, PublicKey key) {
