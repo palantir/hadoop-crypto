@@ -100,7 +100,7 @@ enum SymmetricKeySerializerV3 implements SymmetricKeySerializer {
                     "Invalid serialization format version. Expected %s but found %s", VERSION, version);
 
             byte[] wrappingIv = new byte[IV_SIZE];
-            stream.read(wrappingIv);
+            stream.readFully(wrappingIv);
             Cipher keyUnwrappingCipher = getCipher(Cipher.UNWRAP_MODE, key, wrappingIv);
 
             int algorithmLength = stream.readInt();
