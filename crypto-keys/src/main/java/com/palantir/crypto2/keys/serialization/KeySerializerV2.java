@@ -109,7 +109,7 @@ enum KeySerializerV2 implements KeySerializer {
             SecretKey secretKey = (SecretKey) keyUnwrappingCipher.unwrap(secretKeyBytes, algorithm, Cipher.SECRET_KEY);
             return KeyMaterial.of(secretKey, iv);
         } catch (InvalidKeyException | NoSuchAlgorithmException | IOException e) {
-            throw Throwables.propagate(e);
+            throw new RuntimeException("Unable to unwrap key", e);
         }
     }
 
