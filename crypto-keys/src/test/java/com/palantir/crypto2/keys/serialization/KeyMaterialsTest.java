@@ -82,7 +82,7 @@ public final class KeyMaterialsTest {
         assertThatExceptionOfType(RuntimeException.class)
                 .isThrownBy(() -> KeyMaterials.unwrap(wrapped, invalidKeyPair.getPrivate()))
                 .withCauseInstanceOf(InvalidKeyException.class)
-                .withMessageContaining("Unwrapping failed");
+                .withMessageContaining("Unable to unwrap key");
     }
 
     @Test

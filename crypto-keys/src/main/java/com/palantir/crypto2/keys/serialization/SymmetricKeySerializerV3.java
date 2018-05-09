@@ -32,7 +32,7 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
-import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.GCMParameterSpec;
 
 /**
  * Serializer for wrapping and unwrapping {@link KeyMaterial}. The {@link #wrap} method returns the KeyMaterial
@@ -52,9 +52,11 @@ import javax.crypto.spec.IvParameterSpec;
 enum SymmetricKeySerializerV3 implements SymmetricKeySerializer {
     INSTANCE;
 
-    private static final String AES_CTR_NO_PADDING = "AES/CTR/NoPadding";
-    private static final int IV_SIZE = 16;
-
+    private static final String AES_CTR_NO_PADDING = "AES/GCM/NoPadding";
+    private static final int IV_SIZE = 12;
+    // 128 bit tag length as recommended by:
+    // https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf
+    private static final int TAG_LENGTH = 128;
     private static final int VERSION = 3;
 
     @Override
@@ -131,7 +133,7 @@ enum SymmetricKeySerializerV3 implements SymmetricKeySerializer {
     static Cipher getCipher(int cipherMode, SecretKey key, byte[] iv) {
         try {
             Cipher cipher = Cipher.getInstance(AES_CTR_NO_PADDING);
-            cipher.init(cipherMode, key, new IvParameterSpec(iv));
+            cipher.init(cipherMode, key, new GCMParameterSpec(TAG_LENGTH, iv));
             return cipher;
         } catch (NoSuchAlgorithmException
                 | NoSuchPaddingException
