@@ -40,6 +40,7 @@ public final class CryptoStreamFactoryTest {
     private static final byte[] BYTES = "data".getBytes(StandardCharsets.UTF_8);
 
     private KeyMaterial keyMaterial;
+
     @Before
     public void before() {
         keyMaterial = AesCtrCipher.generateKeyMaterial();
@@ -84,5 +85,4 @@ public final class CryptoStreamFactoryTest {
         assertThat(bytesRead).isEqualTo(BYTES.length);
         assertThat(readBytes).isEqualTo(BYTES);
     }
-
 }
