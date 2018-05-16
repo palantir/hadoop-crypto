@@ -18,26 +18,35 @@ package com.palantir.crypto2.io;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.google.common.io.ByteStreams;
 import com.palantir.crypto2.cipher.AesCtrCipher;
 import com.palantir.crypto2.keys.KeyMaterial;
 import com.palantir.seekio.InMemorySeekableDataInput;
 import com.palantir.seekio.SeekableInput;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import org.apache.commons.crypto.stream.CtrCryptoInputStream;
 import org.apache.commons.crypto.stream.CtrCryptoOutputStream;
+import org.junit.Before;
 import org.junit.Test;
 
 public final class CryptoStreamFactoryTest {
 
     private static final boolean FORCE_JCE = true;
+    private static final byte[] BYTES = "data".getBytes(StandardCharsets.UTF_8);
+
+    private KeyMaterial keyMaterial;
+    @Before
+    public void before() {
+        keyMaterial = AesCtrCipher.generateKeyMaterial();
+    }
 
     @Test
     public void ensureDefaultIsApache() {
-        KeyMaterial keyMaterial = AesCtrCipher.generateKeyMaterial();
-
         OutputStream encrypted = CryptoStreamFactory.encrypt(null, keyMaterial, AesCtrCipher.ALGORITHM);
         SeekableInput decrypted = CryptoStreamFactory.decrypt(
                 (SeekableInput) null, keyMaterial, AesCtrCipher.ALGORITHM);
@@ -47,24 +56,33 @@ public final class CryptoStreamFactoryTest {
     }
 
     @Test
-    public void testEncryptDecryptJce() throws IOException {
-        KeyMaterial keyMaterial = AesCtrCipher.generateKeyMaterial();
-        byte[] bytes = "data".getBytes(StandardCharsets.UTF_8);
+    public void testEncryptDecryptInputStream() throws IOException {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
+        OutputStream encrypted = CryptoStreamFactory.encrypt(os, keyMaterial, AesCtrCipher.ALGORITHM);
+        encrypted.write(BYTES);
+        encrypted.close();
 
+        InputStream decrypted = CryptoStreamFactory.decrypt(
+                new ByteArrayInputStream(os.toByteArray()), keyMaterial, AesCtrCipher.ALGORITHM);
+
+        assertThat(ByteStreams.toByteArray(decrypted)).isEqualTo(BYTES);
+    }
+
+    @Test
+    public void testEncryptDecryptJce() throws IOException {
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
         OutputStream encrypted = CryptoStreamFactory.encrypt(os, keyMaterial, AesCtrCipher.ALGORITHM, FORCE_JCE);
-
-        encrypted.write(bytes);
+        encrypted.write(BYTES);
         encrypted.close();
 
         SeekableInput decrypted = CryptoStreamFactory.decrypt(
                 new InMemorySeekableDataInput(os.toByteArray()), keyMaterial, AesCtrCipher.ALGORITHM, FORCE_JCE);
 
-        byte[] readBytes = new byte[bytes.length];
-        int bytesRead = decrypted.read(readBytes, 0, bytes.length);
+        byte[] readBytes = new byte[BYTES.length];
+        int bytesRead = decrypted.read(readBytes, 0, BYTES.length);
 
-        assertThat(bytesRead).isEqualTo(bytes.length);
-        assertThat(readBytes).isEqualTo(bytes);
+        assertThat(bytesRead).isEqualTo(BYTES.length);
+        assertThat(readBytes).isEqualTo(BYTES);
     }
 
 }
