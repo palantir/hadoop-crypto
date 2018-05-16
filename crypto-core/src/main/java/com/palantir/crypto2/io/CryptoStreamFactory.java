@@ -23,6 +23,7 @@ import com.palantir.crypto2.cipher.SeekableCipherFactory;
 import com.palantir.crypto2.keys.KeyMaterial;
 import com.palantir.seekio.SeekableInput;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Properties;
 import javax.crypto.Cipher;
@@ -64,6 +65,14 @@ public final class CryptoStreamFactory {
     }
 
     /**
+     * Returns an {@link InputStream} that decrypts the given InputStream using the given {@link KeyMaterial} and
+     * cipher {@code algorithm}. When OpenSSL is available an implementation that uses AES-NI will be returned.
+     */
+    public static InputStream decrypt(InputStream input, KeyMaterial keyMaterial, String algorithm) {
+        return new DefaultSeekableInputStream(decrypt(new StreamSeekableInput(input), keyMaterial, algorithm));
+    }
+
+    /**
      * Returns an {@link OutputStream} that encrypts the given OutputStream using the given {@link KeyMaterial} and
      * cipher {@code algorithm}. When OpenSSL is available an implementation that uses AES-NI will be returned.
      */
@@ -98,4 +107,31 @@ public final class CryptoStreamFactory {
         return new CipherOutputStream(output, cipher.initCipher(Cipher.ENCRYPT_MODE));
     }
 
+    private static class StreamSeekableInput implements SeekableInput {
+        private final InputStream input;
+
+        StreamSeekableInput(InputStream input) {
+            this.input = input;
+        }
+
+        @Override
+        public void seek(long offset) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public long getPos() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public int read(byte[] bytes, int offset, int length) throws IOException {
+            return input.read(bytes, offset, length);
+        }
+
+        @Override
+        public void close() throws IOException {
+            input.close();
+        }
+    }
 }
