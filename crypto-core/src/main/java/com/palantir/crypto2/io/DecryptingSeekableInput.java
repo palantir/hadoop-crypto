@@ -84,7 +84,7 @@ public final class DecryptingSeekableInput implements SeekableInput {
 
         int blockSize = seekableCipher.getBlockSize();
 
-        // TODO (markelliot) (#34) not all SeekableCipher implementations require reading the previous blocks, we can
+        // TODO(markelliot): (#34) not all SeekableCipher implementations require reading the previous blocks, we can
         // read and decrypt less (i.e. do less work) if we were able to switch this calculation into the right mode by
         // SeekableCipher implementation
 
@@ -131,7 +131,7 @@ public final class DecryptingSeekableInput implements SeekableInput {
     @Override
     public void close() throws IOException {
         delegate.close();
-        // TODO (davids) really this should close decryptedStream, but https://bugs.openjdk.java.net/browse/JDK-8064546
+        // TODO(davids): really this should close decryptedStream, but https://bugs.openjdk.java.net/browse/JDK-8064546
         // causes "java.io.IOException: javax.crypto.BadPaddingException: Given final block not properly padded" and
         // is not fixed until Java 7u85 (not publicly available) and Java 8u51.
         // decryptedStream.close();
