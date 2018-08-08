@@ -15,7 +15,8 @@ dependencies:
 test:
   override:
     - ./gradlew --parallel --no-daemon build
-    - ./verify-ibmjvm.sh
+    # disabled while moving to circle 2
+    # - ./verify-ibmjvm.sh
 
 deployment:
   release:
