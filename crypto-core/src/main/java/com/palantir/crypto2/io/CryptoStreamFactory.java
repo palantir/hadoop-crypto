@@ -59,7 +59,7 @@ public final class CryptoStreamFactory {
         try {
             return new ApacheCtrDecryptingSeekableInput(encryptedInput, keyMaterial);
         } catch (IOException e) {
-            log.warn("Unable to initialize cipher with OpenSSL falling back to JCE implementation");
+            log.warn("Unable to initialize cipher with OpenSSL falling back to JCE implementation", e);
             return new DecryptingSeekableInput(encryptedInput, SeekableCipherFactory.getCipher(algorithm, keyMaterial));
         }
     }
@@ -89,7 +89,7 @@ public final class CryptoStreamFactory {
         try {
             return createApacheEncryptedStream(output, keyMaterial);
         } catch (IOException e) {
-            log.warn("Unable to initialize cipher with OpenSSL, falling back to JCE implementation");
+            log.warn("Unable to initialize cipher with OpenSSL, falling back to JCE implementation", e);
             return createDefaultEncryptedStream(output, keyMaterial, algorithm);
         }
     }
