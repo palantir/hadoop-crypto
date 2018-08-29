@@ -6,7 +6,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: ellisjoe/openjdk-java-8-openssl:0.0.1
+      - image: ellisjoe/openjdk-java-8-openssl:0.0.2
     resource_class: xlarge
     environment:
       GRADLE_OPTS: -Dorg.gradle.console=plain -Dorg.gradle.internal.launcher.welcomeMessageEnabled=false
