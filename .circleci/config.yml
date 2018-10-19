@@ -45,7 +45,7 @@ jobs:
       - image: ellisjoe/ibm-java-8-openssl:0.0.0
     resource_class: xlarge
     environment:
-      GRADLE_OPTS: -Djdk.tls.client.protocols="TLSv1.2" -Dorg.gradle.console=plain -Dorg.gradle.internal.launcher.welcomeMessageEnabled=false
+      GRADLE_OPTS: -Dorg.gradle.console=plain -Dorg.gradle.internal.launcher.welcomeMessageEnabled=false
 
     steps:
       - checkout
