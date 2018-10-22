@@ -20,6 +20,7 @@ import com.google.common.base.Throwables;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
 
 public final class TestKeyPairs {
@@ -37,8 +38,8 @@ public final class TestKeyPairs {
         SecureRandom random;
         try {
             keyGen = KeyPairGenerator.getInstance("RSA");
-            random = SecureRandom.getInstance("SHA1PRNG");
-        } catch (NoSuchAlgorithmException e) {
+            random = SecureRandom.getInstance("SHA1PRNG", "SUN");
+        } catch (NoSuchAlgorithmException | NoSuchProviderException e) {
             throw Throwables.propagate(e);
         }
         keyGen.initialize(keysize, random);

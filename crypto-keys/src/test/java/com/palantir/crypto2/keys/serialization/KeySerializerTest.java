@@ -63,7 +63,7 @@ public abstract class KeySerializerTest {
 
         byte[] wrapped = getSerializer().wrap(keyMaterial, keyPair.getPublic());
         KeyMaterial unwrapped = getSerializer().unwrap(wrapped, keyPair.getPrivate());
-        assertThat(unwrapped).isEqualTo(keyMaterial);
+        assertThat(keyMaterial).isEqualTo(unwrapped);
     }
 
 }
