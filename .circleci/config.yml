@@ -58,7 +58,7 @@ jobs:
       - save_cache:
           key: gradle-cache-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}
           paths: [ ~/.gradle/caches ]
-      - run: ./gradlew --parallel --continue build
+      - run: ./gradlew --parallel --continue crypto-core:test
       - run:
           command: mkdir -p ~/junit && find . -type f -regex ".*/build/.*TEST.*xml" -exec cp --parents {} ~/junit/ \;
           when: always
