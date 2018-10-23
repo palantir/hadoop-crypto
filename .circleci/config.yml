@@ -4,9 +4,27 @@
 
 version: 2
 jobs:
+
+  compile:
+    docker: [{ image: 'ellisjoe/openjdk-java-openssl:java-8' }]
+    resource_class: xlarge
+    environment:
+      GRADLE_OPTS: -Dorg.gradle.console=plain -Dorg.gradle.internal.launcher.welcomeMessageEnabled=false
+
+    steps:
+      - checkout
+      - restore_cache: { key: 'gradle-wrapper-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}' }
+      - restore_cache: { key: 'gradle-cache-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}' }
+      - run: ./gradlew --no-daemon --parallel --continue resolveConfigurations classes testClasses
+      - save_cache:
+          key: gradle-wrapper-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
+          paths: [ ~/.gradle/wrapper ]
+      - save_cache:
+          key: gradle-cache-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}
+          paths: [ ~/.gradle/caches ]
+
   build:
-    docker:
-      - image: ellisjoe/openjdk-java-openssl:java-8
+    docker: [{ image: 'ellisjoe/openjdk-java-openssl:java-8' }]
     resource_class: xlarge
     environment:
       GRADLE_OPTS: -Dorg.gradle.console=plain -Dorg.gradle.internal.launcher.welcomeMessageEnabled=false
@@ -16,12 +34,6 @@ jobs:
       - restore_cache: { key: 'gradle-wrapper-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}' }
       - restore_cache: { key: 'gradle-cache-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}' }
       - run: ./gradlew --no-daemon --parallel --continue build
-      - save_cache:
-          key: gradle-wrapper-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
-          paths: [ ~/.gradle/wrapper ]
-      - save_cache:
-          key: gradle-cache-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}
-          paths: [ ~/.gradle/caches ]
       - run:
           command: mkdir -p ~/junit && find . -type f -regex ".*/build/.*TEST.*xml" -exec cp --parents {} ~/junit/ \;
           when: always
@@ -29,8 +41,7 @@ jobs:
       - store_artifacts: { path: ~/poms }
 
   build-ibm:
-    docker:
-      - image: ellisjoe/ibm-java-openssl:java-8
+    docker: [{ image: 'ellisjoe/ibm-java-openssl:java-8' }]
     resource_class: xlarge
     environment:
       GRADLE_OPTS: -Dorg.gradle.console=plain -Dorg.gradle.internal.launcher.welcomeMessageEnabled=false
@@ -46,8 +57,7 @@ jobs:
       - store_test_results: { path: ~/junit }
 
   publish:
-    docker:
-      - image: ellisjoe/openjdk-java-openssl:java-8
+    docker: [{ image: 'ellisjoe/openjdk-java-openssl:java-8' }]
     resource_class: xlarge
     environment:
       GRADLE_OPTS: -Dorg.gradle.console=plain -Dorg.gradle.internal.launcher.welcomeMessageEnabled=false
@@ -71,10 +81,14 @@ workflows:
   version: 2
   build:
     jobs:
-      - build:
+      - compile:
           # CircleCI2 will ignore tags without this. https://circleci.com/docs/2.0/workflows/#git-tag-job-execution
           filters: { tags: { only: /.*/ } }
+      - build:
+          requires: [ compile ]
+          filters: { tags: { only: /.*/ } }
       - build-ibm:
+          requires: [ compile ]
           filters: { tags: { only: /.*/ } }
       - publish:
           requires: [ build, build-ibm ]
