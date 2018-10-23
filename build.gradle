@@ -71,15 +71,4 @@ subprojects {
     if (System.env.CIRCLE_TEST_REPORTS) {
         test.reports.junitXml.destination = new File(System.env.CIRCLE_TEST_REPORTS, it.getName())
     }
-
-    // The IBM JVM doesn't play nicely with error-prone
-    // This configuration difference forces us to run gradle with --no-daemon
-    if (!System.env.DISABLE_ERROR_PRONE) {
-        apply plugin: 'com.palantir.baseline-error-prone'
-        configurations.errorprone {
-            resolutionStrategy {
-                force 'com.google.guava:guava:21.0'
-            }
-        }
-    }
 }
