@@ -15,19 +15,17 @@ jobs:
       - checkout
       - restore_cache: { key: 'gradle-wrapper-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}' }
       - restore_cache: { key: 'gradle-cache-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}' }
-      - run: ./gradlew --no-daemon --parallel --stacktrace resolveConfigurations
+      - run: ./gradlew --no-daemon --parallel --continue build
       - save_cache:
           key: gradle-wrapper-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
           paths: [ ~/.gradle/wrapper ]
       - save_cache:
           key: gradle-cache-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}
           paths: [ ~/.gradle/caches ]
-      - run: ./gradlew --no-daemon --parallel --continue build
       - run:
           command: mkdir -p ~/junit && find . -type f -regex ".*/build/.*TEST.*xml" -exec cp --parents {} ~/junit/ \;
           when: always
       - store_test_results: { path: ~/junit }
-
       - store_artifacts: { path: ~/poms }
 
   build-ibm:
@@ -41,13 +39,6 @@ jobs:
       - checkout
       - restore_cache: { key: 'gradle-wrapper-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}' }
       - restore_cache: { key: 'gradle-cache-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}' }
-      - run: ./gradlew --no-daemon --parallel --stacktrace resolveConfigurations
-      - save_cache:
-          key: gradle-wrapper-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
-          paths: [ ~/.gradle/wrapper ]
-      - save_cache:
-          key: gradle-cache-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}
-          paths: [ ~/.gradle/caches ]
       - run: ./gradlew --no-daemon --parallel --continue crypto-core:test
       - run:
           command: mkdir -p ~/junit && find . -type f -regex ".*/build/.*TEST.*xml" -exec cp --parents {} ~/junit/ \;
@@ -56,7 +47,7 @@ jobs:
 
   publish:
     docker:
-      - image: circleci/openjdk:8u171-jdk-node-browsers
+      - image: ellisjoe/openjdk-java-openssl:java-8
     resource_class: xlarge
     environment:
       GRADLE_OPTS: -Dorg.gradle.console=plain -Dorg.gradle.internal.launcher.welcomeMessageEnabled=false
