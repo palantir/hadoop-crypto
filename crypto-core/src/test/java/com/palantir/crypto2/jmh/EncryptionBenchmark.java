@@ -57,6 +57,7 @@ public class EncryptionBenchmark {
 
         public byte[] data;
 
+        @SuppressWarnings("RegexpSinglelineJava")
         @Setup
         public void setup() {
             data = new byte[numBytes];
