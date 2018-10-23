@@ -62,6 +62,9 @@ jobs:
       GRADLE_OPTS: -Dorg.gradle.console=plain -Dorg.gradle.internal.launcher.welcomeMessageEnabled=false
 
     steps:
+      - checkout
+      - restore_cache: { key: 'gradle-wrapper-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}' }
+      - restore_cache: { key: 'gradle-cache-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}' }
       - deploy:
           command: |
             # publishing snapshots to bintray does not work, so we only publish from tag builds (not develop)
