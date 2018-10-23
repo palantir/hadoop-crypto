@@ -49,6 +49,7 @@ public final class CryptoStreamFactory {
         return decrypt(encryptedInput, keyMaterial, algorithm, false);
     }
 
+    @SuppressWarnings("CatchBlockLogException")
     @VisibleForTesting
     static SeekableInput decrypt(
             SeekableInput encryptedInput, KeyMaterial keyMaterial, String algorithm, boolean forceJce) {
@@ -80,6 +81,7 @@ public final class CryptoStreamFactory {
         return encrypt(output, keyMaterial, algorithm, false);
     }
 
+    @SuppressWarnings("CatchBlockLogException")
     @VisibleForTesting
     static OutputStream encrypt(OutputStream output, KeyMaterial keyMaterial, String algorithm, boolean forceJce) {
         if (!algorithm.equals(AES_ALGORITHM) || forceJce) {

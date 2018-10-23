@@ -71,6 +71,7 @@ public final class EncryptedFileSystem extends DelegatingFileSystem {
         this.cipherAlgorithm = getCipherAlgorithm();
     }
 
+    @Override
     public void initialize(URI name, Configuration conf) throws IOException {
         super.initialize(name, conf);
     }
@@ -137,7 +138,7 @@ public final class EncryptedFileSystem extends DelegatingFileSystem {
         try {
             keyStore.remove(path.toString());
         } catch (Exception e) {
-            log.warn("Unable to remove KeyMaterial for file: {}", path);
+            log.warn("Unable to remove KeyMaterial for file: {}", path, e);
         }
     }
 
