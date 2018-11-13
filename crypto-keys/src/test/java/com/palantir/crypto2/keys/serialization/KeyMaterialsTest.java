@@ -67,6 +67,12 @@ public final class KeyMaterialsTest {
     }
 
     @Test
+    public void testWrappedKeySize() {
+        byte[] wrapped = KeyMaterials.wrap(keyMaterial, keyPair.getPublic());
+        assertThat(wrapped.length).isEqualTo(160);
+    }
+
+    @Test
     public void testWrapAndUnwrap() {
         byte[] wrapped = KeyMaterials.wrap(keyMaterial, keyPair.getPublic());
         KeyMaterial unwrapped = KeyMaterials.unwrap(wrapped, keyPair.getPrivate());
