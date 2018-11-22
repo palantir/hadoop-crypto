@@ -24,20 +24,30 @@ import java.security.NoSuchAlgorithmException;
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
-import javax.crypto.spec.GCMParameterSpec;
+import javax.crypto.spec.IvParameterSpec;
 
-enum SymmetricKeySerializerV3 implements SymmetricKeySerializer {
+enum SymmetricKeySerializerV4 implements SymmetricKeySerializer {
     INSTANCE;
 
-    private static final String AES_GCM_NO_PADDING = "AES/GCM/NoPadding";
-    private static final int IV_SIZE = 12;
-    // 128 bit tag length as recommended by:
-    // https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf
-    private static final int TAG_LENGTH = 128;
-    private static final int VERSION = 3;
+    private static final String AES_CBC_PKCS_5_PADDING = "AES/CBC/PKCS5Padding";
+    private static final int IV_SIZE = 16;
+    private static final int VERSION = 4;
 
     private static final SymmetricKeySerializer delegate = new CipherSymmetricKeySerializer(
-            IV_SIZE, VERSION, SymmetricKeySerializerV3::getCipher);
+            IV_SIZE, VERSION, SymmetricKeySerializerV4::getCipher);
+
+    static Cipher getCipher(int cipherMode, SecretKey key, byte[] iv) {
+        try {
+            Cipher cipher = Cipher.getInstance(AES_CBC_PKCS_5_PADDING);
+            cipher.init(cipherMode, key, new IvParameterSpec(iv));
+            return cipher;
+        } catch (NoSuchAlgorithmException
+                | NoSuchPaddingException
+                | InvalidKeyException
+                | InvalidAlgorithmParameterException e) {
+            throw Throwables.propagate(e);
+        }
+    }
 
     @Override
     public byte[] wrap(KeyMaterial keyMaterial, SecretKey key) {
@@ -52,18 +62,5 @@ enum SymmetricKeySerializerV3 implements SymmetricKeySerializer {
     @Override
     public int getVersion() {
         return delegate.getVersion();
-    }
-
-    static Cipher getCipher(int cipherMode, SecretKey key, byte[] iv) {
-        try {
-            Cipher cipher = Cipher.getInstance(AES_GCM_NO_PADDING);
-            cipher.init(cipherMode, key, new GCMParameterSpec(TAG_LENGTH, iv));
-            return cipher;
-        } catch (NoSuchAlgorithmException
-                | NoSuchPaddingException
-                | InvalidKeyException
-                | InvalidAlgorithmParameterException e) {
-            throw Throwables.propagate(e);
-        }
     }
 }
