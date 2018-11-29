@@ -89,7 +89,7 @@ public final class KeyMaterials {
      * See {@link SymmetricKeySerializer} to understand when to use {@link #wrap} vs. {@link #symmetricWrap}.
      */
     public static byte[] symmetricWrap(KeyMaterial keyMaterial, SecretKey key) {
-        return SymmetricKeySerializerV3.INSTANCE.wrap(keyMaterial, key);
+        return SymmetricKeySerializerV4.INSTANCE.wrap(keyMaterial, key);
     }
 
     public static KeyMaterial unwrap(byte[] wrappedKeyMaterial, PrivateKey key) {
