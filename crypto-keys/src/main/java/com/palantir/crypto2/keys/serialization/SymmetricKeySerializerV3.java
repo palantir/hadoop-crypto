@@ -26,6 +26,14 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.GCMParameterSpec;
 
+/**
+ * @deprecated As per the NIST recommendation in section 8.3 [1] the same key should not be used with AES GCM more than
+ * 2^32 times. An alternative method should be used as the current implementation does not guard against this
+ * limitation.
+ *
+ * [1] https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf
+ */
+@Deprecated
 enum SymmetricKeySerializerV3 implements SymmetricKeySerializer {
     INSTANCE;
 
