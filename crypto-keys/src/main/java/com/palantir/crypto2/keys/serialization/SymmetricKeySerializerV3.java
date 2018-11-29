@@ -33,6 +33,7 @@ import javax.crypto.spec.GCMParameterSpec;
  *
  * [1] https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf
  */
+@Deprecated
 enum SymmetricKeySerializerV3 implements SymmetricKeySerializer {
     INSTANCE;
 
