@@ -45,12 +45,12 @@ import javax.crypto.SecretKey;
  *  +-------------------------------------------------------+
  * </pre>
  */
-public final class CipherSymmetricKeySerializer implements SymmetricKeySerializer {
+final class CipherSymmetricKeySerializer implements SymmetricKeySerializer {
     private final int ivSize;
     private final int version;
     private final CipherFactory cipherFactory;
 
-    public CipherSymmetricKeySerializer(int ivSize, int version, CipherFactory cipherFactory) {
+    CipherSymmetricKeySerializer(int ivSize, int version, CipherFactory cipherFactory) {
         this.ivSize = ivSize;
         this.version = version;
         this.cipherFactory = cipherFactory;
