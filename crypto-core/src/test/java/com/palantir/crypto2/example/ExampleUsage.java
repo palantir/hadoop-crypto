@@ -19,17 +19,15 @@ package com.palantir.crypto2.example;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.palantir.crypto2.cipher.AesCtrCipher;
-import com.palantir.crypto2.cipher.SeekableCipher;
 import com.palantir.crypto2.cipher.SeekableCipherFactory;
-import com.palantir.crypto2.io.DecryptingSeekableInput;
+import com.palantir.crypto2.io.CryptoStreamFactory;
 import com.palantir.crypto2.keys.KeyMaterial;
 import com.palantir.seekio.InMemorySeekableDataInput;
 import com.palantir.seekio.SeekableInput;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import javax.crypto.Cipher;
-import javax.crypto.CipherOutputStream;
 import org.junit.Test;
 
 public final class ExampleUsage {
@@ -40,12 +38,10 @@ public final class ExampleUsage {
 
         // Store this key material for future decryption
         KeyMaterial keyMaterial = SeekableCipherFactory.generateKeyMaterial(AesCtrCipher.ALGORITHM);
-        SeekableCipher cipher = SeekableCipherFactory.getCipher(AesCtrCipher.ALGORITHM, keyMaterial);
         ByteArrayOutputStream os = new ByteArrayOutputStream(bytes.length);
-        Cipher encrypt = cipher.initCipher(Cipher.ENCRYPT_MODE);
 
         // Encrypt some bytes
-        CipherOutputStream encryptedStream = new CipherOutputStream(os, encrypt);
+        OutputStream encryptedStream = CryptoStreamFactory.encrypt(os, keyMaterial, AesCtrCipher.ALGORITHM);
         encryptedStream.write(bytes);
         encryptedStream.close();
         byte[] encryptedBytes = os.toByteArray();
@@ -54,7 +50,7 @@ public final class ExampleUsage {
         assertThat(encryptedBytes).isNotEqualTo(bytes);
 
         SeekableInput is = new InMemorySeekableDataInput(encryptedBytes);
-        DecryptingSeekableInput decryptedStream = new DecryptingSeekableInput(is, cipher);
+        SeekableInput decryptedStream = CryptoStreamFactory.decrypt(is, keyMaterial, AesCtrCipher.ALGORITHM);
 
         // Seek to the last byte in the decrypted stream and verify its decrypted value
         byte[] readBytes = new byte[bytes.length];

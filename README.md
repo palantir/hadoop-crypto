@@ -30,32 +30,30 @@ byte[] bytes = "0123456789".getBytes(StandardCharsets.UTF_8);
 
 // Store this key material for future decryption
 KeyMaterial keyMaterial = SeekableCipherFactory.generateKeyMaterial(AesCtrCipher.ALGORITHM);
-SeekableCipher cipher = SeekableCipherFactory.getCipher(AesCtrCipher.ALGORITHM, keyMaterial);
 ByteArrayOutputStream os = new ByteArrayOutputStream(bytes.length);
-Cipher encrypt = cipher.initCipher(Cipher.ENCRYPT_MODE);
 
 // Encrypt some bytes
-CipherOutputStream encryptedStream = new CipherOutputStream(os, encrypt);
+OutputStream encryptedStream = CryptoStreamFactory.encrypt(os, keyMaterial, AesCtrCipher.ALGORITHM);
 encryptedStream.write(bytes);
 encryptedStream.close();
 byte[] encryptedBytes = os.toByteArray();
 
 // Bytes written to stream are encrypted
-assertThat(encryptedBytes, is(not(bytes)));
+assertThat(encryptedBytes).isNotEqualTo(bytes);
 
 SeekableInput is = new InMemorySeekableDataInput(encryptedBytes);
-DecryptingSeekableInput decryptedStream = new DecryptingSeekableInput(is, cipher);
+SeekableInput decryptedStream = CryptoStreamFactory.decrypt(is, keyMaterial, AesCtrCipher.ALGORITHM);
 
 // Seek to the last byte in the decrypted stream and verify its decrypted value
 byte[] readBytes = new byte[bytes.length];
 decryptedStream.seek(bytes.length - 1);
 decryptedStream.read(readBytes, 0, 1);
-assertThat(readBytes[0], is(bytes[bytes.length - 1]));
+assertThat(readBytes[0]).isEqualTo(bytes[bytes.length - 1]);
 
 // Seek to the beginning of the decrypted stream and verify it's equal to the raw bytes
 decryptedStream.seek(0);
 decryptedStream.read(readBytes, 0, bytes.length);
-assertThat(readBytes, is(bytes));
+assertThat(readBytes).isEqualTo(bytes);
 ```
 
 Hadoop Crypto
