@@ -17,6 +17,7 @@
 package com.palantir.crypto2.io;
 
 import com.palantir.crypto2.cipher.ApacheCiphers;
+import com.palantir.crypto2.cipher.FipsModeEnabler;
 import com.palantir.crypto2.keys.KeyMaterial;
 import com.palantir.seekio.SeekableInput;
 import java.io.IOException;
@@ -31,6 +32,9 @@ import org.apache.commons.crypto.utils.Utils;
  * implementation uses Apache's {@link CtrCryptoInputStream} which uses OpenSSL and supports AES-NI.
  */
 public final class ApacheCtrDecryptingSeekableInput extends CtrCryptoInputStream implements SeekableInput {
+    static {
+        FipsModeEnabler.maybeEnableFipsMode();
+    }
 
     private static final String ALGORITHM = "AES/CTR/NoPadding";
     private static final int BUFFER_SIZE = 8192;
