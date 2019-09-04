@@ -31,23 +31,31 @@ public final class FipsModeEnabler {
     private static final int FIPS_WAS_NOT_ENABLED = 0;
     private static final Logger log = LoggerFactory.getLogger(FipsModeEnabler.class);
 
+    private static final boolean FIPS_MODE_ENABLED;
+
     static {
+        boolean enabled = false;
         try {
             Native.register("crypto");
             int fipsMode = FIPS_mode_set(ENABLE_FIPS);
             if (fipsMode == FIPS_WAS_NOT_ENABLED) {
                 log.debug("FIPS mode not enabled, we're likely not using FIPS OpenSSL");
             } else {
+                enabled = FIPS_mode() != 0;
                 log.info("FIPS mode enabled");
             }
         } catch (Exception | UnsatisfiedLinkError e) {
             log.debug("Unable to enable FIPS mode, and got an exception, probably OpenSSL couldn't be loaded", e);
         }
+        FIPS_MODE_ENABLED = enabled;
     }
 
     private FipsModeEnabler() {}
 
-    public static void maybeEnableFipsMode() {}
+    public static boolean maybeEnableFipsMode() {
+        return FIPS_MODE_ENABLED;
+    }
 
     private static native int FIPS_mode_set(int r);
+    private static native int FIPS_mode();
 }
