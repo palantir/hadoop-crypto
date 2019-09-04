@@ -56,6 +56,22 @@ jobs:
           when: always
       - store_test_results: { path: ~/junit }
 
+  build-fips:
+    docker: [{ image: 'jebaker/openjdk-java-openssl-fips:java-8' }]
+    resource_class: xlarge
+    environment:
+      GRADLE_OPTS: -Dorg.gradle.console=plain -Dorg.gradle.internal.launcher.welcomeMessageEnabled=false
+
+    steps:
+      - checkout
+      - restore_cache: { key: 'gradle-wrapper-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}' }
+      - restore_cache: { key: 'gradle-cache-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}' }
+      - run: ./gradlew --no-daemon --parallel --continue crypto-core:test
+      - run:
+          command: mkdir -p ~/junit && find . -type f -regex ".*/build/.*TEST.*xml" -exec cp --parents {} ~/junit/ \;
+          when: always
+      - store_test_results: { path: ~/junit }
+
   publish:
     docker: [{ image: 'ellisjoe/openjdk-java-openssl:java-8' }]
     resource_class: xlarge
