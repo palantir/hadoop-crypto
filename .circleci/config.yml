@@ -107,6 +107,9 @@ workflows:
       - build-ibm:
           requires: [ compile ]
           filters: { tags: { only: /.*/ } }
+      - build-fips:
+          requires: [ compile ]
+          filters: { tags: { only: /.*/ } }
       - publish:
           requires: [ build, build-ibm ]
           filters: { tags: { only: /.*/ } }
