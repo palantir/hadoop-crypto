@@ -5,11 +5,12 @@ buildscript {
     }
 
     dependencies {
+        classpath 'com.netflix.nebula:gradle-info-plugin:5.1.1'
         classpath 'gradle.plugin.com.palantir:gradle-circle-style:1.1.2'
         classpath 'com.github.jengelman.gradle.plugins:shadow:5.1.0'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
         classpath 'com.netflix.nebula:nebula-dependency-recommender:6.0.0'
-        classpath 'com.netflix.nebula:nebula-publishing-plugin:13.2.0'
+        classpath 'com.netflix.nebula:nebula-publishing-plugin:14.0.0'
         classpath 'com.palantir.baseline:gradle-baseline-java:0.24.0'
     }
 }
