@@ -1,6 +1,6 @@
 buildscript {
     repositories {
-        maven { url  "http://palantir.bintray.com/releases" }
+        maven { url  'https://palantir.bintray.com/releases'}
         jcenter()
     }
 
@@ -23,7 +23,7 @@ plugins {
 
 repositories {
     // needed for baselineUpdateConfig task
-    maven { url  "http://palantir.bintray.com/releases" }
+    maven { url  'https://palantir.bintray.com/releases'}
 }
 
 apply plugin: 'com.palantir.baseline-config' // provides baselineUpdateConfig task
@@ -61,7 +61,7 @@ subprojects {
     apply plugin: 'org.inferred.processors'
 
     repositories {
-        maven { url  "http://palantir.bintray.com/releases" }
+        maven { url  'https://palantir.bintray.com/releases'}
         jcenter()
     }
 
