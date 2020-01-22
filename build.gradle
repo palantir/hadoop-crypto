@@ -6,17 +6,14 @@ buildscript {
 
     dependencies {
         classpath 'com.netflix.nebula:gradle-info-plugin:5.2.0'
-        classpath 'gradle.plugin.com.palantir:gradle-circle-style:1.1.2'
         classpath 'com.github.jengelman.gradle.plugins:shadow:5.2.0'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
-        classpath 'com.netflix.nebula:nebula-dependency-recommender:6.0.0'
         classpath 'com.netflix.nebula:nebula-publishing-plugin:14.1.1'
-        classpath 'com.palantir.baseline:gradle-baseline-java:0.24.0'
+        classpath 'com.palantir.baseline:gradle-baseline-java:2.49.1'
     }
 }
 
 plugins {
-    id 'com.palantir.configuration-resolver' version '0.2.0'
     id 'com.palantir.git-version' version '0.12.2'
     id 'org.inferred.processors' version '3.3.0'
 }
@@ -26,20 +23,17 @@ repositories {
     maven { url  'https://palantir.bintray.com/releases'}
 }
 
+apply plugin: 'com.palantir.baseline'
 apply plugin: 'com.palantir.baseline-config' // provides baselineUpdateConfig task
 apply plugin: 'com.palantir.baseline-idea'
-apply plugin: 'com.palantir.circle.style'
 
 dependencies {
-    baseline 'com.palantir.baseline:gradle-baseline-java-config:0.24.0@zip'
 }
 
 allprojects {
     group 'com.palantir.hadoop-crypto2'
     version gitVersion()
 
-    apply plugin: 'com.palantir.configuration-resolver'
-    apply plugin: 'nebula.dependency-recommender'
 
     dependencyRecommendations {
         strategy OverrideTransitives
