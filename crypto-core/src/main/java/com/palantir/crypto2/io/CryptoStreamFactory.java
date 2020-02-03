@@ -63,8 +63,7 @@ public final class CryptoStreamFactory {
         try {
             return new ApacheCtrDecryptingSeekableInput(encryptedInput, keyMaterial);
         } catch (IOException e) {
-            log.warn("Unable to initialize cipher with OpenSSL falling back to JCE implementation", e);
-            maybeLogException(e);
+            warningLog(e);
             return new DecryptingSeekableInput(encryptedInput, SeekableCipherFactory.getCipher(algorithm, keyMaterial));
         }
     }
@@ -95,19 +94,23 @@ public final class CryptoStreamFactory {
         try {
             return createApacheEncryptedStream(output, keyMaterial);
         } catch (IOException e) {
-            log.warn("Unable to initialize cipher with OpenSSL, falling back to JCE implementation");
-            maybeLogException(e);
+            warningLog(e);
             return createDefaultEncryptedStream(output, keyMaterial, algorithm);
         }
     }
 
     /** To avoid spamming logs with exceptions, we only log the exception at most once per minute. */
-    private static void maybeLogException(IOException exception) {
+    private static void warningLog(IOException exception) {
+        String message = "Unable to initialize cipher with OpenSSL, falling back to JCE implementation "
+                + "- see github.com/palantir/hadoop-crypto";
+
         long now = System.currentTimeMillis();
         long prev = mostRecentLoggedExceptionTimestamp.get();
         if (now - prev > DELAY_BETWEEN_LOGGED_EXCEPTIONS
                 && mostRecentLoggedExceptionTimestamp.compareAndSet(prev, now)) {
-            log.warn("Exception for stack trace", exception);
+            log.warn(message, exception);
+        } else {
+            log.warn(message);
         }
     }
 
