@@ -105,7 +105,8 @@ public final class CryptoStreamFactory {
     private static void maybeLogException(IOException exception) {
         long now = System.currentTimeMillis();
         long prev = mostRecentLoggedExceptionTimestamp.get();
-        if (now - prev > DELAY_BETWEEN_LOGGED_EXCEPTIONS && mostRecentLoggedExceptionTimestamp.compareAndSet(prev, now)) {
+        if (now - prev > DELAY_BETWEEN_LOGGED_EXCEPTIONS
+                && mostRecentLoggedExceptionTimestamp.compareAndSet(prev, now)) {
             log.warn("Exception for stack trace", exception);
         }
     }
