@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicLong;
 import javax.crypto.Cipher;
 import javax.crypto.CipherOutputStream;
 import javax.crypto.SecretKey;
@@ -38,6 +39,8 @@ public final class CryptoStreamFactory {
     private static final Logger log = LoggerFactory.getLogger(CryptoStreamFactory.class);
     private static final Properties PROPS = ApacheCiphers.forceOpenSsl(new Properties());
     private static final String AES_ALGORITHM = "AES/CTR/NoPadding";
+    private static AtomicLong mostRecentLoggedExceptionTimestamp = new AtomicLong();
+    private static final long DELAY_BETWEEN_LOGGED_EXCEPTIONS = 60_000;
 
     private CryptoStreamFactory() {}
 
@@ -61,6 +64,7 @@ public final class CryptoStreamFactory {
             return new ApacheCtrDecryptingSeekableInput(encryptedInput, keyMaterial);
         } catch (IOException e) {
             log.warn("Unable to initialize cipher with OpenSSL falling back to JCE implementation", e);
+            maybeLogException(e);
             return new DecryptingSeekableInput(encryptedInput, SeekableCipherFactory.getCipher(algorithm, keyMaterial));
         }
     }
@@ -91,8 +95,18 @@ public final class CryptoStreamFactory {
         try {
             return createApacheEncryptedStream(output, keyMaterial);
         } catch (IOException e) {
-            log.warn("Unable to initialize cipher with OpenSSL, falling back to JCE implementation", e);
+            log.warn("Unable to initialize cipher with OpenSSL, falling back to JCE implementation");
+            maybeLogException(e);
             return createDefaultEncryptedStream(output, keyMaterial, algorithm);
+        }
+    }
+
+    /** To avoid spamming logs with exceptions, we only log the exception at most once per minute. */
+    private static void maybeLogException(IOException exception) {
+        long now = System.currentTimeMillis();
+        long prev = mostRecentLoggedExceptionTimestamp.get();
+        if (now - prev > DELAY_BETWEEN_LOGGED_EXCEPTIONS && mostRecentLoggedExceptionTimestamp.compareAndSet(prev, now)) {
+            log.warn("Exception for stack trace", exception);
         }
     }
 
