@@ -33,11 +33,11 @@ allprojects {
 }
 
 subprojects {
-    apply plugin: 'java'
+    apply plugin: 'java-library'
     apply plugin: 'org.inferred.processors'
     apply from: "${rootDir}/gradle/publish-jar.gradle"
 
-    tasks.check.dependsOn(javadoc)
+    tasks.check.dependsOn javadoc, checkUnusedDependencies
     sourceCompatibility = 1.8
 
     dependencies {

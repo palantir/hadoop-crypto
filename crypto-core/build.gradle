@@ -7,7 +7,7 @@ dependencies {
     compile "com.google.guava:guava"
     compile "com.palantir.seek-io:seek-io"
     compile "org.apache.commons:commons-crypto"
-    compile "org.slf4j:slf4j-api"
+    implementation "org.slf4j:slf4j-api"
 
     processor 'org.openjdk.jmh:jmh-generator-annprocess'
 
