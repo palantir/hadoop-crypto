@@ -1,5 +1,4 @@
 apply from: "${rootDir}/gradle/openssl.gradle"
-apply from: "${rootDir}/gradle/publish.gradle"
 apply plugin: 'com.github.johnrengelman.shadow'
 
 dependencies {
