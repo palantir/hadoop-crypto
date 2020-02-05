@@ -137,7 +137,7 @@ public final class DelegatingFileSystemTest {
         }
 
         @Override
-        public void seek(long pos) throws IOException {
+        public void seek(long _pos) throws IOException {
             throw new UnsupportedOperationException();
         }
 
@@ -147,7 +147,7 @@ public final class DelegatingFileSystemTest {
         }
 
         @Override
-        public boolean seekToNewSource(long targetPos) throws IOException {
+        public boolean seekToNewSource(long _targetPos) throws IOException {
             return false;
         }
 

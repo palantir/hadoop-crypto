@@ -18,9 +18,9 @@ package com.palantir.crypto2.cipher;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.google.common.collect.Maps;
 import com.palantir.crypto2.keys.KeyMaterial;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -37,7 +37,7 @@ public final class AesCtrCipherTest extends AbstractSeekableCipherTest {
     private static final Map<String, String> nistSamplePlainToCipherText;
 
     static {
-        nistSamplePlainToCipherText = Maps.newLinkedHashMap();
+        nistSamplePlainToCipherText = new LinkedHashMap<>();
         nistSamplePlainToCipherText.put("6bc1bee22e409f96e93d7e117393172a", "874d6191b620e3261bef6864990db6ce");
         nistSamplePlainToCipherText.put("ae2d8a571e03ac9c9eb76fac45af8e51", "9806f66b7970fdff8617187bb9fffdff");
         nistSamplePlainToCipherText.put("30c81c46a35ce411e5fbc1191a0a52ef", "5ae4df3edbd5d35e5b4f09020db03eab");

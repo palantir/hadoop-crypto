@@ -132,7 +132,7 @@ public final class CryptoStreamFactory {
         }
 
         @Override
-        public void seek(long offset) {
+        public void seek(long _offset) {
             throw new UnsupportedOperationException();
         }
 

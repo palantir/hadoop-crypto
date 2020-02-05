@@ -41,7 +41,7 @@ public final class NoNegativeSeeksTest {
         }
     }
 
-    private static class DisallowNegativeSeeksSeekableInput implements SeekableInput {
+    private static final class DisallowNegativeSeeksSeekableInput implements SeekableInput {
         private long pos = 0;
 
         @Override
@@ -61,7 +61,7 @@ public final class NoNegativeSeeksTest {
         }
 
         @Override
-        public int read(byte[] bytes, int offset, int length) throws IOException {
+        public int read(byte[] _bytes, int _offset, int length) throws IOException {
             pos += length;
             return length;
         }

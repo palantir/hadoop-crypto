@@ -1,10 +1,8 @@
 apply from: "${rootDir}/gradle/openssl.gradle"
-apply from: "${rootDir}/gradle/publish.gradle"
 apply plugin: 'com.github.johnrengelman.shadow'
 
 dependencies {
     compile project(":crypto-core")
-    compile "com.fasterxml.jackson.core:jackson-databind"
     compile "org.apache.hadoop:hadoop-common"
 
     testCompile "junit:junit"

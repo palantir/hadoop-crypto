@@ -1,75 +1,46 @@
 buildscript {
     repositories {
-        maven { url  'https://palantir.bintray.com/releases'}
         jcenter()
+        maven { url  'https://palantir.bintray.com/releases'}
     }
 
     dependencies {
         classpath 'com.netflix.nebula:gradle-info-plugin:5.2.0'
-        classpath 'gradle.plugin.com.palantir:gradle-circle-style:1.1.2'
         classpath 'com.github.jengelman.gradle.plugins:shadow:5.2.0'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
-        classpath 'com.netflix.nebula:nebula-dependency-recommender:6.0.0'
         classpath 'com.netflix.nebula:nebula-publishing-plugin:15.0.3'
-        classpath 'com.palantir.baseline:gradle-baseline-java:0.24.0'
+        classpath 'com.palantir.baseline:gradle-baseline-java:3.0.0'
+        classpath 'com.palantir.gradle.consistentversions:gradle-consistent-versions:1.17.0'
     }
 }
 
 plugins {
-    id 'com.palantir.configuration-resolver' version '0.2.0'
     id 'com.palantir.git-version' version '0.12.2'
     id 'org.inferred.processors' version '3.3.0'
 }
 
-repositories {
-    // needed for baselineUpdateConfig task
-    maven { url  'https://palantir.bintray.com/releases'}
-}
-
-apply plugin: 'com.palantir.baseline-config' // provides baselineUpdateConfig task
-apply plugin: 'com.palantir.baseline-idea'
-apply plugin: 'com.palantir.circle.style'
-
-dependencies {
-    baseline 'com.palantir.baseline:gradle-baseline-java-config:0.24.0@zip'
-}
+apply plugin: 'com.palantir.baseline'
+apply plugin: 'com.palantir.consistent-versions'
 
 allprojects {
     group 'com.palantir.hadoop-crypto2'
     version gitVersion()
 
-    apply plugin: 'com.palantir.configuration-resolver'
-    apply plugin: 'nebula.dependency-recommender'
-
-    dependencyRecommendations {
-        strategy OverrideTransitives
-        propertiesFile file: project.rootProject.file('versions.props')
-    }
-
-    configurations.all {
-        resolutionStrategy {
-            failOnVersionConflict()
-        }
+    repositories {
+        jcenter()
+        maven { url  'https://palantir.bintray.com/releases'}
     }
 }
 
 subprojects {
-    apply plugin: 'java'
-    apply plugin: 'com.palantir.baseline-checkstyle'
-    apply plugin: 'com.palantir.baseline-eclipse'
-    apply plugin: 'com.palantir.baseline-idea'
+    apply plugin: 'java-library'
     apply plugin: 'org.inferred.processors'
+    apply from: "${rootDir}/gradle/publish-jar.gradle"
 
-    repositories {
-        maven { url  'https://palantir.bintray.com/releases'}
-        jcenter()
-    }
-
-    tasks.check.dependsOn(javadoc)
-
+    tasks.check.dependsOn javadoc, checkUnusedDependencies
     sourceCompatibility = 1.8
 
-    if (System.env.CIRCLE_TEST_REPORTS) {
-        test.reports.junitXml.destination = new File(System.env.CIRCLE_TEST_REPORTS, it.getName())
+    dependencies {
+        processor "org.immutables:value:2.2.1"
     }
 }
