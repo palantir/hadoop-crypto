@@ -39,6 +39,8 @@ public final class CryptoStreamFactory {
     private static final Properties PROPS = ApacheCiphers.forceOpenSsl(new Properties());
     private static final String AES_ALGORITHM = "AES/CTR/NoPadding";
 
+    private static volatile boolean fullExceptionLoggedAlready = false;
+
     private CryptoStreamFactory() {}
 
     /**
@@ -60,7 +62,7 @@ public final class CryptoStreamFactory {
         try {
             return new ApacheCtrDecryptingSeekableInput(encryptedInput, keyMaterial);
         } catch (IOException e) {
-            log.warn("Unable to initialize cipher with OpenSSL falling back to JCE implementation");
+            warningLog(e);
             return new DecryptingSeekableInput(encryptedInput, SeekableCipherFactory.getCipher(algorithm, keyMaterial));
         }
     }
@@ -91,8 +93,21 @@ public final class CryptoStreamFactory {
         try {
             return createApacheEncryptedStream(output, keyMaterial);
         } catch (IOException e) {
-            log.warn("Unable to initialize cipher with OpenSSL, falling back to JCE implementation");
+            warningLog(e);
             return createDefaultEncryptedStream(output, keyMaterial, algorithm);
+        }
+    }
+
+    /** To avoid spamming logs with exceptions, we only log the exception once. */
+    private static void warningLog(IOException exception) {
+        String message = "Unable to initialize cipher with OpenSSL, falling back to JCE implementation "
+                + "- see github.com/palantir/hadoop-crypto";
+
+        if (fullExceptionLoggedAlready) {
+            log.warn(message);
+        } else {
+            log.warn(message, exception);
+            fullExceptionLoggedAlready = true;
         }
     }
 
