@@ -16,14 +16,14 @@
 
 package com.palantir.crypto2.hadoop;
 
-import com.google.common.collect.Maps;
 import com.palantir.crypto2.keys.KeyMaterial;
 import com.palantir.crypto2.keys.KeyStorageStrategy;
+import java.util.HashMap;
 import java.util.Map;
 
 public final class InMemoryKeyStorageStrategy implements KeyStorageStrategy {
 
-    private Map<String, KeyMaterial> store = Maps.newHashMap();
+    private Map<String, KeyMaterial> store = new HashMap<>();
 
     public InMemoryKeyStorageStrategy() {}
 
