@@ -100,7 +100,7 @@ public final class CryptoStreamFactory {
 
     /** To avoid spamming logs with exceptions, we only log the exception once. */
     private static void warningLog(IOException exception) {
-        String message = "Unable to initialize cipher with OpenSSL, falling back to JCE implementation "
+        final String message = "Unable to initialize cipher with OpenSSL, falling back to JCE implementation "
                 + "- see github.com/palantir/hadoop-crypto";
 
         if (fullExceptionLoggedAlready) {

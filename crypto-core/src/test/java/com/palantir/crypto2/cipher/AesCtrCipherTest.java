@@ -18,6 +18,7 @@ package com.palantir.crypto2.cipher;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.google.common.io.BaseEncoding;
 import com.palantir.crypto2.keys.KeyMaterial;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -26,7 +27,6 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.spec.SecretKeySpec;
-import javax.xml.bind.DatatypeConverter;
 import org.junit.Test;
 
 public final class AesCtrCipherTest extends AbstractSeekableCipherTest {
@@ -73,10 +73,10 @@ public final class AesCtrCipherTest extends AbstractSeekableCipherTest {
     }
 
     public void testNistExample(int opmode, int blockNumber, String input, String output) {
-        byte[] key = DatatypeConverter.parseHexBinary(KEY);
-        byte[] iv = DatatypeConverter.parseHexBinary(IV);
-        byte[] inputBytes = DatatypeConverter.parseHexBinary(input);
-        byte[] outputBytes = DatatypeConverter.parseHexBinary(output);
+        byte[] key = hexToBinary(KEY);
+        byte[] iv = hexToBinary(IV);
+        byte[] inputBytes = hexToBinary(input);
+        byte[] outputBytes = hexToBinary(output);
 
         KeyMaterial keyMaterial = KeyMaterial.of(new SecretKeySpec(key, AesCtrCipher.KEY_ALGORITHM), iv);
         SeekableCipher seekableCipher = getCipher(keyMaterial);
@@ -133,4 +133,7 @@ public final class AesCtrCipherTest extends AbstractSeekableCipherTest {
         cipher.seek(100);
     }
 
+    private static byte[] hexToBinary(String hex) {
+        return BaseEncoding.base16().lowerCase().decode(hex);
+    }
 }
