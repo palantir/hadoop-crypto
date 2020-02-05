@@ -18,7 +18,6 @@ package com.palantir.crypto2.hadoop;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.junit.Assert.assertTrue;
 
 import com.google.common.io.ByteStreams;
 import java.io.File;
@@ -234,7 +233,7 @@ public final class StandaloneEncryptedFileSystemTest {
         assertThat(readData).isNotEqualTo(dataBytes);
 
         // KeyMaterial file exists
-        assertTrue(rawFs.exists(keyMaterialPath(path)));
+        assertThat(rawFs.exists(keyMaterialPath(path))).isTrue();
 
         // Unable to open files without Private Key
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -288,7 +287,7 @@ public final class StandaloneEncryptedFileSystemTest {
         FileStatus[] fileStatuses = efs.listStatus(path.getParent());
         FileStatus expectedStatus = fileStatus[0];
 
-        assertThat(fileStatus.length).isEqualTo(1);
+        assertThat(fileStatus).hasSize(1);
         assertThat(fileStatuses).containsExactly(expectedStatus);
     }
 
