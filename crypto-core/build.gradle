@@ -8,7 +8,8 @@ dependencies {
     compile "org.apache.commons:commons-crypto"
     implementation "org.slf4j:slf4j-api"
 
-    processor 'org.openjdk.jmh:jmh-generator-annprocess'
+    annotationProcessor 'org.openjdk.jmh:jmh-generator-annprocess'
+    compileOnly 'org.openjdk.jmh:jmh-generator-annprocess'
 
     testCompile "junit:junit"
     testCompile "org.assertj:assertj-core"
