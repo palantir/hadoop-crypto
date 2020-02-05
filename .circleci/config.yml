@@ -15,7 +15,7 @@ jobs:
       - checkout
       - restore_cache: { key: 'gradle-wrapper-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}' }
       - restore_cache: { key: 'gradle-cache-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}' }
-      - run: ./gradlew --no-daemon --parallel --continue resolveConfigurations classes testClasses
+      - run: ./gradlew --no-daemon --parallel --continue classes testClasses
       - save_cache:
           key: gradle-wrapper-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
           paths: [ ~/.gradle/wrapper ]
