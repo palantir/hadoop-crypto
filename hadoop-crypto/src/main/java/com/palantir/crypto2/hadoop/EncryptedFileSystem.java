@@ -152,7 +152,7 @@ public final class EncryptedFileSystem extends DelegatingFileSystem {
     }
 
     @Override
-    public FSDataOutputStream append(Path path, int bufferSize, Progressable progress) throws IOException {
+    public FSDataOutputStream append(Path _path, int _bufferSize, Progressable _progress) throws IOException {
         throw new UnsupportedOperationException("appending to encrypted files is not supported");
     }
 
