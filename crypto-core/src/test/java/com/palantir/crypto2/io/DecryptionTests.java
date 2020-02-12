@@ -143,7 +143,7 @@ public final class DecryptionTests {
 
         byte[] expected = Arrays.copyOfRange(data, seekPos, NUM_BYTES);
 
-        assertThat(decrypted).hasSize(expected.length);
+        assertThat(decrypted).hasSameSizeAs(expected);
         assertThat(decrypted).isEqualTo(expected);
     }
 
