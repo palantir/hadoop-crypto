@@ -55,7 +55,7 @@ public final class KeyMaterialsTest {
     @Test
     public void testGenerateIv() {
         byte[] iv = KeyMaterials.generateIv(IV_SIZE);
-        assertThat(iv.length).isEqualTo(IV_SIZE);
+        assertThat(iv).hasSize(IV_SIZE);
     }
 
     @Test
