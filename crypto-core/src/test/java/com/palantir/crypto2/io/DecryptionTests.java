@@ -90,7 +90,7 @@ public final class DecryptionTests {
 
     @Test
     public void testDecrypt() throws IOException {
-        assertThat(cis.getPos()).isEqualTo(0);
+        assertThat(cis.getPos()).isZero();
 
         byte[] decrypted = new byte[NUM_BYTES];
         readFully(cis, decrypted);
@@ -143,7 +143,7 @@ public final class DecryptionTests {
 
         byte[] expected = Arrays.copyOfRange(data, seekPos, NUM_BYTES);
 
-        assertThat(decrypted.length).isEqualTo(expected.length);
+        assertThat(decrypted).hasSize(expected.length);
         assertThat(decrypted).isEqualTo(expected);
     }
 

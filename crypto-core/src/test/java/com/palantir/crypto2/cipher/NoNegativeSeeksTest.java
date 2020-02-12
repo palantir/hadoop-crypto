@@ -16,7 +16,7 @@
 
 package com.palantir.crypto2.cipher;
 
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.fail;
 
 import com.palantir.crypto2.io.DecryptingSeekableInput;
 import com.palantir.crypto2.keys.KeyMaterial;
@@ -50,7 +50,7 @@ public final class NoNegativeSeeksTest {
         @Override
         public void seek(long offset) throws IOException {
             if (offset < pos) {
-                fail();
+                fail("fail");
             }
             pos = offset;
         }
