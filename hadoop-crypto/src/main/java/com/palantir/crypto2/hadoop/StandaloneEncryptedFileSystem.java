@@ -119,7 +119,6 @@ public final class StandaloneEncryptedFileSystem extends FilterFileSystem {
         URI backingUri = setUriSchemeFunc(backingScheme).apply(uri);
 
         FileSystem backingFs = FileSystem.get(backingUri, conf);
-        backingFs.initialize(backingUri, conf);
 
         return new PathConvertingFileSystem(
                 backingFs,
