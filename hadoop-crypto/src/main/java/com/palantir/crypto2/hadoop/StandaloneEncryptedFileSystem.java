@@ -118,8 +118,8 @@ public final class StandaloneEncryptedFileSystem extends FilterFileSystem {
         String backingScheme = encryptedScheme.substring(1);
         URI backingUri = setUriSchemeFunc(backingScheme).apply(uri);
 
+        // Do not call `initialize` as Filesystem#get calls `initialize` prior to returning the FileSystem
         FileSystem backingFs = FileSystem.get(backingUri, conf);
-        backingFs.initialize(backingUri, conf);
 
         return new PathConvertingFileSystem(
                 backingFs,
