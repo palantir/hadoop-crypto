@@ -39,7 +39,7 @@ public final class CryptoStreamFactory {
     private static final Properties PROPS = ApacheCiphers.forceOpenSsl(new Properties());
     private static final String AES_ALGORITHM = "AES/CTR/NoPadding";
     private static final String OPEN_SSL_INIT_WARNING = "Unable to initialize cipher with OpenSSL, falling back to "
-            + "JCE implementation - see github.com/palantir/hadoop-crypto";
+            + "JCE implementation - see github.com/palantir/hadoop-crypto#logwarn-lines-from-cryptostreamfactory";
 
     private static volatile boolean fullExceptionLoggedAlready = false;
 
