@@ -42,8 +42,8 @@ import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.Warmup;
 
-@Warmup(iterations = 5)
-@Measurement(iterations = 5)
+@Warmup(iterations = 2, time = 1)
+@Measurement(iterations = 3, time = 2)
 @Fork(1)
 public class EncryptionBenchmark {
 
@@ -57,40 +57,40 @@ public class EncryptionBenchmark {
 
         public byte[] data;
 
+        public KeyMaterial key;
+
         @SuppressWarnings("RegexpSinglelineJava")
         @Setup
         public void setup() {
             data = new byte[numBytes];
             random.nextBytes(data);
+            key = KeyMaterials.generateKeyMaterial("AES", 256, 16);
         }
     }
 
     @Benchmark
     public final void gcmEncrypt(State state) throws NoSuchPaddingException, NoSuchAlgorithmException {
         Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
-        KeyMaterial key = KeyMaterials.generateKeyMaterial("AES", 256, 16);
-        GCMParameterSpec gcmSpec = new GCMParameterSpec(8 * 16, key.getIv());
+        GCMParameterSpec gcmSpec = new GCMParameterSpec(8 * 16, state.key.getIv());
 
-        encrypt(state.data, cipher, key.getSecretKey(), gcmSpec);
+        encrypt(state.data, cipher, state.key.getSecretKey(), gcmSpec);
     }
 
     @Benchmark
     public final void ctrEncrypt(State state) throws NoSuchPaddingException, NoSuchAlgorithmException {
         Cipher cipher = Cipher.getInstance("AES/CTR/NoPadding");
-        KeyMaterial key = KeyMaterials.generateKeyMaterial("AES", 256, 16);
-        IvParameterSpec ivSpec = new IvParameterSpec(key.getIv());
+        IvParameterSpec ivSpec = new IvParameterSpec(state.key.getIv());
 
-        encrypt(state.data, cipher, key.getSecretKey(), ivSpec);
+        encrypt(state.data, cipher, state.key.getSecretKey(), ivSpec);
     }
 
     @Benchmark
     public final void apacheEncrypt(State state) throws IOException {
         Properties props = ApacheCiphers.forceOpenSsl(new Properties());
-        KeyMaterial key = KeyMaterials.generateKeyMaterial("AES", 256, 16);
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         CtrCryptoOutputStream output = new CtrCryptoOutputStream(
-                props, baos, key.getSecretKey().getEncoded(), key.getIv());
+                props, baos, state.key.getSecretKey().getEncoded(), state.key.getIv());
 
         output.write(state.data);
     }
