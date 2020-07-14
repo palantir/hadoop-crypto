@@ -41,7 +41,3 @@ shadowJar {
     relocate('org.slf4j', 'hadoop.crypto.shaded.org.slf4j')
 }
 
-publishing.publications.nebula {
-    artifact(shadowJar)
-}
-
