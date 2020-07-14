@@ -58,7 +58,11 @@ org.codehaus.jackson:jackson-jaxrs:1.8.3 (1 constraints: da0bedeb)
 org.codehaus.jackson:jackson-mapper-asl:1.9.13 (5 constraints: 8e3fb0c8)
 org.codehaus.jackson:jackson-xc:1.8.3 (1 constraints: da0bedeb)
 org.codehaus.jettison:jettison:1.1 (1 constraints: 720b65d4)
+<<<<<<< HEAD
 org.immutables:value:2.8.8 (1 constraints: 4907ad6f)
+=======
+org.immutables:value:2.8.3 (1 constraints: 0f051036)
+>>>>>>> 3535223... locks
 org.mortbay.jetty:jetty:6.1.26 (1 constraints: c30d113d)
 org.mortbay.jetty:jetty-util:6.1.26 (2 constraints: d51883d6)
 org.openjdk.jmh:jmh-core:1.22 (2 constraints: eb1529d8)
