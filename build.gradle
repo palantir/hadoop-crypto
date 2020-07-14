@@ -41,6 +41,6 @@ subprojects {
     sourceCompatibility = 1.8
 
     dependencies {
-        processor "org.immutables:value:2.2.1"
+        processor "org.immutables:value"
     }
 }
