@@ -51,6 +51,7 @@ public final class StandaloneEncryptedFileSystem extends FilterFileSystem {
      * `fs.e[FS-scheme].impl` being defined in the {@link Configuration} passed into the {@link #initialize} method.
      */
     private static final String SCHEME = "";
+
     private static final String DEFAULT_ALGORITHM = "RSA";
     private static final Predicate<FileStatus> NOT_KEY_MATERIAL = new Predicate<FileStatus>() {
         @Override
@@ -82,8 +83,8 @@ public final class StandaloneEncryptedFileSystem extends FilterFileSystem {
     @Override
     public void initialize(URI uri, Configuration conf) throws IOException {
         encryptedScheme = uri.getScheme();
-        Preconditions.checkArgument(encryptedScheme.startsWith("e"),
-                "URI scheme must begin with 'e' but received: %s", encryptedScheme);
+        Preconditions.checkArgument(
+                encryptedScheme.startsWith("e"), "URI scheme must begin with 'e' but received: %s", encryptedScheme);
 
         delegate = getDelegateFileSystem(uri, conf);
 
@@ -106,8 +107,8 @@ public final class StandaloneEncryptedFileSystem extends FilterFileSystem {
     }
 
     private static KeyPair getKeyPair(Configuration conf) {
-        String publicKey = Preconditions.checkNotNull(conf.get(PUBLIC_KEY_CONF),
-                "Public Key must be configured for key %s", PUBLIC_KEY_CONF);
+        String publicKey = Preconditions.checkNotNull(
+                conf.get(PUBLIC_KEY_CONF), "Public Key must be configured for key %s", PUBLIC_KEY_CONF);
         String privateKey = conf.get(PRIVATE_KEY_CONF);
         String algorithm = conf.get(KEY_ALGORITHM_CONF, DEFAULT_ALGORITHM);
 
@@ -175,5 +176,4 @@ public final class StandaloneEncryptedFileSystem extends FilterFileSystem {
     public String getScheme() {
         return SCHEME;
     }
-
 }

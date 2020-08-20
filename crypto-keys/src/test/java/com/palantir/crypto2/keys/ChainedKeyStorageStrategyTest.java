@@ -87,7 +87,8 @@ public final class ChainedKeyStorageStrategyTest {
 
         assertThatExceptionOfType(RuntimeException.class)
                 .isThrownBy(() -> chained.get(key))
-                .withMessage("Unable to get key material for 'key' using any of the provided strategies: %s",
+                .withMessage(
+                        "Unable to get key material for 'key' using any of the provided strategies: %s",
                         ImmutableList.of(failingStrategy.getClass().getCanonicalName()));
     }
 
@@ -100,5 +101,4 @@ public final class ChainedKeyStorageStrategyTest {
         inOrder.verify(failingStrategy).remove(key);
         verifyNoMoreInteractions(successfulStrategy, failingStrategy);
     }
-
 }

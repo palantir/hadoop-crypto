@@ -60,13 +60,15 @@ public final class ChainedKeyStorageStrategy implements KeyStorageStrategy {
                 return strategy.get(fileKey);
             } catch (Exception e) {
                 suppressedExceptions.add(e);
-                logger.info("Failed to get key material using {}", strategy.getClass().getCanonicalName(), e);
+                logger.info(
+                        "Failed to get key material using {}",
+                        strategy.getClass().getCanonicalName(),
+                        e);
             }
         }
         RuntimeException toThrow = new RuntimeException(String.format(
                 "Unable to get key material for '%s' using any of the provided strategies: %s",
-                fileKey,
-                Collections2.transform(strategies, s -> s.getClass().getCanonicalName())));
+                fileKey, Collections2.transform(strategies, s -> s.getClass().getCanonicalName())));
         suppressedExceptions.forEach(toThrow::addSuppressed);
         throw toThrow;
     }
@@ -77,5 +79,4 @@ public final class ChainedKeyStorageStrategy implements KeyStorageStrategy {
             strategy.remove(fileKey);
         }
     }
-
 }

@@ -52,5 +52,4 @@ public final class CipherStreamSupplierImplTest {
     public void testGetCipherOutputStream() {
         assertThat(supplier.getOutputStream(os, cipher)).isInstanceOf(CipherOutputStream.class);
     }
-
 }

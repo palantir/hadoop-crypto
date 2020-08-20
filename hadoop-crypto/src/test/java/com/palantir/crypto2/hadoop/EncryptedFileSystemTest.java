@@ -235,8 +235,7 @@ public final class EncryptedFileSystemTest {
     public void testRename_failedGet() throws IOException {
         doThrow(new IllegalArgumentException()).when(mockKeyStore).get(path.toString());
 
-        assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> mockedEfs.rename(path, newPath));
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> mockedEfs.rename(path, newPath));
         verify(mockFs, never()).rename(path, newPath);
         verify(mockKeyStore, never()).remove(path.toString());
     }
@@ -245,8 +244,7 @@ public final class EncryptedFileSystemTest {
     public void testRename_failedPut() throws IOException {
         doThrow(new IllegalArgumentException()).when(mockKeyStore).put(newPath.toString(), keyMaterial);
 
-        assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> mockedEfs.rename(path, newPath));
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> mockedEfs.rename(path, newPath));
         verify(mockFs, never()).rename(path, newPath);
         verify(mockKeyStore, never()).remove(path.toString());
     }
@@ -399,5 +397,4 @@ public final class EncryptedFileSystemTest {
         IOUtils.readFully(input, readBytes);
         assertThat(readBytes).isEqualTo(data);
     }
-
 }

@@ -36,5 +36,4 @@ public abstract class KeyMaterial {
     public static KeyMaterial of(SecretKey secretKey, byte[] iv) {
         return ImmutableKeyMaterial.of(secretKey, iv);
     }
-
 }

@@ -89,8 +89,8 @@ public class EncryptionBenchmark {
         Properties props = ApacheCiphers.forceOpenSsl(new Properties());
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        CtrCryptoOutputStream output = new CtrCryptoOutputStream(
-                props, baos, state.key.getSecretKey().getEncoded(), state.key.getIv());
+        CtrCryptoOutputStream output =
+                new CtrCryptoOutputStream(props, baos, state.key.getSecretKey().getEncoded(), state.key.getIv());
 
         output.write(state.data);
     }

@@ -100,5 +100,4 @@ public final class FileKeyStorageStrategyTest {
                 .isThrownBy(() -> strategy.get("key"))
                 .withMessage("Private key is absent but required to get key material");
     }
-
 }

@@ -73,5 +73,4 @@ public final class SeekableCipherFactory {
                         String.format("No known SeekableCipher with algorithm: %s", cipherAlgorithm));
         }
     }
-
 }
