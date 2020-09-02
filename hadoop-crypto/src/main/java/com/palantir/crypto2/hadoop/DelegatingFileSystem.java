@@ -34,7 +34,7 @@ import org.apache.hadoop.fs.Path;
  */
 public abstract class DelegatingFileSystem extends FilterFileSystem {
 
-    public DelegatingFileSystem(FileSystem delegate) {
+    protected DelegatingFileSystem(FileSystem delegate) {
         super(delegate);
         try {
             super.initialize(delegate.getUri(), delegate.getConf());
