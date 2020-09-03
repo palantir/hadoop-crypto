@@ -88,8 +88,8 @@ public abstract class AbstractSeekableCipherTest {
         decryptCipher = seekableCipher.seek(prevBlockOffset);
 
         // Decrypt from block n - 1 to the end of the encrypted data
-        byte[] lastBlocksData = decryptCipher.doFinal(
-                encryptedData, prevBlockOffset, encryptedData.length - prevBlockOffset);
+        byte[] lastBlocksData =
+                decryptCipher.doFinal(encryptedData, prevBlockOffset, encryptedData.length - prevBlockOffset);
         byte[] lastBlockData = Arrays.copyOfRange(lastBlocksData, blockSize, 2 * blockSize);
 
         byte[] expected = new byte[blockSize];
@@ -129,5 +129,4 @@ public abstract class AbstractSeekableCipherTest {
         assertThat(data).isNotEqualTo(encryptedData);
         assertThat(data).isEqualTo(decryptedData);
     }
-
 }

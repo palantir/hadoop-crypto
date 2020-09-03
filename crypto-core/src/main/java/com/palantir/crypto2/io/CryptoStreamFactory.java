@@ -117,8 +117,8 @@ public final class CryptoStreamFactory {
         return new CtrCryptoOutputStream(PROPS, output, secretKey.getEncoded(), iv);
     }
 
-    private static OutputStream createDefaultEncryptedStream(OutputStream output, KeyMaterial keyMaterial,
-            String algorithm) {
+    private static OutputStream createDefaultEncryptedStream(
+            OutputStream output, KeyMaterial keyMaterial, String algorithm) {
         SeekableCipher cipher = SeekableCipherFactory.getCipher(algorithm, keyMaterial);
         return new CipherOutputStream(output, cipher.initCipher(Cipher.ENCRYPT_MODE));
     }

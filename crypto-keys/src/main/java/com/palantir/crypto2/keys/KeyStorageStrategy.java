@@ -35,5 +35,4 @@ public interface KeyStorageStrategy {
      * Removes the {@link KeyMaterial} for a file with the given {@code fileKey}.
      */
     void remove(String fileKey);
-
 }
