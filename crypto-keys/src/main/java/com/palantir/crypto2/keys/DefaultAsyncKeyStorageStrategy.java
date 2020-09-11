@@ -31,10 +31,12 @@ public final class DefaultAsyncKeyStorageStrategy implements AsyncKeyStorageStra
 
     @Override
     public CompletableFuture<Void> put(String fileKey, KeyMaterial keyMaterial) {
-        return CompletableFuture.supplyAsync(() -> {
-            keys.put(fileKey, keyMaterial);
-            return null;
-        }, executor);
+        return CompletableFuture.supplyAsync(
+                () -> {
+                    keys.put(fileKey, keyMaterial);
+                    return null;
+                },
+                executor);
     }
 
     @Override
@@ -44,10 +46,11 @@ public final class DefaultAsyncKeyStorageStrategy implements AsyncKeyStorageStra
 
     @Override
     public CompletableFuture<Void> remove(String fileKey) {
-        return CompletableFuture.supplyAsync(() -> {
-            keys.remove(fileKey);
-            return null;
-        }, executor);
+        return CompletableFuture.supplyAsync(
+                () -> {
+                    keys.remove(fileKey);
+                    return null;
+                },
+                executor);
     }
-
 }

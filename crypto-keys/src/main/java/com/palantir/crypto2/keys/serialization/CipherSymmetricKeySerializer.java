@@ -95,8 +95,11 @@ final class CipherSymmetricKeySerializer implements SymmetricKeySerializer {
 
         try {
             int readVersion = stream.read();
-            Preconditions.checkArgument(readVersion == version,
-                    "Invalid serialization format version. Expected %s but found %s", readVersion, version);
+            Preconditions.checkArgument(
+                    readVersion == version,
+                    "Invalid serialization format version. Expected %s but found %s",
+                    readVersion,
+                    version);
 
             byte[] wrappingIv = new byte[ivSize];
             stream.readFully(wrappingIv);

@@ -136,5 +136,4 @@ public final class DecryptingSeekableInput implements SeekableInput {
         // is not fixed until Java 7u85 (not publicly available) and Java 8u51.
         // decryptedStream.close();
     }
-
 }

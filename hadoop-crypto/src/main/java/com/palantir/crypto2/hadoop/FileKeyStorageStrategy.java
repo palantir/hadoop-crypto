@@ -90,5 +90,4 @@ public final class FileKeyStorageStrategy implements KeyStorageStrategy {
     private static Path getKeyPath(String fileKey) {
         return new Path(fileKey + EXTENSION);
     }
-
 }

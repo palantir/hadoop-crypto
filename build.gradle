@@ -5,6 +5,7 @@ buildscript {
     }
 
     dependencies {
+        classpath 'com.palantir.javaformat:gradle-palantir-java-format:1.0.1'
         classpath 'com.netflix.nebula:gradle-info-plugin:9.1.1'
         classpath 'com.github.jengelman.gradle.plugins:shadow:6.0.0'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.5'
@@ -23,6 +24,7 @@ apply plugin: 'com.palantir.baseline'
 apply plugin: 'com.palantir.consistent-versions'
 
 allprojects {
+    apply plugin: 'com.palantir.java-format'
     group 'com.palantir.hadoop-crypto2'
     version gitVersion()
 

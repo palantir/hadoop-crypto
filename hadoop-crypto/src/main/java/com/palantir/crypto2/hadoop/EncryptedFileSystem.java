@@ -58,6 +58,7 @@ public final class EncryptedFileSystem extends DelegatingFileSystem {
      */
     @Deprecated
     public static final String DEPRECATED_CIPHER_ALGORITHM_KEY = "fs.cipher";
+
     public static final String CIPHER_ALGORITHM_KEY = "fs.efs.cipher";
 
     private final FileSystem fs;
@@ -86,9 +87,15 @@ public final class EncryptedFileSystem extends DelegatingFileSystem {
     }
 
     @Override
-    public FSDataOutputStream create(Path path, FsPermission permission,
-            boolean overwrite, int bufferSize, short replication, long blockSize,
-            Progressable progress) throws IOException {
+    public FSDataOutputStream create(
+            Path path,
+            FsPermission permission,
+            boolean overwrite,
+            int bufferSize,
+            short replication,
+            long blockSize,
+            Progressable progress)
+            throws IOException {
         FSDataOutputStream outputStream =
                 fs.create(path, permission, overwrite, bufferSize, replication, blockSize, progress);
 
@@ -96,8 +103,16 @@ public final class EncryptedFileSystem extends DelegatingFileSystem {
     }
 
     @Override
-    public FSDataOutputStream create(Path path, FsPermission permission, EnumSet<CreateFlag> flags, int bufferSize,
-            short replication, long blockSize, Progressable progress, ChecksumOpt checksumOpt) throws IOException {
+    public FSDataOutputStream create(
+            Path path,
+            FsPermission permission,
+            EnumSet<CreateFlag> flags,
+            int bufferSize,
+            short replication,
+            long blockSize,
+            Progressable progress,
+            ChecksumOpt checksumOpt)
+            throws IOException {
         FSDataOutputStream outputStream =
                 fs.create(path, permission, flags, bufferSize, replication, blockSize, progress, checksumOpt);
 
@@ -163,8 +178,8 @@ public final class EncryptedFileSystem extends DelegatingFileSystem {
 
         if (cipher.isPresent() && deprecatedCipher.isPresent()) {
             if (!cipher.get().equals(deprecatedCipher.get())) {
-                throw new IllegalStateException(String.format("Two incompatible ciphers configured: '%s' and '%s'",
-                        cipher.get(), deprecatedCipher.get()));
+                throw new IllegalStateException(String.format(
+                        "Two incompatible ciphers configured: '%s' and '%s'", cipher.get(), deprecatedCipher.get()));
             }
         }
 
@@ -178,5 +193,4 @@ public final class EncryptedFileSystem extends DelegatingFileSystem {
             return second;
         }
     }
-
 }

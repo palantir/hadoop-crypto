@@ -44,8 +44,8 @@ enum SymmetricKeySerializerV3 implements SymmetricKeySerializer {
     private static final int TAG_LENGTH = 128;
     private static final int VERSION = 3;
 
-    private static final SymmetricKeySerializer delegate = new CipherSymmetricKeySerializer(
-            IV_SIZE, VERSION, SymmetricKeySerializerV3::getCipher);
+    private static final SymmetricKeySerializer delegate =
+            new CipherSymmetricKeySerializer(IV_SIZE, VERSION, SymmetricKeySerializerV3::getCipher);
 
     @Override
     public byte[] wrap(KeyMaterial keyMaterial, SecretKey key) {

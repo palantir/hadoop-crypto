@@ -75,5 +75,4 @@ public final class ExampleUsage {
         // Wrapped symmetric key is stored next to the encrypted file
         assertThat(fs.exists(new Path(path + FileKeyStorageStrategy.EXTENSION))).isTrue();
     }
-
 }

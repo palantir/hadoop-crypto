@@ -52,5 +52,4 @@ public final class KeyPairsTest {
     private static String encode(byte[] bytes) {
         return Base64.getEncoder().encodeToString(bytes);
     }
-
 }

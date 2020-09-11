@@ -65,9 +65,11 @@ public final class StandaloneEncryptedFileSystemTest {
     public void before() throws IOException {
         KeyPair keyPair = TestKeyPairs.generateKeyPair();
         conf = getBaseConf();
-        conf.set(StandaloneEncryptedFileSystem.PUBLIC_KEY_CONF,
+        conf.set(
+                StandaloneEncryptedFileSystem.PUBLIC_KEY_CONF,
                 Base64.getEncoder().encodeToString(keyPair.getPublic().getEncoded()));
-        conf.set(StandaloneEncryptedFileSystem.PRIVATE_KEY_CONF,
+        conf.set(
+                StandaloneEncryptedFileSystem.PRIVATE_KEY_CONF,
                 Base64.getEncoder().encodeToString(keyPair.getPrivate().getEncoded()));
 
         efs = FileSystem.newInstance(EFS_URI, conf);
@@ -273,8 +275,7 @@ public final class StandaloneEncryptedFileSystemTest {
         // NOTE(jellis): IllegalArgumentException is the most likely exception, however if the first byte of the
         // .keymaterial file is the same as the KeyMaterials version then any number of RuntimeExceptions may be thrown.
 
-        assertThatExceptionOfType(RuntimeException.class)
-                .isThrownBy(() -> efs.open(path));
+        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> efs.open(path));
     }
 
     @Test
@@ -313,5 +314,4 @@ public final class StandaloneEncryptedFileSystemTest {
     private Path keyMaterialPath(Path dataPath) {
         return new Path(dataPath + FileKeyStorageStrategy.EXTENSION);
     }
-
 }
