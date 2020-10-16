@@ -54,7 +54,7 @@ public final class PathConvertingFileSystemTest {
         fileChecksum = mock(FileChecksum.class);
         when(delegate.getConf()).thenReturn(new Configuration());
         when(delegate.getUri()).thenReturn(URI.create("foo://bar"));
-        convertingFs = new PathConvertingFileSystem(delegate, p -> DELEGATE_PATH, p -> RETURN_PATH, u -> RETURN_URI);
+        convertingFs = new PathConvertingFileSystem(delegate, _p -> DELEGATE_PATH, _p -> RETURN_PATH, _u -> RETURN_URI);
     }
 
     @Test
