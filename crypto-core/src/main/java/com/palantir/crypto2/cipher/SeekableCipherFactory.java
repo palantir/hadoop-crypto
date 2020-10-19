@@ -39,8 +39,10 @@ public final class SeekableCipherFactory {
     }
 
     /**
-     * @deprecated This method has been found to be error prone because consumers are not forced to handle the generated
-     * {@link KeyMaterial} explicitly. Use {@link #generateKeyMaterial(String)} and {@link #getCipher(String,
+     * This method has been found to be error prone because consumers are not forced to handle the generated
+     * {@link KeyMaterial} explicitly.
+     *
+     * @deprecated Use {@link #generateKeyMaterial(String)} and {@link #getCipher(String,
      * KeyMaterial)} directly.
      * <p>
      * ex: https://github.com/palantir/hadoop-crypto/pull/77

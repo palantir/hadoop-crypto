@@ -27,6 +27,8 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.GCMParameterSpec;
 
 /**
+ * This serialization format has been deprecated.
+ *
  * @deprecated As per the NIST recommendation in section 8.3 [1] the same key should not be used with AES GCM more than
  * 2^32 times. An alternative method should be used as the current implementation does not guard against this
  * limitation.

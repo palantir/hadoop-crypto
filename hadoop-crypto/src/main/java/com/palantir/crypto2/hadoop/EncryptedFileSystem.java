@@ -54,6 +54,8 @@ public final class EncryptedFileSystem extends DelegatingFileSystem {
     private static final String DEFAULT_CIPHER_ALGORITHM = AesCtrCipher.ALGORITHM;
 
     /**
+     * This key has been deprecated.
+     *
      * @deprecated use {@link #CIPHER_ALGORITHM_KEY}.
      */
     @Deprecated
