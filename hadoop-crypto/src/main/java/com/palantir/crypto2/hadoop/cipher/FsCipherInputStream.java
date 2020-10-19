@@ -35,6 +35,9 @@ public final class FsCipherInputStream extends FSInputStream {
     private final DefaultSeekableInputStream delegate;
 
     /**
+     * Deprecated as this constructor will always use the JCE crypto implementations which can be significantly
+     * slower in many cases.
+     *
      * @deprecated use {@link FsCipherInputStream#FsCipherInputStream(FSDataInputStream, KeyMaterial, String)} instead.
      */
     @Deprecated

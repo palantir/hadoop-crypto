@@ -4,6 +4,6 @@ dependencies {
 
     testCompile "junit:junit"
     testCompile "org.assertj:assertj-core"
-    testCompile "org.jmock:jmock-junit4"
+    testCompile "org.jmock:jmock"
     testCompile "org.mockito:mockito-core"
 }
