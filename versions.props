@@ -15,7 +15,7 @@ org.slf4j:slf4j-* = 1.7.30
 
 # Hadoop dependencies
 commons-codec:commons-codec = 1.15
-commons-collections:commons-collections = 20040616
+commons-collections:commons-collections = 3.2.2
 commons-lang:commons-lang = 2.6
 commons-logging:commons-logging = 1.2
 log4j:log4j = 1.2.17
