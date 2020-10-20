@@ -3,7 +3,10 @@ apply plugin: 'com.github.johnrengelman.shadow'
 
 dependencies {
     compile project(":crypto-core")
-    compile "org.apache.hadoop:hadoop-common"
+    compile "org.apache.hadoop:hadoop-client-api"
+    compile "org.slf4j:slf4j-api"
+
+    runtime "org.apache.hadoop:hadoop-client-runtime"
 
     testCompile "junit:junit"
     testCompile "org.assertj:assertj-core"

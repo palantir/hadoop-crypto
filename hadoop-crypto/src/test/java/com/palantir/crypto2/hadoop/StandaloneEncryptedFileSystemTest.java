@@ -21,7 +21,6 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import com.google.common.io.ByteStreams;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -31,7 +30,6 @@ import java.nio.file.Files;
 import java.security.KeyPair;
 import java.util.Base64;
 import java.util.UUID;
-import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileStatus;
@@ -83,22 +81,21 @@ public final class StandaloneEncryptedFileSystemTest {
 
     @Test
     public void testReadWrite() throws IOException {
-        byte[] readData = new byte[DATA.length()];
-
         // Write encrypted data
         OutputStream os = efs.create(path);
-        IOUtils.write(DATA, os);
+
+        os.write(DATA_BYTES);
         os.close();
 
         // Read encrypted data
         InputStream dis = efs.open(path);
-        IOUtils.readFully(dis, readData);
-        assertThat(readData).containsExactly(DATA_BYTES);
+        byte[] encryptedData = ByteStreams.toByteArray(dis);
+        assertThat(encryptedData).containsExactly(DATA_BYTES);
 
         // Raw data is not the same
         dis = rawFs.open(path);
-        IOUtils.readFully(dis, readData);
-        assertThat(readData).isNotEqualTo(DATA_BYTES);
+        byte[] rawData = ByteStreams.toByteArray(dis);
+        assertThat(rawData).isNotEqualTo(DATA_BYTES);
 
         // KeyMaterial file exists
         assertThat(rawFs.exists(keyMaterialPath(path))).isTrue();
@@ -202,34 +199,34 @@ public final class StandaloneEncryptedFileSystemTest {
         // Write encrypted data
         java.nio.file.Path filePath = Files.createTempFile(rootFolder.toPath(), "prefix", "suffix");
         Path newPath = new Path(filePath.toAbsolutePath().toString());
-        OutputStream os = efs.create(newPath);
-        IOUtils.write(DATA, os);
-        os.close();
+
+        try (OutputStream os = efs.create(newPath)) {
+            os.write(DATA_BYTES);
+        }
 
         return newPath;
     }
 
     @Test
-    public void testMakeQualified() throws IOException {
+    public void testMakeQualified() {
         assertThat(efs.makeQualified(pathWithScheme)).isEqualTo(pathWithScheme);
     }
 
     @Test
     public void testOnlyPublicKey() throws IOException {
         byte[] dataBytes = DATA.getBytes(StandardCharsets.UTF_8);
-        byte[] readData = new byte[DATA.length()];
 
         conf.unset(StandaloneEncryptedFileSystem.PRIVATE_KEY_CONF);
         FileSystem efsPublic = FileSystem.newInstance(EFS_URI, conf);
 
         // Write encrypted data
         OutputStream os = efsPublic.create(path);
-        IOUtils.write(DATA, os);
+        os.write(DATA_BYTES);
         os.close();
 
         // Raw data is not the same
         InputStream dis = rawFs.open(path);
-        IOUtils.readFully(dis, readData);
+        byte[] readData = ByteStreams.toByteArray(dis);
         assertThat(readData).isNotEqualTo(dataBytes);
 
         // KeyMaterial file exists
@@ -242,14 +239,14 @@ public final class StandaloneEncryptedFileSystemTest {
     }
 
     @Test
-    public void testNoPublicKey() throws IOException {
+    public void testNoPublicKey() {
         assertThatExceptionOfType(NullPointerException.class)
                 .isThrownBy(() -> FileSystem.newInstance(EFS_URI, getBaseConf()))
                 .withMessage("Public Key must be configured for key %s", StandaloneEncryptedFileSystem.PUBLIC_KEY_CONF);
     }
 
     @Test
-    public void testBackingFsInvalid() throws IOException {
+    public void testBackingFsInvalid() {
         conf = getBaseConf();
         conf.set("fs.nope.impl", StandaloneEncryptedFileSystem.class.getCanonicalName());
 
@@ -262,12 +259,12 @@ public final class StandaloneEncryptedFileSystemTest {
     public void testFileNameCollidesWithKeyMaterial() throws IOException {
         // Write encrypted data
         OutputStream os = efs.create(path);
-        IOUtils.write(DATA, os);
+        os.write(DATA_BYTES);
         os.close();
 
         // Write encrypted data
         os = efs.create(keyMaterialPath(path));
-        IOUtils.write(DATA, os);
+        os.write(DATA_BYTES);
         os.close();
 
         // NOTE(jellis): IllegalArgumentException is the most likely exception, however if the first byte of the
@@ -294,13 +291,12 @@ public final class StandaloneEncryptedFileSystemTest {
     @Test // https://github.com/palantir/hadoop-crypto/issues/27
     public void testCopyFromLocalFile() throws IOException {
         File file = folder.newFile();
-        byte[] readBytes = new byte[DATA_BYTES.length];
 
-        IOUtils.write(DATA_BYTES, new FileOutputStream(file));
+        Files.write(file.toPath(), DATA_BYTES);
         efs.copyFromLocalFile(new Path(file.getAbsolutePath()), path);
 
         FSDataInputStream input = efs.open(path);
-        IOUtils.readFully(input, readBytes);
+        byte[] readBytes = ByteStreams.toByteArray(input);
         assertThat(readBytes).containsExactly(DATA_BYTES);
     }
 

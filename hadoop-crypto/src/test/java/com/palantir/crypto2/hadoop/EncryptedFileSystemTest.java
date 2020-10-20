@@ -28,21 +28,21 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
+import com.google.common.io.ByteStreams;
 import com.palantir.crypto2.cipher.AesCtrCipher;
 import com.palantir.crypto2.keys.KeyMaterial;
 import com.palantir.crypto2.keys.KeyStorageStrategy;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.Random;
-import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.CreateFlag;
 import org.apache.hadoop.fs.FSDataInputStream;
@@ -118,32 +118,30 @@ public final class EncryptedFileSystemTest {
     @Test
     public void testEncryptDecrypt_success() throws IllegalArgumentException, IOException {
         byte[] data = new byte[MB];
-        byte[] readData = new byte[MB];
         random.nextBytes(data);
 
         OutputStream os = efs.create(path);
-        IOUtils.write(data, os);
+        os.write(data);
         os.close();
 
         // Read using EncryptedFileSystem yields input data
         InputStream is = efs.open(path);
-        IOUtils.readFully(is, readData);
+        byte[] readData = ByteStreams.toByteArray(is);
         is.close();
 
         assertThat(data).isEqualTo(readData);
 
         // Read using delegate FileSystem does not yield input data
         is = delegateFs.open(path);
-        IOUtils.readFully(is, readData);
+        byte[] rawData = ByteStreams.toByteArray(is);
         is.close();
 
-        assertThat(data).isNotEqualTo(readData);
+        assertThat(data).isNotEqualTo(rawData);
     }
 
     @Test
     public void testEncryptDecrypt_secondaryCreateMethod() throws IOException {
         byte[] data = new byte[MB];
-        byte[] readData = new byte[MB];
         random.nextBytes(data);
 
         OutputStream os = efs.create(
@@ -155,38 +153,37 @@ public final class EncryptedFileSystemTest {
                 64 * 1024 * 1024,
                 null,
                 null);
-        IOUtils.write(data, os);
+        os.write(data);
         os.close();
 
         // Read using EncryptedFileSystem yields input data
         InputStream is = efs.open(path);
-        IOUtils.readFully(is, readData);
+        byte[] readData = ByteStreams.toByteArray(is);
         is.close();
 
         assertThat(data).isEqualTo(readData);
 
         // Read using delegate FileSystem does not yield input data
         is = delegateFs.open(path);
-        IOUtils.readFully(is, readData);
+        byte[] rawData = ByteStreams.toByteArray(is);
         is.close();
 
-        assertThat(data).isNotEqualTo(readData);
+        assertThat(data).isNotEqualTo(rawData);
     }
 
     @Test
     public void testEncryptDecrypt_decryptSeek() throws IllegalArgumentException, IOException {
         byte[] data = new byte[MB];
         int seekPos = MB / 2;
-        byte[] readData = new byte[MB - seekPos];
         random.nextBytes(data);
 
         OutputStream os = efs.create(path);
-        IOUtils.write(data, os);
+        os.write(data);
         os.close();
 
         FSDataInputStream is = efs.open(path);
         is.seek(seekPos);
-        IOUtils.readFully(is, readData);
+        byte[] readData = ByteStreams.toByteArray(is);
 
         byte[] actualReadData = Arrays.copyOfRange(data, seekPos, MB);
         assertThat(actualReadData).isEqualTo(readData);
@@ -390,13 +387,12 @@ public final class EncryptedFileSystemTest {
     public void testCopyFromLocalFile() throws IOException {
         File file = folder.newFile();
         byte[] data = "data".getBytes(StandardCharsets.UTF_8);
-        byte[] readBytes = new byte[data.length];
 
-        IOUtils.write(data, new FileOutputStream(file));
+        Files.write(file.toPath(), data);
         efs.copyFromLocalFile(new Path(file.getAbsolutePath()), path);
 
         FSDataInputStream input = efs.open(path);
-        IOUtils.readFully(input, readBytes);
+        byte[] readBytes = ByteStreams.toByteArray(input);
         assertThat(readBytes).isEqualTo(data);
     }
 
