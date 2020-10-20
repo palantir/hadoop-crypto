@@ -15,32 +15,5 @@ dependencies {
 
 shadowJar {
     mergeServiceFiles()
-
-    dependencies {
-        // only keep hadoop-aws, exclude all other hadoop-* jars.
-        exclude(dependency('org.apache.hadoop:hadoop-annotations'))
-        exclude(dependency('org.apache.hadoop:hadoop-auth'))
-        exclude(dependency('org.apache.hadoop:hadoop-client'))
-        exclude(dependency('org.apache.hadoop:hadoop-common'))
-        exclude(dependency('org.apache.hadoop:hadoop-hdfs'))
-        exclude(dependency('org.apache.hadoop:hadoop-mapreduce-client-app'))
-        exclude(dependency('org.apache.hadoop:hadoop-mapreduce-client-common'))
-        exclude(dependency('org.apache.hadoop:hadoop-mapreduce-client-core'))
-        exclude(dependency('org.apache.hadoop:hadoop-mapreduce-client-jobclient'))
-        exclude(dependency('org.apache.hadoop:hadoop-mapreduce-client-shuffle'))
-        exclude(dependency('org.apache.hadoop:hadoop-yarn-api'))
-        exclude(dependency('org.apache.hadoop:hadoop-yarn-client'))
-        exclude(dependency('org.apache.hadoop:hadoop-yarn-common'))
-        exclude(dependency('org.apache.hadoop:hadoop-yarn-server-common'))
-        exclude(dependency('org.apache.hadoop:hadoop-yarn-server-nodemanager'))
-    }
-
-    // Shade dependencies that can cause conflict with Hadoop
-    relocate('com.google.common', 'hadoop.crypto.shaded.com.google.common')
-    relocate('com.fasterxml.jackson', 'hadoop.crypto.shaded.com.fasterxml.jackson')
-    relocate('org.apache.commons.codec', 'hadoop.crypto.shaded.org.apache.commons.codec')
-    relocate('org.apache.commons.lang3', 'hadoop.crypto.shaded.org.apache.commons.lang3')
-    relocate('org.apache.commons.logging', 'hadoop.crypto.shaded.org.apache.commons.logging')
-    relocate('org.slf4j', 'hadoop.crypto.shaded.org.slf4j')
 }
 

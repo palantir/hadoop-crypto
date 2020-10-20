@@ -12,6 +12,3 @@ org.mockito:mockito-core = 3.5.15
 org.openjdk.jmh:* = 1.22
 org.ow2.asm:asm = 9.0
 org.slf4j:slf4j-* = 1.7.30
-
-# Hadoop dependencies
-commons-collections:commons-collections = 3.2.2
