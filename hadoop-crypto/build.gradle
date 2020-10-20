@@ -15,5 +15,20 @@ dependencies {
 
 shadowJar {
     mergeServiceFiles()
+
+    dependencies {
+        exclude(dependency('org.apache.hadoop:hadoop-client-api'))
+        exclude(dependency('org.apache.hadoop:hadoop-client-runtime'))
+    }
 }
 
+// Automatically shadow all included dependencies
+// https://imperceptiblethoughts.com/shadow/configuration/relocation/#automatically-relocating-dependencies
+import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation
+
+task relocateShadowJar(type: ConfigureShadowRelocation) {
+    target = tasks.shadowJar
+    prefix = "hadoop.crypto.shaded" // Default value is "shadow"
+}
+
+tasks.shadowJar.dependsOn tasks.relocateShadowJar
