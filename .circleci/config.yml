@@ -70,7 +70,7 @@ jobs:
           command: |
             # publishing snapshots to bintray does not work, so we only publish from tag builds (not develop)
             if [[ "${CIRCLE_TAG}" =~ [0-9]+(\.[0-9]+)+(-[a-zA-Z]+[0-9]*)* ]]; then
-              ./gradlew --no-daemon --stacktrace --continue bintrayUpload
+              ./gradlew --no-daemon --stacktrace --continue publish
             else
               ./gradlew --no-daemon --parallel --continue publishToMavenLocal
               mkdir -p ~/poms
