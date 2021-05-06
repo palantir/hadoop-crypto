@@ -17,6 +17,8 @@ shadowJar {
     mergeServiceFiles()
 
     dependencies {
+        // The shadow jar is expected to be added to the Hadoop cli classpath
+        // which comes with these deps
         exclude(dependency('org.apache.hadoop:hadoop-client-api'))
         exclude(dependency('org.apache.hadoop:hadoop-client-runtime'))
     }
