@@ -3,7 +3,10 @@ apply plugin: 'com.github.johnrengelman.shadow'
 
 dependencies {
     compile project(":crypto-core")
-    compile "org.apache.hadoop:hadoop-common"
+    compile "org.apache.hadoop:hadoop-client-api"
+    compile "org.slf4j:slf4j-api"
+
+    runtime "org.apache.hadoop:hadoop-client-runtime"
 
     testCompile "junit:junit"
     testCompile "org.assertj:assertj-core"
@@ -14,30 +17,20 @@ shadowJar {
     mergeServiceFiles()
 
     dependencies {
-        // only keep hadoop-aws, exclude all other hadoop-* jars.
-        exclude(dependency('org.apache.hadoop:hadoop-annotations'))
-        exclude(dependency('org.apache.hadoop:hadoop-auth'))
-        exclude(dependency('org.apache.hadoop:hadoop-client'))
-        exclude(dependency('org.apache.hadoop:hadoop-common'))
-        exclude(dependency('org.apache.hadoop:hadoop-hdfs'))
-        exclude(dependency('org.apache.hadoop:hadoop-mapreduce-client-app'))
-        exclude(dependency('org.apache.hadoop:hadoop-mapreduce-client-common'))
-        exclude(dependency('org.apache.hadoop:hadoop-mapreduce-client-core'))
-        exclude(dependency('org.apache.hadoop:hadoop-mapreduce-client-jobclient'))
-        exclude(dependency('org.apache.hadoop:hadoop-mapreduce-client-shuffle'))
-        exclude(dependency('org.apache.hadoop:hadoop-yarn-api'))
-        exclude(dependency('org.apache.hadoop:hadoop-yarn-client'))
-        exclude(dependency('org.apache.hadoop:hadoop-yarn-common'))
-        exclude(dependency('org.apache.hadoop:hadoop-yarn-server-common'))
-        exclude(dependency('org.apache.hadoop:hadoop-yarn-server-nodemanager'))
+        // The shadow jar is expected to be added to the Hadoop cli classpath
+        // which comes with these deps
+        exclude(dependency('org.apache.hadoop:hadoop-client-api'))
+        exclude(dependency('org.apache.hadoop:hadoop-client-runtime'))
     }
-
-    // Shade dependencies that can cause conflict with Hadoop
-    relocate('com.google.common', 'hadoop.crypto.shaded.com.google.common')
-    relocate('com.fasterxml.jackson', 'hadoop.crypto.shaded.com.fasterxml.jackson')
-    relocate('org.apache.commons.codec', 'hadoop.crypto.shaded.org.apache.commons.codec')
-    relocate('org.apache.commons.lang3', 'hadoop.crypto.shaded.org.apache.commons.lang3')
-    relocate('org.apache.commons.logging', 'hadoop.crypto.shaded.org.apache.commons.logging')
-    relocate('org.slf4j', 'hadoop.crypto.shaded.org.slf4j')
 }
 
+// Automatically shadow all included dependencies
+// https://imperceptiblethoughts.com/shadow/configuration/relocation/#automatically-relocating-dependencies
+import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation
+
+task relocateShadowJar(type: ConfigureShadowRelocation) {
+    target = tasks.shadowJar
+    prefix = "hadoop.crypto.shaded" // Default value is "shadow"
+}
+
+tasks.shadowJar.dependsOn tasks.relocateShadowJar

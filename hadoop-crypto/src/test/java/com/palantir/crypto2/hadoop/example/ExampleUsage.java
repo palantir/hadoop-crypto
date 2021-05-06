@@ -18,6 +18,7 @@ package com.palantir.crypto2.hadoop.example;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.google.common.io.ByteStreams;
 import com.palantir.crypto2.hadoop.EncryptedFileSystem;
 import com.palantir.crypto2.hadoop.FileKeyStorageStrategy;
 import com.palantir.crypto2.hadoop.TestKeyPairs;
@@ -29,7 +30,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyPair;
-import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -54,7 +54,6 @@ public final class ExampleUsage {
 
         // Init data and local path to write to
         byte[] data = "test".getBytes(StandardCharsets.UTF_8);
-        byte[] readData = new byte[data.length];
         Path path = new Path(folder.newFile().getAbsolutePath());
 
         // Write data out to the encrypted stream
@@ -64,13 +63,13 @@ public final class ExampleUsage {
 
         // Reading through the decrypted stream produces the original bytes
         InputStream ein = efs.open(path);
-        IOUtils.readFully(ein, readData);
+        byte[] readData = ByteStreams.toByteArray(ein);
         assertThat(data).isEqualTo(readData);
 
         // Reading through the raw stream produces the encrypted bytes
         InputStream in = fs.open(path);
-        IOUtils.readFully(in, readData);
-        assertThat(data).isNotEqualTo(readData);
+        byte[] rawBytes = ByteStreams.toByteArray(in);
+        assertThat(data).isNotEqualTo(rawBytes);
 
         // Wrapped symmetric key is stored next to the encrypted file
         assertThat(fs.exists(new Path(path + FileKeyStorageStrategy.EXTENSION))).isTrue();

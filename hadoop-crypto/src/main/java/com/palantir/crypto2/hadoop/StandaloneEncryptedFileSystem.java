@@ -23,11 +23,11 @@ import com.palantir.crypto2.keys.KeyPairs;
 import com.palantir.crypto2.keys.KeyStorageStrategy;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.security.KeyPair;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.function.Function;
-import javax.ws.rs.core.UriBuilder;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
@@ -163,11 +163,18 @@ public final class StandaloneEncryptedFileSystem extends FilterFileSystem {
 
     private static Function<URI, URI> setUriSchemeFunc(final String scheme) {
         return uri -> {
-            UriBuilder builder = UriBuilder.fromUri(uri);
-            if (uri.getScheme() != null) {
-                builder.scheme(scheme);
+            try {
+                return new URI(
+                        scheme,
+                        uri.getUserInfo(),
+                        uri.getHost(),
+                        uri.getPort(),
+                        uri.getPath(),
+                        uri.getQuery(),
+                        uri.getFragment());
+            } catch (URISyntaxException e) {
+                throw new RuntimeException(e);
             }
-            return builder.build();
         };
     }
 
@@ -175,5 +182,4 @@ public final class StandaloneEncryptedFileSystem extends FilterFileSystem {
     public String getScheme() {
         return SCHEME;
     }
-
 }
