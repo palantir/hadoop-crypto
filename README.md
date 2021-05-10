@@ -3,7 +3,7 @@
 </p>
 
 [![CircleCI Build Status](https://circleci.com/gh/palantir/hadoop-crypto/tree/develop.svg?style=shield)](https://circleci.com/gh/palantir/hadoop-crypto)
-[![Download](https://api.bintray.com/packages/palantir/releases/hadoop-crypto/images/download.svg)](https://bintray.com/palantir/releases/hadoop-crypto/_latestVersion)
+![Maven Central](https://img.shields.io/maven-central/v/com.palantir.hadoop-crypto2/hadoop-crypto)
 
 Seekable Crypto
 ===============
