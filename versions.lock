@@ -16,8 +16,8 @@ org.apache.hadoop:hadoop-client-runtime:3.3.0 (1 constraints: 08050336)
 org.apache.htrace:htrace-core4:4.1.0-incubating (1 constraints: 01158a88)
 org.checkerframework:checker-qual:3.8.0 (1 constraints: 1d0a02b5)
 org.immutables:value:2.8.8 (1 constraints: 14051536)
-org.openjdk.jmh:jmh-core:1.31 (2 constraints: eb152bd8)
-org.openjdk.jmh:jmh-generator-annprocess:1.31 (1 constraints: d904f630)
+org.openjdk.jmh:jmh-core:1.32 (2 constraints: ed155dd8)
+org.openjdk.jmh:jmh-generator-annprocess:1.32 (1 constraints: da04f730)
 org.slf4j:slf4j-api:1.7.30 (2 constraints: 26160805)
 
 [Test dependencies]
