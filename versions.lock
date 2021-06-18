@@ -18,7 +18,7 @@ org.checkerframework:checker-qual:3.8.0 (1 constraints: 1d0a02b5)
 org.immutables:value:2.8.8 (1 constraints: 14051536)
 org.openjdk.jmh:jmh-core:1.32 (2 constraints: ed155dd8)
 org.openjdk.jmh:jmh-generator-annprocess:1.32 (1 constraints: da04f730)
-org.slf4j:slf4j-api:1.7.30 (2 constraints: 22160505)
+org.slf4j:slf4j-api:1.7.31 (2 constraints: 23163705)
 
 [Test dependencies]
 com.google.code.findbugs:annotations:3.0.1 (1 constraints: 9e0aafc3)
