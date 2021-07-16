@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
  */
 public final class ChainedKeyStorageStrategy implements KeyStorageStrategy {
 
-    private static final Logger logger = LoggerFactory.getLogger(ChainedKeyStorageStrategy.class);
+    private static final Logger log = LoggerFactory.getLogger(ChainedKeyStorageStrategy.class);
 
     private final List<KeyStorageStrategy> strategies;
 
@@ -60,7 +60,10 @@ public final class ChainedKeyStorageStrategy implements KeyStorageStrategy {
                 return strategy.get(fileKey);
             } catch (Exception e) {
                 suppressedExceptions.add(e);
-                logger.info("Failed to get key material using {}", strategy.getClass().getCanonicalName(), e);
+                log.info(
+                        "Failed to get key material using {}",
+                        strategy.getClass().getCanonicalName(),
+                        e);
             }
         }
         RuntimeException toThrow = new RuntimeException(String.format(
