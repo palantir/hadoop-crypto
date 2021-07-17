@@ -57,8 +57,8 @@ public final class ApacheCtrDecryptingSeekableInput extends CtrCryptoInputStream
     }
 
     @Override
-    public int read(byte[] bytes, int offset, int length) throws IOException {
-        return super.read(bytes, offset, length);
+    public int read(byte[] bytes, int off, int len) throws IOException {
+        return super.read(bytes, off, len);
     }
 
     @Override
