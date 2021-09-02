@@ -112,6 +112,7 @@ public final class ApacheCtrDecryptingSeekableInput extends CtrCryptoInputStream
 
         @Override
         public void close() throws IOException {
+            readBuffer = null;
             input.close();
         }
 
