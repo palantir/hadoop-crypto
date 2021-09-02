@@ -67,8 +67,8 @@ public final class ApacheCtrDecryptingSeekableInput extends CtrCryptoInputStream
     }
 
     private static final class InputAdapter implements Input {
-
         private SeekableInput input;
+        private byte[] readBuffer = new byte[BUFFER_SIZE];
 
         private InputAdapter(SeekableInput input) {
             this.input = input;
@@ -82,11 +82,13 @@ public final class ApacheCtrDecryptingSeekableInput extends CtrCryptoInputStream
 
         @Override
         public int read(ByteBuffer dst) throws IOException {
-            byte[] bytes = new byte[dst.remaining()];
-            int read = input.read(bytes, 0, bytes.length);
+            if (readBuffer.length < dst.remaining()) {
+                resize(dst.remaining());
+            }
+            int read = input.read(readBuffer, 0, readBuffer.length);
 
             if (read != -1) {
-                dst.put(bytes, 0, read);
+                dst.put(readBuffer, 0, read);
             }
 
             return read;
@@ -112,6 +114,35 @@ public final class ApacheCtrDecryptingSeekableInput extends CtrCryptoInputStream
         public void close() throws IOException {
             input.close();
         }
-    }
 
+        private void resize(int required) {
+            int size = readBuffer.length;
+            readBuffer = new byte[newLength(size, required - size, size << 1)];
+        }
+
+        // copied from jdk.internal.util.ArraysSupport
+        private static final int MAX_ARRAY_LENGTH = Integer.MAX_VALUE - 8;
+
+        private static int newLength(int oldLength, int minGrowth, int prefGrowth) {
+            // assert oldLength >= 0
+            // assert minGrowth > 0
+
+            int newLength = Math.max(minGrowth, prefGrowth) + oldLength;
+            if (newLength - MAX_ARRAY_LENGTH <= 0) {
+                return newLength;
+            }
+            return hugeLength(oldLength, minGrowth);
+        }
+
+        private static int hugeLength(int oldLength, int minGrowth) {
+            int minLength = oldLength + minGrowth;
+            if (minLength < 0) { // overflow
+                throw new OutOfMemoryError("Required array length too large");
+            }
+            if (minLength <= MAX_ARRAY_LENGTH) {
+                return MAX_ARRAY_LENGTH;
+            }
+            return Integer.MAX_VALUE;
+        }
+    }
 }
