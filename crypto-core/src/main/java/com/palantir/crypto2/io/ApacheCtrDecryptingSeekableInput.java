@@ -85,7 +85,7 @@ public final class ApacheCtrDecryptingSeekableInput extends CtrCryptoInputStream
             if (readBuffer.length < dst.remaining()) {
                 resize(dst.remaining());
             }
-            int read = input.read(readBuffer, 0, readBuffer.length);
+            int read = input.read(readBuffer, 0, dst.remaining());
 
             if (read != -1) {
                 dst.put(readBuffer, 0, read);
