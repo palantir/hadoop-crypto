@@ -20,10 +20,9 @@ import com.palantir.crypto2.cipher.ApacheCiphers;
 import com.palantir.crypto2.keys.KeyMaterial;
 import com.palantir.seekio.SeekableInput;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.Properties;
 import org.apache.commons.crypto.stream.CtrCryptoInputStream;
-import org.apache.commons.crypto.stream.input.Input;
+import org.apache.commons.crypto.stream.input.StreamInput;
 import org.apache.commons.crypto.utils.Utils;
 
 /**
@@ -42,8 +41,11 @@ public final class ApacheCtrDecryptingSeekableInput extends CtrCryptoInputStream
      * the OpenSSL library is able to be loaded.
      */
     ApacheCtrDecryptingSeekableInput(SeekableInput input, KeyMaterial keyMaterial) throws IOException {
-        super(new InputAdapter(input), Utils.getCipherInstance(ALGORITHM, PROPS), BUFFER_SIZE,
-                keyMaterial.getSecretKey().getEncoded(), keyMaterial.getIv());
+        super(new StreamInput(new DefaultSeekableInputStream(input), BUFFER_SIZE),
+                Utils.getCipherInstance(ALGORITHM, PROPS),
+                BUFFER_SIZE,
+                keyMaterial.getSecretKey().getEncoded(),
+                keyMaterial.getIv());
     }
 
     @Override
@@ -65,53 +67,4 @@ public final class ApacheCtrDecryptingSeekableInput extends CtrCryptoInputStream
     public void close() throws IOException {
         super.close();
     }
-
-    private static final class InputAdapter implements Input {
-
-        private SeekableInput input;
-
-        private InputAdapter(SeekableInput input) {
-            this.input = input;
-        }
-
-        @Override
-        public int read(long position, byte[] buffer, int offset, int length) throws IOException {
-            input.seek(position);
-            return input.read(buffer, offset, length);
-        }
-
-        @Override
-        public int read(ByteBuffer dst) throws IOException {
-            byte[] bytes = new byte[dst.remaining()];
-            int read = input.read(bytes, 0, bytes.length);
-
-            if (read != -1) {
-                dst.put(bytes, 0, read);
-            }
-
-            return read;
-        }
-
-        @Override
-        public long skip(long bytes) throws IOException {
-            input.seek(input.getPos() + bytes);
-            return bytes;
-        }
-
-        @Override
-        public int available() throws IOException {
-            return 0;
-        }
-
-        @Override
-        public void seek(long position) throws IOException {
-            input.seek(position);
-        }
-
-        @Override
-        public void close() throws IOException {
-            input.close();
-        }
-    }
-
 }
