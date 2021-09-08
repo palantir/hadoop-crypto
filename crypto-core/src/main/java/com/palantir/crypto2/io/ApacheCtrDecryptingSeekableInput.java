@@ -67,8 +67,8 @@ public final class ApacheCtrDecryptingSeekableInput extends CtrCryptoInputStream
     }
 
     private static final class InputAdapter implements Input {
-        private SeekableInput input;
-        private byte[] readBuffer = new byte[BUFFER_SIZE];
+        private final SeekableInput input;
+        private final byte[] readBuffer = new byte[BUFFER_SIZE];
 
         private InputAdapter(SeekableInput input) {
             this.input = input;
@@ -119,7 +119,6 @@ public final class ApacheCtrDecryptingSeekableInput extends CtrCryptoInputStream
 
         @Override
         public void close() throws IOException {
-            readBuffer = null;
             input.close();
         }
     }
