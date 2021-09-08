@@ -117,30 +117,18 @@ public final class ApacheCtrDecryptingSeekableInput extends CtrCryptoInputStream
         }
 
         private void resize(int required) {
-            int size = readBuffer.length;
-            readBuffer = new byte[newLength(size, required - size, size << 1)];
+            readBuffer = new byte[newLength(readBuffer.length, required)];
         }
 
-        // copied from jdk.internal.util.ArraysSupport
+        // some jvms reserve header words in an array, reducing its max size
         private static final int MAX_ARRAY_LENGTH = Integer.MAX_VALUE - 8;
 
-        private static int newLength(int oldLength, int minGrowth, int prefGrowth) {
-            // assert oldLength >= 0
-            // assert minGrowth > 0
-
-            int newLength = Math.max(minGrowth, prefGrowth) + oldLength;
+        private static int newLength(int oldLength, int targetLength) {
+            int newLength = Math.max(targetLength, oldLength << 1);
             if (newLength - MAX_ARRAY_LENGTH <= 0) {
                 return newLength;
             }
-            return hugeLength(oldLength, minGrowth);
-        }
-
-        private static int hugeLength(int oldLength, int minGrowth) {
-            int minLength = oldLength + minGrowth;
-            if (minLength < 0) { // overflow
-                throw new OutOfMemoryError("Required array length too large");
-            }
-            if (minLength <= MAX_ARRAY_LENGTH) {
+            if (targetLength - MAX_ARRAY_LENGTH <= 0) {
                 return MAX_ARRAY_LENGTH;
             }
             return Integer.MAX_VALUE;
