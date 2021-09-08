@@ -82,16 +82,23 @@ public final class ApacheCtrDecryptingSeekableInput extends CtrCryptoInputStream
 
         @Override
         public int read(ByteBuffer dst) throws IOException {
-            if (readBuffer.length < dst.remaining()) {
-                resize(dst.remaining());
-            }
-            int read = input.read(readBuffer, 0, dst.remaining());
+            int toRead = dst.remaining();
+            int totalRead = 0;
 
-            if (read != -1) {
-                dst.put(readBuffer, 0, read);
+            while (toRead > 0) {
+                int chunk = Math.min(toRead, readBuffer.length);
+                int read = input.read(readBuffer, 0, chunk);
+
+                if (read == -1) {
+                    return totalRead;
+                } else {
+                    dst.put(readBuffer, 0, read);
+                    totalRead += read;
+                    toRead -= read;
+                }
             }
 
-            return read;
+            return totalRead;
         }
 
         @Override
@@ -114,24 +121,6 @@ public final class ApacheCtrDecryptingSeekableInput extends CtrCryptoInputStream
         public void close() throws IOException {
             readBuffer = null;
             input.close();
-        }
-
-        private void resize(int required) {
-            readBuffer = new byte[newLength(readBuffer.length, required)];
-        }
-
-        // some jvms reserve header words in an array, reducing its max size
-        private static final int MAX_ARRAY_LENGTH = Integer.MAX_VALUE - 8;
-
-        private static int newLength(int oldLength, int targetLength) {
-            int newLength = Math.max(targetLength, oldLength << 1);
-            if (newLength - MAX_ARRAY_LENGTH <= 0) {
-                return newLength;
-            }
-            if (targetLength - MAX_ARRAY_LENGTH <= 0) {
-                return MAX_ARRAY_LENGTH;
-            }
-            return Integer.MAX_VALUE;
         }
     }
 }
