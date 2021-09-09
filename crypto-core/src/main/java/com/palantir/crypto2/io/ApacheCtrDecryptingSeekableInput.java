@@ -16,6 +16,7 @@
 
 package com.palantir.crypto2.io;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.palantir.crypto2.cipher.ApacheCiphers;
 import com.palantir.crypto2.keys.KeyMaterial;
 import com.palantir.seekio.SeekableInput;
@@ -66,11 +67,12 @@ public final class ApacheCtrDecryptingSeekableInput extends CtrCryptoInputStream
         super.close();
     }
 
-    private static final class InputAdapter implements Input {
+    @VisibleForTesting
+    static final class InputAdapter implements Input {
         private final SeekableInput input;
         private final byte[] readBuffer = new byte[BUFFER_SIZE];
 
-        private InputAdapter(SeekableInput input) {
+        InputAdapter(SeekableInput input) {
             this.input = input;
         }
 
@@ -90,7 +92,12 @@ public final class ApacheCtrDecryptingSeekableInput extends CtrCryptoInputStream
                 int read = input.read(readBuffer, 0, chunk);
 
                 if (read == -1) {
-                    return totalRead;
+                    if (totalRead == 0) {
+                        // first read hit EOF
+                        return -1;
+                    } else {
+                        return totalRead;
+                    }
                 } else {
                     dst.put(readBuffer, 0, read);
                     totalRead += read;
