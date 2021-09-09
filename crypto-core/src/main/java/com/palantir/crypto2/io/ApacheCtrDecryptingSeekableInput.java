@@ -16,6 +16,7 @@
 
 package com.palantir.crypto2.io;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.palantir.crypto2.cipher.ApacheCiphers;
 import com.palantir.crypto2.keys.KeyMaterial;
 import com.palantir.seekio.SeekableInput;
@@ -66,11 +67,12 @@ public final class ApacheCtrDecryptingSeekableInput extends CtrCryptoInputStream
         super.close();
     }
 
-    private static final class InputAdapter implements Input {
+    @VisibleForTesting
+    static final class InputAdapter implements Input {
+        private final SeekableInput input;
+        private final byte[] readBuffer = new byte[BUFFER_SIZE];
 
-        private SeekableInput input;
-
-        private InputAdapter(SeekableInput input) {
+        InputAdapter(SeekableInput input) {
             this.input = input;
         }
 
@@ -82,14 +84,28 @@ public final class ApacheCtrDecryptingSeekableInput extends CtrCryptoInputStream
 
         @Override
         public int read(ByteBuffer dst) throws IOException {
-            byte[] bytes = new byte[dst.remaining()];
-            int read = input.read(bytes, 0, bytes.length);
+            int toRead = dst.remaining();
+            int totalRead = 0;
 
-            if (read != -1) {
-                dst.put(bytes, 0, read);
+            while (toRead > 0) {
+                int chunk = Math.min(toRead, readBuffer.length);
+                int read = input.read(readBuffer, 0, chunk);
+
+                if (read == -1) {
+                    if (totalRead == 0) {
+                        // first read hit EOF
+                        return -1;
+                    } else {
+                        return totalRead;
+                    }
+                } else {
+                    dst.put(readBuffer, 0, read);
+                    totalRead += read;
+                    toRead -= read;
+                }
             }
 
-            return read;
+            return totalRead;
         }
 
         @Override
@@ -113,5 +129,4 @@ public final class ApacheCtrDecryptingSeekableInput extends CtrCryptoInputStream
             input.close();
         }
     }
-
 }
