@@ -20,6 +20,8 @@ import javax.crypto.SecretKey;
 import org.immutables.value.Value;
 
 // This class is not Jackson serializable due to SecretKey
+// Automatically suppressed to unblock enforcement in new code
+@SuppressWarnings("ImmutablesStyle")
 @Value.Immutable
 @Value.Style(visibility = Value.Style.ImplementationVisibility.PACKAGE, jdkOnly = true)
 public abstract class KeyMaterial {
