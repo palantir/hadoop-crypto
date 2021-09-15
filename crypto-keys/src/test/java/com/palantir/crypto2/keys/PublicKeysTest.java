@@ -29,5 +29,4 @@ public final class PublicKeysTest {
         PublicKey actualKey = PublicKeys.from(expectedKey.getAlgorithm(), expectedKey.getEncoded());
         assertThat(actualKey).isEqualTo(expectedKey);
     }
-
 }

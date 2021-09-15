@@ -57,22 +57,27 @@ public final class ChainedAsyncKeyStorageStrategy implements AsyncKeyStorageStra
 
     @Override
     public CompletableFuture<KeyMaterial> get(String fileKey) {
-        return CompletableFuture.supplyAsync(() -> {
-            List<Exception> suppressedExceptions = new ArrayList<>();
-            for (AsyncKeyStorageStrategy strategy : strategies) {
-                try {
-                    return strategy.get(fileKey).join();
-                } catch (Exception e) {
-                    suppressedExceptions.add(e);
-                    log.info("Failed to get key material using {}", strategy.getClass().getCanonicalName(), e);
-                }
-            }
-            RuntimeException toThrow = new RuntimeException(String.format(
-                    "Unable to get key material using any of the provided strategies: %s",
-                    Collections2.transform(strategies, s -> s.getClass().getCanonicalName())));
-            suppressedExceptions.forEach(toThrow::addSuppressed);
-            throw toThrow;
-        }, executor);
+        return CompletableFuture.supplyAsync(
+                () -> {
+                    List<Exception> suppressedExceptions = new ArrayList<>();
+                    for (AsyncKeyStorageStrategy strategy : strategies) {
+                        try {
+                            return strategy.get(fileKey).join();
+                        } catch (Exception e) {
+                            suppressedExceptions.add(e);
+                            log.info(
+                                    "Failed to get key material using {}",
+                                    strategy.getClass().getCanonicalName(),
+                                    e);
+                        }
+                    }
+                    RuntimeException toThrow = new RuntimeException(String.format(
+                            "Unable to get key material using any of the provided strategies: %s",
+                            Collections2.transform(strategies, s -> s.getClass().getCanonicalName())));
+                    suppressedExceptions.forEach(toThrow::addSuppressed);
+                    throw toThrow;
+                },
+                executor);
     }
 
     @Override
@@ -81,10 +86,7 @@ public final class ChainedAsyncKeyStorageStrategy implements AsyncKeyStorageStra
     }
 
     private CompletableFuture<Void> applyToStrategies(Function<AsyncKeyStorageStrategy, CompletableFuture<?>> mapper) {
-        CompletableFuture[] futures = strategies.stream()
-                .map(mapper)
-                .toArray(CompletableFuture[]::new);
+        CompletableFuture[] futures = strategies.stream().map(mapper).toArray(CompletableFuture[]::new);
         return CompletableFuture.allOf(futures);
     }
-
 }

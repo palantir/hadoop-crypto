@@ -31,7 +31,8 @@ public final class CiphersTest {
 
     @Test
     public void testProvider_ignoresUnavailable() {
-        assertThat(Ciphers.getProvider(ImmutableList.of("Invalid", "SunJCE", "IBMJCE"))).doesNotContain("Invalid");
+        assertThat(Ciphers.getProvider(ImmutableList.of("Invalid", "SunJCE", "IBMJCE")))
+                .doesNotContain("Invalid");
     }
 
     @Test
@@ -40,5 +41,4 @@ public final class CiphersTest {
                 .isThrownBy(() -> Ciphers.getProvider(ImmutableList.of("Invalid")))
                 .withMessage("None of the acceptable JCE providers are available: [Invalid]");
     }
-
 }

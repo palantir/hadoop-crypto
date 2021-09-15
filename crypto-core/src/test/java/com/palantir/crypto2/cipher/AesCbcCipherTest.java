@@ -29,5 +29,4 @@ public final class AesCbcCipherTest extends AbstractSeekableCipherTest {
     SeekableCipher getCipher(KeyMaterial initKeyMaterial) {
         return new AesCbcCipher(initKeyMaterial);
     }
-
 }

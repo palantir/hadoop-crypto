@@ -49,8 +49,8 @@ public final class CryptoStreamFactoryTest {
     @Test
     public void ensureDefaultIsApache() {
         OutputStream encrypted = CryptoStreamFactory.encrypt(null, keyMaterial, AesCtrCipher.ALGORITHM);
-        SeekableInput decrypted = CryptoStreamFactory.decrypt(
-                (SeekableInput) null, keyMaterial, AesCtrCipher.ALGORITHM);
+        SeekableInput decrypted =
+                CryptoStreamFactory.decrypt((SeekableInput) null, keyMaterial, AesCtrCipher.ALGORITHM);
 
         assertThat(encrypted).isInstanceOf(CtrCryptoOutputStream.class);
         assertThat(decrypted).isInstanceOf(CtrCryptoInputStream.class);

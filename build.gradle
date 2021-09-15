@@ -5,6 +5,7 @@ buildscript {
     }
 
     dependencies {
+        classpath 'com.palantir.javaformat:gradle-palantir-java-format:2.2.0'
         classpath 'com.palantir.gradle.externalpublish:gradle-external-publish-plugin:1.4.0'
         classpath 'com.github.jengelman.gradle.plugins:shadow:6.1.0'
         classpath 'com.palantir.baseline:gradle-baseline-java:4.25.0'
@@ -22,6 +23,7 @@ apply plugin: 'com.palantir.baseline'
 apply plugin: 'com.palantir.consistent-versions'
 
 allprojects {
+    apply plugin: 'com.palantir.java-format'
     group 'com.palantir.hadoop-crypto2'
     version gitVersion()
 

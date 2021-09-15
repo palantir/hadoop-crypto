@@ -37,5 +37,4 @@ public interface AsyncKeyStorageStrategy {
      * Async equivalent of {@link KeyStorageStrategy#remove(String)}.
      */
     CompletableFuture<Void> remove(String fileKey);
-
 }
