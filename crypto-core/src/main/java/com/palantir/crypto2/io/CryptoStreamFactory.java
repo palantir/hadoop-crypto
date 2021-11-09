@@ -16,8 +16,6 @@
 
 package com.palantir.crypto2.io;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.palantir.crypto2.cipher.ApacheCiphers;
 import com.palantir.crypto2.cipher.SeekableCipher;
 import com.palantir.crypto2.cipher.SeekableCipherFactory;
 import com.palantir.crypto2.keys.KeyMaterial;
@@ -26,23 +24,10 @@ import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Properties;
 import javax.crypto.Cipher;
 import javax.crypto.CipherOutputStream;
-import javax.crypto.SecretKey;
-import org.apache.commons.crypto.stream.CtrCryptoOutputStream;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public final class CryptoStreamFactory {
-
-    private static final Logger log = LoggerFactory.getLogger(CryptoStreamFactory.class);
-    private static final Properties PROPS = ApacheCiphers.forceOpenSsl(new Properties());
-    private static final String AES_ALGORITHM = "AES/CTR/NoPadding";
-    private static final String OPEN_SSL_INIT_WARNING = "Unable to initialize cipher with OpenSSL, falling back to "
-            + "JCE implementation - see github.com/palantir/hadoop-crypto#faq";
-
-    private static volatile boolean fullExceptionLoggedAlready = false;
 
     private CryptoStreamFactory() {}
 
@@ -51,23 +36,7 @@ public final class CryptoStreamFactory {
      * cipher {@code algorithm}. When OpenSSL is available an implementation that uses AES-NI will be returned.
      */
     public static SeekableInput decrypt(SeekableInput encryptedInput, KeyMaterial keyMaterial, String algorithm) {
-        return decrypt(encryptedInput, keyMaterial, algorithm, false);
-    }
-
-    @SuppressWarnings("CatchBlockLogException")
-    @VisibleForTesting
-    static SeekableInput decrypt(
-            SeekableInput encryptedInput, KeyMaterial keyMaterial, String algorithm, boolean forceJce) {
-        if (!algorithm.equals(AES_ALGORITHM) || forceJce) {
-            return new DecryptingSeekableInput(encryptedInput, SeekableCipherFactory.getCipher(algorithm, keyMaterial));
-        }
-
-        try {
-            return new ApacheCtrDecryptingSeekableInput(encryptedInput, keyMaterial);
-        } catch (IOException e) {
-            warningLog(e);
-            return new DecryptingSeekableInput(encryptedInput, SeekableCipherFactory.getCipher(algorithm, keyMaterial));
-        }
+        return new DecryptingSeekableInput(encryptedInput, SeekableCipherFactory.getCipher(algorithm, keyMaterial));
     }
 
     /**
@@ -83,39 +52,7 @@ public final class CryptoStreamFactory {
      * cipher {@code algorithm}. When OpenSSL is available an implementation that uses AES-NI will be returned.
      */
     public static OutputStream encrypt(OutputStream output, KeyMaterial keyMaterial, String algorithm) {
-        return encrypt(output, keyMaterial, algorithm, false);
-    }
-
-    @SuppressWarnings("CatchBlockLogException")
-    @VisibleForTesting
-    static OutputStream encrypt(OutputStream output, KeyMaterial keyMaterial, String algorithm, boolean forceJce) {
-        if (!algorithm.equals(AES_ALGORITHM) || forceJce) {
-            return createDefaultEncryptedStream(output, keyMaterial, algorithm);
-        }
-
-        try {
-            return createApacheEncryptedStream(output, keyMaterial);
-        } catch (IOException e) {
-            warningLog(e);
-            return createDefaultEncryptedStream(output, keyMaterial, algorithm);
-        }
-    }
-
-    /** To avoid spamming logs with exceptions, we only log the exception once. */
-    private static void warningLog(IOException exception) {
-        if (fullExceptionLoggedAlready) {
-            log.warn(OPEN_SSL_INIT_WARNING);
-        } else {
-            log.warn(OPEN_SSL_INIT_WARNING, exception);
-            fullExceptionLoggedAlready = true;
-        }
-    }
-
-    private static OutputStream createApacheEncryptedStream(OutputStream output, KeyMaterial keyMaterial)
-            throws IOException {
-        SecretKey secretKey = keyMaterial.getSecretKey();
-        byte[] iv = keyMaterial.getIv();
-        return new CtrCryptoOutputStream(PROPS, output, secretKey.getEncoded(), iv);
+        return createDefaultEncryptedStream(output, keyMaterial, algorithm);
     }
 
     private static OutputStream createDefaultEncryptedStream(OutputStream output, KeyMaterial keyMaterial,
