@@ -1,12 +1,8 @@
-apply from: "${rootDir}/gradle/openssl.gradle"
-
 dependencies {
     compile project(':crypto-keys')
 
     compile "com.google.guava:guava"
     compile "com.palantir.seek-io:seek-io"
-    compile "org.apache.commons:commons-crypto"
-    implementation "org.slf4j:slf4j-api"
 
     annotationProcessor 'org.openjdk.jmh:jmh-generator-annprocess'
     compileOnly 'org.openjdk.jmh:jmh-generator-annprocess'
