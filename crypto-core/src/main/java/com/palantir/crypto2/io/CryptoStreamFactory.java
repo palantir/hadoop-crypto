@@ -22,6 +22,7 @@ import com.palantir.crypto2.cipher.SeekableCipher;
 import com.palantir.crypto2.cipher.SeekableCipherFactory;
 import com.palantir.crypto2.keys.KeyMaterial;
 import com.palantir.seekio.SeekableInput;
+import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -120,7 +121,7 @@ public final class CryptoStreamFactory {
     private static OutputStream createDefaultEncryptedStream(OutputStream output, KeyMaterial keyMaterial,
             String algorithm) {
         SeekableCipher cipher = SeekableCipherFactory.getCipher(algorithm, keyMaterial);
-        return new CipherOutputStream(output, cipher.initCipher(Cipher.ENCRYPT_MODE));
+        return new ChunkingOutputStream(new CipherOutputStream(output, cipher.initCipher(Cipher.ENCRYPT_MODE)));
     }
 
     private static class StreamSeekableInput implements SeekableInput {
@@ -148,6 +149,46 @@ public final class CryptoStreamFactory {
         @Override
         public void close() throws IOException {
             input.close();
+        }
+    }
+
+    /**
+     * {@link ChunkingOutputStream} limits the size of individual writes to the wrapped {@link OutputStream}
+     * in order to prevent degraded performance on large buffers as described in
+     * <a href="https://github.com/palantir/hadoop-crypto/pull/586">hadoop-crypto#586</a>.
+     */
+    static final class ChunkingOutputStream extends FilterOutputStream {
+
+        private static final int CHUNK_SIZE = 16 * 1024;
+
+        ChunkingOutputStream(OutputStream delegate) {
+            super(delegate);
+        }
+
+        @Override
+        public void write(byte[] buffer, int off, int len) throws IOException {
+            validateArgs(buffer, off, len);
+            doWrite(buffer, off, len);
+        }
+
+        private void doWrite(byte[] buffer, int off, int len) throws IOException {
+            int currentOffset = off;
+            int remaining = len;
+            while (remaining > 0) {
+                int toWrite = Math.min(remaining, CHUNK_SIZE);
+                out.write(buffer, currentOffset, toWrite);
+                currentOffset += toWrite;
+                remaining -= toWrite;
+            }
+        }
+
+        private static void validateArgs(byte[] buffer, int off, int len) {
+            if (buffer == null) {
+                throw new NullPointerException("buffer is required");
+            }
+            if (off < 0 || len < 0 || buffer.length < off + len) {
+                throw new IndexOutOfBoundsException();
+            }
         }
     }
 }
