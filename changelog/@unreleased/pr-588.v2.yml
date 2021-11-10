@@ -1,0 +1,5 @@
+type: improvement
+improvement:
+  description: hadoop-crypto only uses the JCE cryptography implementations and no longer relies on openssl or commons-crypto. Performance is not expected to be impacted.
+  links:
+  - https://github.com/palantir/hadoop-crypto/pull/588
