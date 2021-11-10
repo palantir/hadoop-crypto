@@ -159,6 +159,15 @@ public final class CryptoStreamFactory {
      */
     static final class ChunkingOutputStream extends FilterOutputStream {
 
+        /**
+         * Chunk size of 16 KB is small enough to allow cipher implementations to become hot and optimize properly
+         * when given large inputs. Otherwise large array writes into a {@link CipherOutputStream} fail to use
+         * intrinsified implementations. If 16 KB chunks aren't enough to produce hot methods, the I/O is small
+         * and infrequent enough that performance isn't relevant.
+         * For more information, see the details around {@code com.sun.crypto.provider.GHASH::processBlocks} in
+         * <a href="https://github.com/palantir/hadoop-crypto/pull/586#issuecomment-964394587">
+         * hadoop-crypto#586 (comment)</a>
+         */
         private static final int CHUNK_SIZE = 16 * 1024;
 
         ChunkingOutputStream(OutputStream delegate) {
