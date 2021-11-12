@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.ThreadLocalRandom;
 import org.apache.commons.crypto.stream.CtrCryptoInputStream;
 import org.apache.commons.crypto.stream.CtrCryptoOutputStream;
 import org.junit.Before;
@@ -84,5 +85,24 @@ public final class CryptoStreamFactoryTest {
 
         assertThat(bytesRead).isEqualTo(BYTES.length);
         assertThat(readBytes).isEqualTo(BYTES);
+    }
+
+    @Test
+    public void testChunkingOutputStream() throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        byte[] data = new byte[100 * 1024 * 1024];
+        ThreadLocalRandom.current().nextBytes(data);
+        int chunkSize = 1;
+        int dataOffset = 0;
+        try (OutputStream out = new CryptoStreamFactory.ChunkingOutputStream(baos)) {
+            while (data.length - dataOffset > 0) {
+                int remaining = data.length - dataOffset;
+                int toWrite = Math.min(chunkSize, remaining);
+                out.write(data, dataOffset, toWrite);
+                dataOffset += toWrite;
+                chunkSize += ThreadLocalRandom.current().nextInt(1024);
+            }
+        }
+        assertThat(baos.toByteArray()).isEqualTo(data);
     }
 }
