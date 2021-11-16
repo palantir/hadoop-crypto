@@ -23,6 +23,7 @@ import com.palantir.seekio.SeekableInput;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Properties;
+import org.apache.commons.crypto.cipher.CryptoCipher;
 import org.apache.commons.crypto.stream.CtrCryptoInputStream;
 import org.apache.commons.crypto.stream.input.Input;
 import org.apache.commons.crypto.utils.Utils;
@@ -43,8 +44,12 @@ public final class ApacheCtrDecryptingSeekableInput extends CtrCryptoInputStream
      * the OpenSSL library is able to be loaded.
      */
     ApacheCtrDecryptingSeekableInput(SeekableInput input, KeyMaterial keyMaterial) throws IOException {
-        super(new InputAdapter(input), Utils.getCipherInstance(ALGORITHM, PROPS), BUFFER_SIZE,
+        super(new InputAdapter(input), getCipherInstance(), BUFFER_SIZE,
                 keyMaterial.getSecretKey().getEncoded(), keyMaterial.getIv());
+    }
+
+    static CryptoCipher getCipherInstance() throws IOException {
+        return Utils.getCipherInstance(ALGORITHM, PROPS);
     }
 
     @Override

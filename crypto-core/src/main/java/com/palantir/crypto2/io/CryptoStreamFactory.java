@@ -17,6 +17,7 @@
 package com.palantir.crypto2.io;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Suppliers;
 import com.palantir.crypto2.cipher.ApacheCiphers;
 import com.palantir.crypto2.cipher.SeekableCipher;
 import com.palantir.crypto2.cipher.SeekableCipherFactory;
@@ -27,6 +28,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Properties;
+import java.util.function.Supplier;
 import javax.crypto.Cipher;
 import javax.crypto.CipherOutputStream;
 import javax.crypto.SecretKey;
@@ -44,6 +46,17 @@ public final class CryptoStreamFactory {
 
     private static volatile boolean fullExceptionLoggedAlready = false;
 
+    private static final Supplier<Boolean> OPENSSL_IS_AVAILABLE = Suppliers.memoize(() -> {
+        try {
+            ApacheCtrDecryptingSeekableInput.getCipherInstance().close();
+            log.info("Detected OpenSSL: the openssl native implementation will be used for AES/CTR/NoPadding");
+            return true;
+        } catch (Throwable t) {
+            log.info(OPEN_SSL_INIT_WARNING, t);
+            return false;
+        }
+    });
+
     private CryptoStreamFactory() {}
 
     /**
@@ -51,7 +64,7 @@ public final class CryptoStreamFactory {
      * cipher {@code algorithm}. When OpenSSL is available an implementation that uses AES-NI will be returned.
      */
     public static SeekableInput decrypt(SeekableInput encryptedInput, KeyMaterial keyMaterial, String algorithm) {
-        return decrypt(encryptedInput, keyMaterial, algorithm, false);
+        return decrypt(encryptedInput, keyMaterial, algorithm, !OPENSSL_IS_AVAILABLE.get());
     }
 
     @SuppressWarnings("CatchBlockLogException")
@@ -83,7 +96,7 @@ public final class CryptoStreamFactory {
      * cipher {@code algorithm}. When OpenSSL is available an implementation that uses AES-NI will be returned.
      */
     public static OutputStream encrypt(OutputStream output, KeyMaterial keyMaterial, String algorithm) {
-        return encrypt(output, keyMaterial, algorithm, false);
+        return encrypt(output, keyMaterial, algorithm, !OPENSSL_IS_AVAILABLE.get());
     }
 
     @SuppressWarnings("CatchBlockLogException")
