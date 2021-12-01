@@ -43,8 +43,6 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 public final class DecryptionTests {
 
-    private static final boolean JCE = true;
-    private static final boolean APACHE = !JCE;
     private static final String AES_CTR = AesCtrCipher.ALGORITHM;
     private static final String AES_CBC = AesCbcCipher.ALGORITHM;
     private static final int BLOCK_SIZE = 16;
@@ -66,23 +64,23 @@ public final class DecryptionTests {
     @Parameterized.Parameters
     public static Collection<TestCase> ciphers() {
         return ImmutableList.of(
-                new TestCase(AES_CTR, JCE, JCE),
-                new TestCase(AES_CTR, APACHE, APACHE),
-                new TestCase(AES_CTR, JCE, APACHE),
-                new TestCase(AES_CTR, APACHE, JCE),
-                new TestCase(AES_CBC, JCE, JCE));
+                new TestCase(AES_CTR),
+                new TestCase(AES_CTR),
+                new TestCase(AES_CTR),
+                new TestCase(AES_CTR),
+                new TestCase(AES_CBC));
     }
 
     public DecryptionTests(TestCase testCase) {
         try {
             ByteArrayOutputStream os = new ByteArrayOutputStream();
             KeyMaterial keyMaterial = SeekableCipherFactory.generateKeyMaterial(testCase.alg);
-            OutputStream cos = CryptoStreamFactory.encrypt(os, keyMaterial, testCase.alg, testCase.forceJceEncrypt);
+            OutputStream cos = CryptoStreamFactory.encrypt(os, keyMaterial, testCase.alg);
             cos.write(data);
             cos.close();
 
             InMemorySeekableDataInput input = new InMemorySeekableDataInput(os.toByteArray());
-            cis = CryptoStreamFactory.decrypt(input, keyMaterial, testCase.alg, testCase.forceJceDecrypt);
+            cis = CryptoStreamFactory.decrypt(input, keyMaterial, testCase.alg);
         } catch (IOException e) {
             throw Throwables.propagate(e);
         }
@@ -174,13 +172,9 @@ public final class DecryptionTests {
     @SuppressWarnings("VisibilityModifier")
     private static final class TestCase {
         String alg;
-        boolean forceJceEncrypt;
-        boolean forceJceDecrypt;
 
-        TestCase(String alg, boolean forceJceEncrypt, boolean forceJceDecrypt) {
+        TestCase(String alg) {
             this.alg = alg;
-            this.forceJceEncrypt = forceJceEncrypt;
-            this.forceJceDecrypt = forceJceDecrypt;
         }
     }
 }

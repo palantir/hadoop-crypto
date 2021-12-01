@@ -16,7 +16,6 @@
 
 package com.palantir.crypto2.jmh;
 
-import com.palantir.crypto2.cipher.ApacheCiphers;
 import com.palantir.crypto2.keys.KeyMaterial;
 import com.palantir.crypto2.keys.serialization.KeyMaterials;
 import java.io.ByteArrayOutputStream;
@@ -26,14 +25,12 @@ import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.AlgorithmParameterSpec;
-import java.util.Properties;
 import java.util.Random;
 import javax.crypto.Cipher;
 import javax.crypto.CipherOutputStream;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.IvParameterSpec;
-import org.apache.commons.crypto.stream.CtrCryptoOutputStream;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Fork;
 import org.openjdk.jmh.annotations.Measurement;
@@ -82,17 +79,6 @@ public class EncryptionBenchmark {
         IvParameterSpec ivSpec = new IvParameterSpec(state.key.getIv());
 
         encrypt(state.data, cipher, state.key.getSecretKey(), ivSpec);
-    }
-
-    @Benchmark
-    public final void apacheEncrypt(State state) throws IOException {
-        Properties props = ApacheCiphers.forceOpenSsl(new Properties());
-
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        CtrCryptoOutputStream output = new CtrCryptoOutputStream(
-                props, baos, state.key.getSecretKey().getEncoded(), state.key.getIv());
-
-        output.write(state.data);
     }
 
     private void encrypt(byte[] bytes, Cipher cipher, Key key, AlgorithmParameterSpec spec) {
