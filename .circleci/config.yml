@@ -87,6 +87,14 @@ jobs:
       - attach_workspace: { at: /home/circleci }
       - restore_cache: { key: 'gradle-wrapper-v2-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}' }
       - restore_cache: { key: 'unit-test-gradle-cache-v2-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}' }
+      - run:
+          name: link_openssl
+          command: |
+            sudo apt-get update -q && sudo apt-get install -qy libssl-dev
+            sudo ln -s /lib/x86_64-linux-gnu/libcrypt.so /usr/lib/libcrypto.so
+            sudo ln -s /lib/x86_64-linux-gnu/libcrypt.so /usr/lib64/libcrypto.so
+            echo "Linked openssl /usr/lib/libcrypto.so"
+            ls -al /lib/libcrypto* /usr/lib/libcrypto* /usr/lib64/libcrypto* /usr/lib/x86_64-linux-gnu/libcrypto*
       - run: ./gradlew --parallel --stacktrace --continue --max-workers=2 test
       - save_cache:
           key: 'unit-test-gradle-cache-v2-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}'
