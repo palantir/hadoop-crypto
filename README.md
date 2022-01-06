@@ -131,7 +131,7 @@ openssl pkcs8 -topk8 -inform pem -in rsa.key -outform pem -nocrypt | grep -v PRI
 Programatic Example
 -------------------
 
-Source for examples can be found [here](hadoop-crypto/src/test/java/com/palantir/hadoop/example/ExampleUsage.java)
+Source for examples can be found [here](hadoop-crypto/src/test/java/com/palantir/crypto2/hadoop/example/ExampleUsage.java)
 
 ### Initialization
 
