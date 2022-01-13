@@ -17,6 +17,7 @@
 package com.palantir.crypto2.io;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Suppliers;
 import com.palantir.crypto2.cipher.ApacheCiphers;
 import com.palantir.crypto2.cipher.SeekableCipher;
 import com.palantir.crypto2.cipher.SeekableCipherFactory;
@@ -27,6 +28,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Properties;
+import java.util.function.Supplier;
 import javax.crypto.Cipher;
 import javax.crypto.CipherOutputStream;
 import javax.crypto.SecretKey;
@@ -39,10 +41,18 @@ public final class CryptoStreamFactory {
     private static final Logger log = LoggerFactory.getLogger(CryptoStreamFactory.class);
     private static final Properties PROPS = ApacheCiphers.forceOpenSsl(new Properties());
     private static final String AES_ALGORITHM = "AES/CTR/NoPadding";
-    private static final String OPEN_SSL_INIT_WARNING = "Unable to initialize cipher with OpenSSL, falling back to "
-            + "JCE implementation - see github.com/palantir/hadoop-crypto#faq";
 
-    private static volatile boolean fullExceptionLoggedAlready = false;
+    private static final Supplier<Boolean> OPENSSL_IS_AVAILABLE = Suppliers.memoize(() -> {
+        try {
+            ApacheCtrDecryptingSeekableInput.getCipherInstance().close();
+            log.info("Detected OpenSSL: the openssl native implementation will be used for AES/CTR/NoPadding");
+            return true;
+        } catch (Throwable t) {
+            log.info("Unable to initialize cipher with OpenSSL, falling back to "
+                    + "JCE implementation - see github.com/palantir/hadoop-crypto#faq", t);
+            return false;
+        }
+    });
 
     private CryptoStreamFactory() {}
 
@@ -54,19 +64,17 @@ public final class CryptoStreamFactory {
         return decrypt(encryptedInput, keyMaterial, algorithm, false);
     }
 
-    @SuppressWarnings("CatchBlockLogException")
     @VisibleForTesting
     static SeekableInput decrypt(
             SeekableInput encryptedInput, KeyMaterial keyMaterial, String algorithm, boolean forceJce) {
-        if (!algorithm.equals(AES_ALGORITHM) || forceJce) {
+        if (!algorithm.equals(AES_ALGORITHM) || !OPENSSL_IS_AVAILABLE.get() || forceJce) {
             return new DecryptingSeekableInput(encryptedInput, SeekableCipherFactory.getCipher(algorithm, keyMaterial));
         }
 
         try {
             return new ApacheCtrDecryptingSeekableInput(encryptedInput, keyMaterial);
         } catch (IOException e) {
-            warningLog(e);
-            return new DecryptingSeekableInput(encryptedInput, SeekableCipherFactory.getCipher(algorithm, keyMaterial));
+            throw new IllegalStateException("Failed to create ApacheCtrDecryptingSeekableInput", e);
         }
     }
 
@@ -86,28 +94,16 @@ public final class CryptoStreamFactory {
         return encrypt(output, keyMaterial, algorithm, false);
     }
 
-    @SuppressWarnings("CatchBlockLogException")
     @VisibleForTesting
     static OutputStream encrypt(OutputStream output, KeyMaterial keyMaterial, String algorithm, boolean forceJce) {
-        if (!algorithm.equals(AES_ALGORITHM) || forceJce) {
+        if (!algorithm.equals(AES_ALGORITHM) || !OPENSSL_IS_AVAILABLE.get() || forceJce) {
             return createDefaultEncryptedStream(output, keyMaterial, algorithm);
         }
 
         try {
             return createApacheEncryptedStream(output, keyMaterial);
         } catch (IOException e) {
-            warningLog(e);
-            return createDefaultEncryptedStream(output, keyMaterial, algorithm);
-        }
-    }
-
-    /** To avoid spamming logs with exceptions, we only log the exception once. */
-    private static void warningLog(IOException exception) {
-        if (fullExceptionLoggedAlready) {
-            log.warn(OPEN_SSL_INIT_WARNING);
-        } else {
-            log.warn(OPEN_SSL_INIT_WARNING, exception);
-            fullExceptionLoggedAlready = true;
+            throw new IllegalStateException("Failed to create CtrCryptoOutputStream", e);
         }
     }
 
