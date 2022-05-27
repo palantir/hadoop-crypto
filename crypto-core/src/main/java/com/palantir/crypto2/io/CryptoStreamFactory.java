@@ -22,6 +22,8 @@ import com.palantir.crypto2.cipher.ApacheCiphers;
 import com.palantir.crypto2.cipher.SeekableCipher;
 import com.palantir.crypto2.cipher.SeekableCipherFactory;
 import com.palantir.crypto2.keys.KeyMaterial;
+import com.palantir.logsafe.logger.SafeLogger;
+import com.palantir.logsafe.logger.SafeLoggerFactory;
 import com.palantir.seekio.SeekableInput;
 import java.io.FilterOutputStream;
 import java.io.IOException;
@@ -33,12 +35,10 @@ import javax.crypto.Cipher;
 import javax.crypto.CipherOutputStream;
 import javax.crypto.SecretKey;
 import org.apache.commons.crypto.stream.CtrCryptoOutputStream;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public final class CryptoStreamFactory {
 
-    private static final Logger log = LoggerFactory.getLogger(CryptoStreamFactory.class);
+    private static final SafeLogger log = SafeLoggerFactory.get(CryptoStreamFactory.class);
     private static final Properties PROPS = ApacheCiphers.forceOpenSsl(new Properties());
     private static final String AES_ALGORITHM = "AES/CTR/NoPadding";
 
