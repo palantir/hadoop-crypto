@@ -58,5 +58,4 @@ public final class DefaultSeekableInputStream extends InputStream implements See
     public void close() throws IOException {
         input.close();
     }
-
 }

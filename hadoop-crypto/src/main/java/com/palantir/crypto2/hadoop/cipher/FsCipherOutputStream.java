@@ -37,8 +37,7 @@ public final class FsCipherOutputStream extends FilterOutputStream {
     }
 
     @VisibleForTesting
-    FsCipherOutputStream(FSDataOutputStream delegate, SeekableCipher cipher,
-            CipherStreamSupplier supplier) {
+    FsCipherOutputStream(FSDataOutputStream delegate, SeekableCipher cipher, CipherStreamSupplier supplier) {
         super(supplier.getOutputStream(delegate, cipher.initCipher(Cipher.ENCRYPT_MODE)));
     }
 
@@ -51,5 +50,4 @@ public final class FsCipherOutputStream extends FilterOutputStream {
     public void write(byte[] bytes) throws IOException {
         out.write(bytes);
     }
-
 }

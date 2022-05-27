@@ -86,13 +86,7 @@ public final class DelegatingFileSystemTest {
         Files.write(bytes, localFile);
 
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        when(delegate.create(
-                remotePath,
-                FsPermission.valueOf("-rw-r--r--"),
-                true, 4096,
-                (short) 0,
-                0,
-                null))
+        when(delegate.create(remotePath, FsPermission.valueOf("-rw-r--r--"), true, 4096, (short) 0, 0, null))
                 .thenReturn(new FSDataOutputStream(output, null));
 
         copyFromLocal.accept(src);
@@ -119,10 +113,9 @@ public final class DelegatingFileSystemTest {
     @Test
     public void testGetFileBlockLocations() throws IOException {
         Path path = new Path("test-path");
-        BlockLocation location = new BlockLocation(
-                new String[] {"some-host:50010"}, new String[] {"some-host"}, 0L, 0L);
-        when(delegate.getFileBlockLocations(eq(path), anyLong(), anyLong()))
-                .thenReturn(new BlockLocation[]{location});
+        BlockLocation location =
+                new BlockLocation(new String[] {"some-host:50010"}, new String[] {"some-host"}, 0L, 0L);
+        when(delegate.getFileBlockLocations(eq(path), anyLong(), anyLong())).thenReturn(new BlockLocation[] {location});
 
         assertThat(delegatingFs.getFileBlockLocations(path, 0L, 0L)).containsExactly(location);
         verify(delegate).getFileBlockLocations(path, 0L, 0L);

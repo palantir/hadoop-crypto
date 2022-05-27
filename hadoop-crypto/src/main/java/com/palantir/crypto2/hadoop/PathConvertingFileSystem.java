@@ -43,7 +43,8 @@ public final class PathConvertingFileSystem extends DelegatingFileSystem {
     private final Function<Path, Path> fromFunc;
     private Function<URI, URI> fromUriFunc;
 
-    public PathConvertingFileSystem(FileSystem delegate,
+    public PathConvertingFileSystem(
+            FileSystem delegate,
             Function<Path, Path> toFunc,
             Function<Path, Path> fromFunc,
             Function<URI, URI> fromUriFunc) {
@@ -65,15 +66,29 @@ public final class PathConvertingFileSystem extends DelegatingFileSystem {
     }
 
     @Override
-    public FSDataOutputStream create(Path path, FsPermission permission, boolean overwrite, int bufferSize,
-            short replication, long blockSize, Progressable progress) throws IOException {
-        return delegate.create(to(path), permission, overwrite, bufferSize, replication, blockSize,
-                progress);
+    public FSDataOutputStream create(
+            Path path,
+            FsPermission permission,
+            boolean overwrite,
+            int bufferSize,
+            short replication,
+            long blockSize,
+            Progressable progress)
+            throws IOException {
+        return delegate.create(to(path), permission, overwrite, bufferSize, replication, blockSize, progress);
     }
 
     @Override
-    public FSDataOutputStream create(Path path, FsPermission permission, EnumSet<CreateFlag> flags, int bufferSize,
-            short replication, long blockSize, Progressable progress, ChecksumOpt checksumOpt) throws IOException {
+    public FSDataOutputStream create(
+            Path path,
+            FsPermission permission,
+            EnumSet<CreateFlag> flags,
+            int bufferSize,
+            short replication,
+            long blockSize,
+            Progressable progress,
+            ChecksumOpt checksumOpt)
+            throws IOException {
         return delegate.create(to(path), permission, flags, bufferSize, replication, blockSize, progress, checksumOpt);
     }
 
@@ -154,5 +169,4 @@ public final class PathConvertingFileSystem extends DelegatingFileSystem {
                 status.isSymlink() ? status.getSymlink() : null, // getSymlink throws if file is not a symlink
                 from(status.getPath()));
     }
-
 }

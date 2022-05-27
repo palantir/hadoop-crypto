@@ -33,8 +33,8 @@ enum SymmetricKeySerializerV4 implements SymmetricKeySerializer {
     private static final int IV_SIZE = 16;
     private static final int VERSION = 4;
 
-    private static final SymmetricKeySerializer delegate = new CipherSymmetricKeySerializer(
-            IV_SIZE, VERSION, SymmetricKeySerializerV4::getCipher);
+    private static final SymmetricKeySerializer delegate =
+            new CipherSymmetricKeySerializer(IV_SIZE, VERSION, SymmetricKeySerializerV4::getCipher);
 
     static Cipher getCipher(int cipherMode, SecretKey key, byte[] iv) {
         try {

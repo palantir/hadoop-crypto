@@ -94,18 +94,22 @@ public final class KeyMaterials {
 
     public static KeyMaterial unwrap(byte[] wrappedKeyMaterial, PrivateKey key) {
         int version = version(wrappedKeyMaterial);
-        checkArgument(ASYMMETRIC_SERIALIZERS.containsKey(version),
+        checkArgument(
+                ASYMMETRIC_SERIALIZERS.containsKey(version),
                 "Invalid serialization format version. Expected version in %s but found %s",
-                ASYMMETRIC_SERIALIZERS.keySet(), version);
+                ASYMMETRIC_SERIALIZERS.keySet(),
+                version);
 
         return ASYMMETRIC_SERIALIZERS.get(version).unwrap(wrappedKeyMaterial, key);
     }
 
     public static KeyMaterial symmetricUnwrap(byte[] wrappedKeyMaterial, SecretKey key) {
         int version = version(wrappedKeyMaterial);
-        checkArgument(SYMMETRIC_SERIALIZERS.containsKey(version),
+        checkArgument(
+                SYMMETRIC_SERIALIZERS.containsKey(version),
                 "Invalid serialization format version. Expected version in %s but found %s",
-                SYMMETRIC_SERIALIZERS.keySet(), version);
+                SYMMETRIC_SERIALIZERS.keySet(),
+                version);
 
         return SYMMETRIC_SERIALIZERS.get(version).unwrap(wrappedKeyMaterial, key);
     }
@@ -143,10 +147,12 @@ public final class KeyMaterials {
                         "Requested key length %d exceeds JVM allowable key length %d for %s",
                         desiredLength, maxAllowedKeyLength, algorithm));
             }
-            log.warn("Requested key length {} exceeds JVM allowable key length for algorithm {}, using key size: {}",
-                    desiredLength, algorithm, maxAllowedKeyLength);
+            log.warn(
+                    "Requested key length {} exceeds JVM allowable key length for algorithm {}, using key size: {}",
+                    desiredLength,
+                    algorithm,
+                    maxAllowedKeyLength);
         }
         return safeSize;
     }
-
 }

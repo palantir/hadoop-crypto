@@ -48,8 +48,10 @@ public final class CryptoStreamFactory {
             log.info("Detected OpenSSL: the openssl native implementation will be used for AES/CTR/NoPadding");
             return true;
         } catch (Throwable t) {
-            log.info("Unable to initialize cipher with OpenSSL, falling back to "
-                    + "JCE implementation - see github.com/palantir/hadoop-crypto#faq", t);
+            log.info(
+                    "Unable to initialize cipher with OpenSSL, falling back to "
+                            + "JCE implementation - see github.com/palantir/hadoop-crypto#faq",
+                    t);
             return false;
         }
     });
@@ -114,8 +116,8 @@ public final class CryptoStreamFactory {
         return new CtrCryptoOutputStream(PROPS, output, secretKey.getEncoded(), iv);
     }
 
-    private static OutputStream createDefaultEncryptedStream(OutputStream output, KeyMaterial keyMaterial,
-            String algorithm) {
+    private static OutputStream createDefaultEncryptedStream(
+            OutputStream output, KeyMaterial keyMaterial, String algorithm) {
         SeekableCipher cipher = SeekableCipherFactory.getCipher(algorithm, keyMaterial);
         return new ChunkingOutputStream(new CipherOutputStream(output, cipher.initCipher(Cipher.ENCRYPT_MODE)));
     }
