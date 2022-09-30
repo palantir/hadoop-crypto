@@ -20,6 +20,7 @@ plugins {
 apply plugin: 'com.palantir.external-publish'
 apply plugin: 'com.palantir.baseline'
 apply plugin: 'com.palantir.consistent-versions'
+apply plugin: 'com.palantir.baseline-java-versions'
 
 allprojects {
     group 'com.palantir.hadoop-crypto2'
@@ -36,9 +37,12 @@ subprojects {
     apply plugin: 'com.palantir.external-publish-jar'
 
     tasks.check.dependsOn javadoc, checkUnusedDependencies
-    sourceCompatibility = 1.8
 
     dependencies {
         processor "org.immutables:value"
     }
+}
+
+javaVersions {
+    libraryTarget = 11
 }
