@@ -46,5 +46,4 @@ interface KeySerializer {
      * Returns the unique version of the serializer.
      */
     int getVersion();
-
 }

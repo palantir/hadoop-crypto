@@ -44,5 +44,4 @@ public final class KeySerializerV1Test extends KeySerializerTest {
                 .withCauseInstanceOf(InvalidKeyException.class)
                 .withMessageContaining("Unwrapping failed");
     }
-
 }

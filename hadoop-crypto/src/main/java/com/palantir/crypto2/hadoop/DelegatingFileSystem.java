@@ -49,8 +49,7 @@ public abstract class DelegatingFileSystem extends FilterFileSystem {
     }
 
     @Override
-    public final void copyFromLocalFile(boolean delSrc, Path src, Path dst)
-            throws IOException {
+    public final void copyFromLocalFile(boolean delSrc, Path src, Path dst) throws IOException {
         copyFromLocalFile(delSrc, true, src, dst);
     }
 
@@ -80,9 +79,7 @@ public abstract class DelegatingFileSystem extends FilterFileSystem {
     public final void copyToLocalFile(boolean delSrc, Path src, Path dst, boolean useRawLocalFileSystem)
             throws IOException {
         Configuration conf = getConf();
-        FileSystem local = useRawLocalFileSystem
-                ? getLocal(conf).getRaw()
-                : getLocal(conf);
+        FileSystem local = useRawLocalFileSystem ? getLocal(conf).getRaw() : getLocal(conf);
         FileUtil.copy(this, src, local, dst, delSrc, conf);
     }
 

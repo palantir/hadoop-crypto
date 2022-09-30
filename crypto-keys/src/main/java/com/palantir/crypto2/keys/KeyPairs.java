@@ -54,5 +54,4 @@ public final class KeyPairs {
             throw Throwables.propagate(e);
         }
     }
-
 }

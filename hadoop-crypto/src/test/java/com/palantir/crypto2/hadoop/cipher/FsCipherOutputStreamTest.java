@@ -79,5 +79,4 @@ public final class FsCipherOutputStreamTest {
         scos.write(bytes);
         verify(cos).write(bytes);
     }
-
 }
