@@ -8,13 +8,13 @@ buildscript {
         classpath 'com.palantir.gradle.externalpublish:gradle-external-publish-plugin:1.4.0'
         classpath 'com.github.jengelman.gradle.plugins:shadow:6.1.0'
         classpath 'com.palantir.baseline:gradle-baseline-java:4.42.0'
-        classpath 'com.palantir.gradle.consistentversions:gradle-consistent-versions:2.1.0'
+        classpath 'com.palantir.gradle.consistentversions:gradle-consistent-versions:2.11.0'
     }
 }
 
 plugins {
-    id 'com.palantir.git-version' version '0.12.3'
-    id 'org.inferred.processors' version '3.6.0'
+    id 'com.palantir.git-version' version '0.15.0'
+    id 'org.inferred.processors' version '3.7.0'
 }
 
 apply plugin: 'com.palantir.external-publish'
