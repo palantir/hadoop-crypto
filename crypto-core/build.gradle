@@ -1,20 +1,20 @@
 apply from: "${rootDir}/gradle/openssl.gradle"
 
 dependencies {
-    compile project(':crypto-keys')
+    api project(':crypto-keys')
 
-    compile "com.google.guava:guava"
-    compile "com.palantir.seek-io:seek-io"
-    compile "org.apache.commons:commons-crypto"
+    api "com.google.guava:guava"
+    api "com.palantir.seek-io:seek-io"
+    api "org.apache.commons:commons-crypto"
     implementation "org.slf4j:slf4j-api"
 
     annotationProcessor 'org.openjdk.jmh:jmh-generator-annprocess'
     compileOnly 'org.openjdk.jmh:jmh-generator-annprocess'
 
-    testCompile "junit:junit"
-    testCompile "org.assertj:assertj-core"
-    testCompile "org.mockito:mockito-core"
-    testCompile 'org.openjdk.jmh:jmh-core'
+    testImplementation "junit:junit"
+    testImplementation "org.assertj:assertj-core"
+    testImplementation "org.mockito:mockito-core"
+    testImplementation 'org.openjdk.jmh:jmh-core'
 }
 
 project.task(type: JavaExec, 'benchmarks') {
