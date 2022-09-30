@@ -2,94 +2,141 @@
 # To request a modification to the general template, file an issue on Excavator.
 # To manually manage the CircleCI configuration for this project, remove the .circleci/template.sh file.
 
-version: 2
+version: 2.1
 jobs:
 
-  compile:
-    docker: [{ image: 'ellisjoe/openjdk-java-openssl:java-8' }]
-    resource_class: xlarge
+  check:
+    docker: [{ image: 'cimg/openjdk:8.0.282-node' }]
+    resource_class: large
     environment:
-      GRADLE_OPTS: -Dorg.gradle.console=plain -Dorg.gradle.internal.launcher.welcomeMessageEnabled=false
-
+      CIRCLE_TEST_REPORTS: /home/circleci/junit
+      CIRCLE_ARTIFACTS: /home/circleci/artifacts
+      GRADLE_OPTS: -Dorg.gradle.workers.max=2 -Dorg.gradle.jvmargs='-Xmx2g'
+      _JAVA_OPTIONS: -XX:ActiveProcessorCount=4 -XX:MaxRAM=8g -XX:ErrorFile=/home/circleci/artifacts/hs_err_pid%p.log -XX:HeapDumpPath=/home/circleci/artifacts
     steps:
       - checkout
-      - restore_cache: { key: 'gradle-wrapper-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}' }
-      - restore_cache: { key: 'gradle-cache-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}' }
-      - run: ./gradlew --no-daemon --parallel --continue classes testClasses
+      - run:
+          name: delete_unrelated_tags
+          command: |
+            ALL_TAGS=$(git tag --points-at HEAD)
+
+            if [ -z "$ALL_TAGS" ]; then
+                echo "No-op as there are no tags on the current commit ($(git rev-parse HEAD))"
+                exit 0
+            fi
+
+            if [ -z "${CIRCLE_TAG:+x}" ]; then
+                echo "Non-tag build, deleting all tags which point to HEAD: [${ALL_TAGS/$'\n'/,}]"
+                echo "$ALL_TAGS" | while read -r TAG; do git tag -d "$TAG" 1>/dev/null; done
+                exit 0
+            fi
+
+            TAGS_TO_DELETE=$(echo "$ALL_TAGS" | grep -v "^$CIRCLE_TAG$" || :)
+            if [ -z "$TAGS_TO_DELETE" ]; then
+                echo "No-op as exactly one tag ($CIRCLE_TAG) points to HEAD"
+                exit 0
+            fi
+
+            echo "Detected tag build, deleting all tags except '$CIRCLE_TAG' which point to HEAD: [${TAGS_TO_DELETE/$'\n'/,}]"
+            echo "$TAGS_TO_DELETE" | while read -r TAG; do git tag -d "$TAG" 1>/dev/null; done
+      - restore_cache: { key: 'gradle-wrapper-v1-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}' }
+      - restore_cache: { key: 'check-gradle-cache-v1-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}' }
+      - run: ./gradlew --parallel --stacktrace --continue --max-workers=2 check -Porg.gradle.java.installations.fromEnv=JAVA_8_HOME,JAVA_11_HOME,JAVA_15_HOME,JAVA_17_HOME,JAVA_HOME
+      - persist_to_workspace:
+          root: /home/circleci
+          paths: [ project ]
       - save_cache:
-          key: gradle-wrapper-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
+          key: 'gradle-wrapper-v1-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}'
           paths: [ ~/.gradle/wrapper ]
       - save_cache:
-          key: gradle-cache-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}
+          key: 'check-gradle-cache-v1-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}'
           paths: [ ~/.gradle/caches ]
-
-  build:
-    docker: [{ image: 'ellisjoe/openjdk-java-openssl:java-8' }]
-    resource_class: xlarge
-    environment:
-      GRADLE_OPTS: -Dorg.gradle.console=plain -Dorg.gradle.internal.launcher.welcomeMessageEnabled=false
-
-    steps:
-      - checkout
-      - restore_cache: { key: 'gradle-wrapper-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}' }
-      - restore_cache: { key: 'gradle-cache-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}' }
-      - run: ./gradlew --no-daemon --parallel --continue build
       - run:
           command: mkdir -p ~/junit && find . -type f -regex ".*/build/.*TEST.*xml" -exec cp --parents {} ~/junit/ \;
           when: always
       - store_test_results: { path: ~/junit }
-      - store_artifacts: { path: ~/poms }
+      - store_artifacts: { path: ~/artifacts }
 
-  build-ibm:
-    docker: [{ image: 'ellisjoe/ibm-java-openssl:java-8' }]
-    resource_class: xlarge
+  trial-publish:
+    docker: [{ image: 'cimg/openjdk:8.0.282-node' }]
+    resource_class: medium
     environment:
-      GRADLE_OPTS: -Dorg.gradle.console=plain -Dorg.gradle.internal.launcher.welcomeMessageEnabled=false
-
+      CIRCLE_TEST_REPORTS: /home/circleci/junit
+      CIRCLE_ARTIFACTS: /home/circleci/artifacts
+      GRADLE_OPTS: -Dorg.gradle.workers.max=1 -Dorg.gradle.jvmargs='-Xmx2g'
+      _JAVA_OPTIONS: -XX:ActiveProcessorCount=2 -XX:MaxRAM=4g -XX:ErrorFile=/home/circleci/artifacts/hs_err_pid%p.log -XX:HeapDumpPath=/home/circleci/artifacts
     steps:
       - checkout
-      - restore_cache: { key: 'gradle-wrapper-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}' }
-      - restore_cache: { key: 'gradle-cache-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}' }
-      - run: ./gradlew --no-daemon --parallel --continue crypto-core:test
       - run:
-          command: mkdir -p ~/junit && find . -type f -regex ".*/build/.*TEST.*xml" -exec cp --parents {} ~/junit/ \;
+          name: delete_unrelated_tags
+          command: |
+            ALL_TAGS=$(git tag --points-at HEAD)
+
+            if [ -z "$ALL_TAGS" ]; then
+                echo "No-op as there are no tags on the current commit ($(git rev-parse HEAD))"
+                exit 0
+            fi
+
+            if [ -z "${CIRCLE_TAG:+x}" ]; then
+                echo "Non-tag build, deleting all tags which point to HEAD: [${ALL_TAGS/$'\n'/,}]"
+                echo "$ALL_TAGS" | while read -r TAG; do git tag -d "$TAG" 1>/dev/null; done
+                exit 0
+            fi
+
+            TAGS_TO_DELETE=$(echo "$ALL_TAGS" | grep -v "^$CIRCLE_TAG$" || :)
+            if [ -z "$TAGS_TO_DELETE" ]; then
+                echo "No-op as exactly one tag ($CIRCLE_TAG) points to HEAD"
+                exit 0
+            fi
+
+            echo "Detected tag build, deleting all tags except '$CIRCLE_TAG' which point to HEAD: [${TAGS_TO_DELETE/$'\n'/,}]"
+            echo "$TAGS_TO_DELETE" | while read -r TAG; do git tag -d "$TAG" 1>/dev/null; done
+      - restore_cache: { key: 'gradle-wrapper-v1-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}' }
+      - restore_cache: { key: 'trial-publish-gradle-cache-v1-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}' }
+      - run: ./gradlew --stacktrace publishToMavenLocal -Porg.gradle.java.installations.fromEnv=JAVA_8_HOME,JAVA_11_HOME,JAVA_15_HOME,JAVA_17_HOME,JAVA_HOME
+      - run:
+          command: git status --porcelain
           when: always
+      - save_cache:
+          key: 'trial-publish-gradle-cache-v1-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}'
+          paths: [ ~/.gradle/caches ]
       - store_test_results: { path: ~/junit }
+      - store_artifacts: { path: ~/artifacts }
 
   publish:
-    docker: [{ image: 'ellisjoe/openjdk-java-openssl:java-8' }]
-    resource_class: xlarge
+    docker: [{ image: 'cimg/openjdk:8.0.282-node' }]
+    resource_class: medium
     environment:
-      GRADLE_OPTS: -Dorg.gradle.console=plain -Dorg.gradle.internal.launcher.welcomeMessageEnabled=false
-
+      CIRCLE_TEST_REPORTS: /home/circleci/junit
+      CIRCLE_ARTIFACTS: /home/circleci/artifacts
+      GRADLE_OPTS: -Dorg.gradle.workers.max=1 -Dorg.gradle.jvmargs='-Xmx2g'
+      _JAVA_OPTIONS: -XX:ActiveProcessorCount=2 -XX:MaxRAM=4g -XX:ErrorFile=/home/circleci/artifacts/hs_err_pid%p.log -XX:HeapDumpPath=/home/circleci/artifacts
     steps:
-      - checkout
-      - restore_cache: { key: 'gradle-wrapper-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}' }
-      - restore_cache: { key: 'gradle-cache-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}' }
+      - attach_workspace: { at: /home/circleci }
+      - restore_cache: { key: 'gradle-wrapper-v1-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}' }
+      - restore_cache: { key: 'publish-gradle-cache-v1-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}' }
       - deploy:
-          command: |
-            # publishing snapshots to bintray does not work, so we only publish from tag builds (not develop)
-            if [[ "${CIRCLE_TAG}" =~ [0-9]+(\.[0-9]+)+(-[a-zA-Z]+[0-9]*)* ]]; then
-              ./gradlew --no-daemon --stacktrace --continue publish
-            else
-              ./gradlew --no-daemon --parallel --continue publishToMavenLocal
-              mkdir -p ~/poms
-              find . -name 'pom-default.xml' -exec cp --parents {} ~/poms \;
-            fi
+          command: ./gradlew --parallel --stacktrace --continue publish -Porg.gradle.java.installations.fromEnv=JAVA_8_HOME,JAVA_11_HOME,JAVA_15_HOME,JAVA_17_HOME,JAVA_HOME
+      - run:
+          command: git status --porcelain
+          when: always
+      - save_cache:
+          key: 'publish-gradle-cache-v1-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}'
+          paths: [ ~/.gradle/caches ]
+      - store_test_results: { path: ~/junit }
+      - store_artifacts: { path: ~/artifacts }
+
 
 workflows:
   version: 2
   build:
     jobs:
-      - compile:
-          # CircleCI2 will ignore tags without this. https://circleci.com/docs/2.0/workflows/#git-tag-job-execution
+      - check:
           filters: { tags: { only: /.*/ } }
-      - build:
-          requires: [ compile ]
-          filters: { tags: { only: /.*/ } }
-      - build-ibm:
-          requires: [ compile ]
-          filters: { tags: { only: /.*/ } }
+
+      - trial-publish:
+          filters: { branches: { ignore: develop } }
+
       - publish:
-          requires: [ build, build-ibm ]
-          filters: { tags: { only: /.*/ } }
+          requires: [ check, trial-publish ]
+          filters: { tags: { only: /.*/ }, branches: { only: develop } }
