@@ -45,5 +45,4 @@ public final class TestKeyPairs {
         keyGen.initialize(keysize, random);
         return keyGen.generateKeyPair();
     }
-
 }

@@ -37,5 +37,4 @@ public interface CipherStreamSupplier {
      * encryption.
      */
     CipherOutputStream getOutputStream(OutputStream os, Cipher cipher);
-
 }
