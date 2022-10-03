@@ -16,6 +16,7 @@
 
 package com.palantir.crypto2.hadoop;
 
+import com.palantir.logsafe.exceptions.SafeRuntimeException;
 import java.io.IOException;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.BlockLocation;
@@ -28,9 +29,9 @@ import org.apache.hadoop.fs.Path;
  * Equivalent to {@link FilterFileSystem} but invokes {@link #create} and {@link #open} on this class when calling
  * {@link #copyFromLocalFile} and {@link #copyToLocalFile}.
  * <p>
- * Additionally delegates (@link getFileBlockLocations(Path, long, long)} to the underlying filesystem.
+ * Additionally, delegates {@link #getFileBlockLocations(Path, long, long)} to the underlying filesystem.
  * <p>
- * Solves: https://issues.apache.org/jira/browse/HADOOP-13870
+ * Solves: <a href="https://issues.apache.org/jira/browse/HADOOP-13870">HADOOP-13870</a>
  */
 public abstract class DelegatingFileSystem extends FilterFileSystem {
 
@@ -39,7 +40,7 @@ public abstract class DelegatingFileSystem extends FilterFileSystem {
         try {
             super.initialize(delegate.getUri(), delegate.getConf());
         } catch (IOException e) {
-            throw new RuntimeException("Failed to initialize the delegating filesystem", e);
+            throw new SafeRuntimeException("Failed to initialize the delegating filesystem", e);
         }
     }
 

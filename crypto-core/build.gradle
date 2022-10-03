@@ -3,18 +3,22 @@ apply from: "${rootDir}/gradle/openssl.gradle"
 dependencies {
     api project(':crypto-keys')
 
-    api "com.google.guava:guava"
-    api "com.palantir.seek-io:seek-io"
-    api "org.apache.commons:commons-crypto"
-    implementation "org.slf4j:slf4j-api"
+    api 'com.google.guava:guava'
+    api 'com.palantir.seek-io:seek-io'
+    api 'org.apache.commons:commons-crypto'
+
+    implementation 'com.palantir.safe-logging:logger'
+    implementation 'com.palantir.safe-logging:preconditions'
+    implementation 'com.palantir.safe-logging:safe-logging'
 
     annotationProcessor 'org.openjdk.jmh:jmh-generator-annprocess'
     compileOnly 'org.openjdk.jmh:jmh-generator-annprocess'
 
-    testImplementation "junit:junit"
-    testImplementation "org.assertj:assertj-core"
-    testImplementation "org.mockito:mockito-core"
+    testImplementation 'junit:junit'
+    testImplementation 'org.assertj:assertj-core'
+    testImplementation 'org.mockito:mockito-core'
     testImplementation 'org.openjdk.jmh:jmh-core'
+    testImplementation 'com.palantir.safe-logging:preconditions-assertj'
 }
 
 project.task(type: JavaExec, 'benchmarks') {

@@ -16,12 +16,12 @@
 
 package com.palantir.crypto2.hadoop;
 
-import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 import com.google.common.io.ByteStreams;
 import com.palantir.crypto2.keys.KeyMaterial;
 import com.palantir.crypto2.keys.KeyStorageStrategy;
 import com.palantir.crypto2.keys.serialization.KeyMaterials;
+import com.palantir.logsafe.Preconditions;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
