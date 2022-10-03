@@ -16,10 +16,12 @@
 
 package com.palantir.crypto2.cipher;
 
-import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 import com.palantir.crypto2.keys.KeyMaterial;
 import com.palantir.crypto2.keys.serialization.KeyMaterials;
+import com.palantir.logsafe.Preconditions;
+import com.palantir.logsafe.SafeArg;
+import com.palantir.logsafe.exceptions.SafeIllegalArgumentException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -74,11 +76,12 @@ public final class AesCbcCipher implements SeekableCipher {
     public Cipher seek(long pos) {
         Preconditions.checkState(
                 currentOpmode == Cipher.DECRYPT_MODE || currentOpmode == Cipher.ENCRYPT_MODE, "Cipher not initialized");
-        Preconditions.checkArgument(pos >= 0, "Cannot seek to negative position: %s", pos);
+        if (pos < 0) {
+            throw new SafeIllegalArgumentException("Cannot seek to negative position", SafeArg.of("pos", pos));
+        }
         Preconditions.checkArgument(
                 pos % BLOCK_SIZE == 0,
-                "Can only seek AES/CBC cipher to block offset positions every %s bytes",
-                BLOCK_SIZE);
+                "Can only seek AES/CBC cipher to block offset positions every " + BLOCK_SIZE + " bytes");
         return initCipher(currentOpmode);
     }
 

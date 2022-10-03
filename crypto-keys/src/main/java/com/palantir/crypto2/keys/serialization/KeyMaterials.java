@@ -20,6 +20,10 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 import com.google.common.base.Throwables;
 import com.palantir.crypto2.keys.KeyMaterial;
+import com.palantir.logsafe.SafeArg;
+import com.palantir.logsafe.exceptions.SafeRuntimeException;
+import com.palantir.logsafe.logger.SafeLogger;
+import com.palantir.logsafe.logger.SafeLoggerFactory;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -33,8 +37,6 @@ import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Utilities for {@link KeyMaterial} generation and serialization. The KeyMaterial is securely serialized by wrapping
@@ -42,7 +44,7 @@ import org.slf4j.LoggerFactory;
  */
 public final class KeyMaterials {
 
-    private static final Logger log = LoggerFactory.getLogger(KeyMaterials.class);
+    private static final SafeLogger log = SafeLoggerFactory.get(KeyMaterials.class);
     private static final Map<Integer, ? extends KeySerializer> ASYMMETRIC_SERIALIZERS =
             KeySerializers.getAsymmetricSerializers();
     private static final Map<Integer, ? extends SymmetricKeySerializer> SYMMETRIC_SERIALIZERS =
@@ -119,7 +121,7 @@ public final class KeyMaterials {
             DataInputStream stream = new DataInputStream(new ByteArrayInputStream(wrappedKeyMaterial));
             return stream.read();
         } catch (IOException e) {
-            throw new RuntimeException("Unable to read version from wrapped key", e);
+            throw new SafeRuntimeException("Unable to read version from wrapped key", e);
         }
     }
 
@@ -142,16 +144,17 @@ public final class KeyMaterials {
         }
         int safeSize = Math.min(maxAllowedKeyLength, desiredLength);
         if (safeSize < desiredLength) {
-            if (!Boolean.valueOf(System.getenv("OVERRIDE_KEY_SAFETY_PROTECTIONS"))) {
+            if (!Boolean.parseBoolean(System.getenv("OVERRIDE_KEY_SAFETY_PROTECTIONS"))) {
                 throw new InvalidKeyException(String.format(
                         "Requested key length %d exceeds JVM allowable key length %d for %s",
                         desiredLength, maxAllowedKeyLength, algorithm));
             }
             log.warn(
-                    "Requested key length {} exceeds JVM allowable key length for algorithm {}, using key size: {}",
-                    desiredLength,
-                    algorithm,
-                    maxAllowedKeyLength);
+                    "Requested key length exceeds JVM allowable key length for algorithm, using max key size",
+                    SafeArg.of("desiredLength", desiredLength),
+                    SafeArg.of("algorithm", algorithm),
+                    SafeArg.of("maxAllowedKeyLength", maxAllowedKeyLength),
+                    SafeArg.of("safeSize", safeSize));
         }
         return safeSize;
     }

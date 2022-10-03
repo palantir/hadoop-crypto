@@ -16,14 +16,15 @@
 
 package com.palantir.crypto2.keys;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
+import com.palantir.logsafe.Preconditions;
+import com.palantir.logsafe.SafeArg;
+import com.palantir.logsafe.logger.SafeLogger;
+import com.palantir.logsafe.logger.SafeLoggerFactory;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Wrapper that allows ordered usage of multiple {@link KeyStorageStrategy}s. {@link #put} dispatches to every storage
@@ -32,7 +33,7 @@ import org.slf4j.LoggerFactory;
  */
 public final class ChainedKeyStorageStrategy implements KeyStorageStrategy {
 
-    private static final Logger log = LoggerFactory.getLogger(ChainedKeyStorageStrategy.class);
+    private static final SafeLogger log = SafeLoggerFactory.get(ChainedKeyStorageStrategy.class);
 
     private final List<KeyStorageStrategy> strategies;
 
@@ -61,8 +62,8 @@ public final class ChainedKeyStorageStrategy implements KeyStorageStrategy {
             } catch (Exception e) {
                 suppressedExceptions.add(e);
                 log.info(
-                        "Failed to get key material using {}",
-                        strategy.getClass().getCanonicalName(),
+                        "Failed to get key material using strategy",
+                        SafeArg.of("strategy", strategy.getClass().getCanonicalName()),
                         e);
             }
         }

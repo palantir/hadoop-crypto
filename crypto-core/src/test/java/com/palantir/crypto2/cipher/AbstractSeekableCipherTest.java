@@ -16,10 +16,13 @@
 
 package com.palantir.crypto2.cipher;
 
+import static com.palantir.logsafe.testing.Assertions.assertThatLoggableExceptionThrownBy;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import com.palantir.crypto2.keys.KeyMaterial;
+import com.palantir.logsafe.SafeArg;
+import com.palantir.logsafe.exceptions.SafeIllegalArgumentException;
 import java.util.Arrays;
 import java.util.Random;
 import javax.crypto.BadPaddingException;
@@ -102,9 +105,10 @@ public abstract class AbstractSeekableCipherTest {
     public final void testSeek_seekNegativeValue() {
         long negPos = -1;
 
-        assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> seekableCipher.seek(negPos))
-                .withMessage("Cannot seek to negative position: %d", negPos);
+        assertThatLoggableExceptionThrownBy(() -> seekableCipher.seek(negPos))
+                .isInstanceOf(SafeIllegalArgumentException.class)
+                .hasMessageContaining("Cannot seek to negative position")
+                .containsArgs(SafeArg.of("pos", negPos));
     }
 
     @Test

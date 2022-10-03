@@ -37,7 +37,7 @@ import org.junit.Test;
 public final class ChainedAsyncKeyStorageStrategyTest {
 
     private static final Executor EXECUTOR = MoreExecutors.directExecutor();
-    private static final CompletableFuture VOID = CompletableFuture.allOf();
+    private static final CompletableFuture<Void> VOID = CompletableFuture.allOf();
     private static final String KEY = "key";
 
     private KeyMaterial keyMaterial;
@@ -141,9 +141,16 @@ public final class ChainedAsyncKeyStorageStrategyTest {
         verify(successfulStrategy, never()).get(KEY);
 
         // sanity check that not cancelling invokes the strategy
-        chained.get(KEY);
+        CompletableFuture<KeyMaterial> keyMaterialFuture = chained.get(KEY);
         executor.runUntilIdle();
 
         verify(successfulStrategy).get(KEY);
+
+        assertThat(keyMaterialFuture)
+                .isCompleted()
+                .isDone()
+                .isNotCompletedExceptionally()
+                .isNotCancelled()
+                .satisfies(f -> assertThat(f.join()).isNotNull());
     }
 }

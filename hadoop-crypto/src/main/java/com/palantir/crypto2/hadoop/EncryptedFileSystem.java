@@ -24,6 +24,9 @@ import com.palantir.crypto2.hadoop.cipher.FsCipherInputStream;
 import com.palantir.crypto2.io.CryptoStreamFactory;
 import com.palantir.crypto2.keys.KeyMaterial;
 import com.palantir.crypto2.keys.KeyStorageStrategy;
+import com.palantir.logsafe.UnsafeArg;
+import com.palantir.logsafe.logger.SafeLogger;
+import com.palantir.logsafe.logger.SafeLoggerFactory;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
@@ -38,8 +41,6 @@ import org.apache.hadoop.fs.Options.ChecksumOpt;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.util.Progressable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A {@link FileSystem} wrapper that encrypts and decrypts the streams from the underlying {@link FileSystem}. The
@@ -50,7 +51,7 @@ import org.slf4j.LoggerFactory;
  */
 public final class EncryptedFileSystem extends DelegatingFileSystem {
 
-    private static final Logger log = LoggerFactory.getLogger(EncryptedFileSystem.class);
+    private static final SafeLogger log = SafeLoggerFactory.get(EncryptedFileSystem.class);
     private static final String DEFAULT_CIPHER_ALGORITHM = AesCtrCipher.ALGORITHM;
 
     /**
@@ -152,10 +153,16 @@ public final class EncryptedFileSystem extends DelegatingFileSystem {
     }
 
     private void tryRemoveKey(Path path) {
+        String fileKey = null;
         try {
-            keyStore.remove(path.toString());
+            fileKey = path.toString();
+            keyStore.remove(fileKey);
         } catch (Exception e) {
-            log.warn("Unable to remove KeyMaterial for file: {}", path, e);
+            log.warn(
+                    "Unable to remove KeyMaterial for file",
+                    UnsafeArg.of("fileKey", fileKey),
+                    UnsafeArg.of("path", path),
+                    e);
         }
     }
 

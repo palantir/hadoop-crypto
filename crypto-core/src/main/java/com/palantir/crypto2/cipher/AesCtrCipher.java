@@ -16,10 +16,12 @@
 
 package com.palantir.crypto2.cipher;
 
-import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 import com.palantir.crypto2.keys.KeyMaterial;
 import com.palantir.crypto2.keys.serialization.KeyMaterials;
+import com.palantir.logsafe.Preconditions;
+import com.palantir.logsafe.SafeArg;
+import com.palantir.logsafe.exceptions.SafeIllegalArgumentException;
 import java.math.BigInteger;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -70,7 +72,9 @@ public final class AesCtrCipher implements SeekableCipher {
     public Cipher seek(long pos) {
         Preconditions.checkState(
                 currentOpmode == Cipher.DECRYPT_MODE || currentOpmode == Cipher.ENCRYPT_MODE, "Cipher not initialized");
-        Preconditions.checkArgument(pos >= 0, "Cannot seek to negative position: %s", pos);
+        if (pos < 0) {
+            throw new SafeIllegalArgumentException("Cannot seek to negative position", SafeArg.of("pos", pos));
+        }
 
         // Compute the block that the byte 'pos' is located in
         BigInteger block = BigInteger.valueOf(pos / BLOCK_SIZE);

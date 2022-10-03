@@ -16,17 +16,18 @@
 
 package com.palantir.crypto2.keys;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
+import com.palantir.logsafe.Preconditions;
+import com.palantir.logsafe.SafeArg;
+import com.palantir.logsafe.logger.SafeLogger;
+import com.palantir.logsafe.logger.SafeLoggerFactory;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.function.Function;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Async equivalent of {@link ChainedKeyStorageStrategy}. {@link #put(String, KeyMaterial)} and {@link #remove(String)}
@@ -35,7 +36,7 @@ import org.slf4j.LoggerFactory;
  */
 public final class ChainedAsyncKeyStorageStrategy implements AsyncKeyStorageStrategy {
 
-    private static final Logger log = LoggerFactory.getLogger(ChainedAsyncKeyStorageStrategy.class);
+    private static final SafeLogger log = SafeLoggerFactory.get(ChainedAsyncKeyStorageStrategy.class);
 
     private final Executor executor;
     private final List<AsyncKeyStorageStrategy> strategies;
@@ -66,8 +67,8 @@ public final class ChainedAsyncKeyStorageStrategy implements AsyncKeyStorageStra
                         } catch (Exception e) {
                             suppressedExceptions.add(e);
                             log.info(
-                                    "Failed to get key material using {}",
-                                    strategy.getClass().getCanonicalName(),
+                                    "Failed to get key material using strategy",
+                                    SafeArg.of("strategy", strategy.getClass().getCanonicalName()),
                                     e);
                         }
                     }
@@ -86,7 +87,7 @@ public final class ChainedAsyncKeyStorageStrategy implements AsyncKeyStorageStra
     }
 
     private CompletableFuture<Void> applyToStrategies(Function<AsyncKeyStorageStrategy, CompletableFuture<?>> mapper) {
-        CompletableFuture[] futures = strategies.stream().map(mapper).toArray(CompletableFuture[]::new);
+        CompletableFuture<?>[] futures = strategies.stream().map(mapper).toArray(CompletableFuture[]::new);
         return CompletableFuture.allOf(futures);
     }
 }
