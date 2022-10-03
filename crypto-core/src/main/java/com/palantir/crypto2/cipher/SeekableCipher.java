@@ -46,5 +46,4 @@ public interface SeekableCipher {
      * Returns the underlying {@link Cipher}'s block size.
      */
     int getBlockSize();
-
 }

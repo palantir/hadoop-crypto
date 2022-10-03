@@ -63,5 +63,4 @@ public final class ExampleUsage {
         decryptedStream.read(readBytes, 0, bytes.length);
         assertThat(readBytes).isEqualTo(bytes);
     }
-
 }

@@ -146,5 +146,4 @@ public final class ChainedAsyncKeyStorageStrategyTest {
 
         verify(successfulStrategy).get(KEY);
     }
-
 }

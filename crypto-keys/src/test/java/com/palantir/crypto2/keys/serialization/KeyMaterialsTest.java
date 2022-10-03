@@ -87,7 +87,8 @@ public final class KeyMaterialsTest {
 
     @Test
     public void testWrapAndUnwrap_serializedByAllVersions() {
-        for (KeySerializer keySerializer : KeySerializers.getAsymmetricSerializers().values()) {
+        for (KeySerializer keySerializer :
+                KeySerializers.getAsymmetricSerializers().values()) {
             testUnwrapWhenSerializedBy(keySerializer);
         }
     }
@@ -105,7 +106,8 @@ public final class KeyMaterialsTest {
 
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> KeyMaterials.unwrap(wrapped, keyPair.getPrivate()))
-                .withMessage("Invalid serialization format version. Expected version in %s but found 0",
+                .withMessage(
+                        "Invalid serialization format version. Expected version in %s but found 0",
                         KeySerializers.getAsymmetricSerializers().keySet());
     }
 
@@ -133,7 +135,8 @@ public final class KeyMaterialsTest {
 
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> KeyMaterials.symmetricUnwrap(wrapped, symmetricKey))
-                .withMessage("Invalid serialization format version. Expected version in %s but found 0",
+                .withMessage(
+                        "Invalid serialization format version. Expected version in %s but found 0",
                         KeySerializers.getSymmetricSerializers().keySet());
     }
 
@@ -145,5 +148,4 @@ public final class KeyMaterialsTest {
         byte[] iv = keyMaterial.getIv();
         assertThat(KeyMaterials.from(algorithm, encoded, iv)).isEqualTo(keyMaterial);
     }
-
 }

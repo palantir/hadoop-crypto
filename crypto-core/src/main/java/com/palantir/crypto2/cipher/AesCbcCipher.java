@@ -72,11 +72,13 @@ public final class AesCbcCipher implements SeekableCipher {
      */
     @Override
     public Cipher seek(long pos) {
-        Preconditions.checkState(currentOpmode == Cipher.DECRYPT_MODE || currentOpmode == Cipher.ENCRYPT_MODE,
-                "Cipher not initialized");
+        Preconditions.checkState(
+                currentOpmode == Cipher.DECRYPT_MODE || currentOpmode == Cipher.ENCRYPT_MODE, "Cipher not initialized");
         Preconditions.checkArgument(pos >= 0, "Cannot seek to negative position: %s", pos);
-        Preconditions.checkArgument(pos % BLOCK_SIZE == 0,
-                "Can only seek AES/CBC cipher to block offset positions every %s bytes", BLOCK_SIZE);
+        Preconditions.checkArgument(
+                pos % BLOCK_SIZE == 0,
+                "Can only seek AES/CBC cipher to block offset positions every %s bytes",
+                BLOCK_SIZE);
         return initCipher(currentOpmode);
     }
 
@@ -101,5 +103,4 @@ public final class AesCbcCipher implements SeekableCipher {
             throw Throwables.propagate(e);
         }
     }
-
 }

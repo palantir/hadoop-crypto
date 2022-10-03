@@ -44,8 +44,12 @@ public final class ApacheCtrDecryptingSeekableInput extends CtrCryptoInputStream
      * the OpenSSL library is able to be loaded.
      */
     ApacheCtrDecryptingSeekableInput(SeekableInput input, KeyMaterial keyMaterial) throws IOException {
-        super(new InputAdapter(input), getCipherInstance(), BUFFER_SIZE,
-                keyMaterial.getSecretKey().getEncoded(), keyMaterial.getIv());
+        super(
+                new InputAdapter(input),
+                getCipherInstance(),
+                BUFFER_SIZE,
+                keyMaterial.getSecretKey().getEncoded(),
+                keyMaterial.getIv());
     }
 
     static CryptoCipher getCipherInstance() throws IOException {
