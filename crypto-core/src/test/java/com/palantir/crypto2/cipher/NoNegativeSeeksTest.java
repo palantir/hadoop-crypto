@@ -32,8 +32,8 @@ public final class NoNegativeSeeksTest {
         SeekableCipher cipher = SeekableCipherFactory.getCipher(AesCtrCipher.ALGORITHM, keyMaterial);
 
         for (int increment = 16; increment < 2048; increment += 16) {
-            try (DecryptingSeekableInput stream = new DecryptingSeekableInput(
-                    new DisallowNegativeSeeksSeekableInput(), cipher)) {
+            try (DecryptingSeekableInput stream =
+                    new DecryptingSeekableInput(new DisallowNegativeSeeksSeekableInput(), cipher)) {
                 for (int i = 0; i < 1024 * 1024; i += increment) {
                     stream.seek(i);
                 }
@@ -66,5 +66,4 @@ public final class NoNegativeSeeksTest {
             return length;
         }
     }
-
 }

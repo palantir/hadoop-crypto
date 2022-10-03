@@ -92,5 +92,4 @@ public final class SeekableCipherFactoryTest {
                 .isThrownBy(() -> SeekableCipherFactory.getCipher("doesnt_exist", keyMaterial))
                 .withMessage("No known SeekableCipher with algorithm: %s", "doesnt_exist");
     }
-
 }

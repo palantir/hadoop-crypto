@@ -68,8 +68,8 @@ public final class AesCtrCipher implements SeekableCipher {
 
     @Override
     public Cipher seek(long pos) {
-        Preconditions.checkState(currentOpmode == Cipher.DECRYPT_MODE || currentOpmode == Cipher.ENCRYPT_MODE,
-                "Cipher not initialized");
+        Preconditions.checkState(
+                currentOpmode == Cipher.DECRYPT_MODE || currentOpmode == Cipher.ENCRYPT_MODE, "Cipher not initialized");
         Preconditions.checkArgument(pos >= 0, "Cannot seek to negative position: %s", pos);
 
         // Compute the block that the byte 'pos' is located in
@@ -127,5 +127,4 @@ public final class AesCtrCipher implements SeekableCipher {
             throw Throwables.propagate(e);
         }
     }
-
 }

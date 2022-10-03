@@ -45,7 +45,8 @@ public abstract class KeySerializerTest {
 
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> getSerializer().unwrap(wrapped, keyPair.getPrivate()))
-                .withMessage("Invalid serialization format version. Expected %s but found 0",
+                .withMessage(
+                        "Invalid serialization format version. Expected %s but found 0",
                         getSerializer().getVersion());
     }
 
@@ -65,5 +66,4 @@ public abstract class KeySerializerTest {
         KeyMaterial unwrapped = getSerializer().unwrap(wrapped, keyPair.getPrivate());
         assertThat(keyMaterial).isEqualTo(unwrapped);
     }
-
 }

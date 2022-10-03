@@ -2,15 +2,15 @@ apply from: "${rootDir}/gradle/openssl.gradle"
 apply plugin: 'com.github.johnrengelman.shadow'
 
 dependencies {
-    compile project(":crypto-core")
-    compile "org.apache.hadoop:hadoop-client-api"
-    compile "org.slf4j:slf4j-api"
+    api project(":crypto-core")
+    api "org.apache.hadoop:hadoop-client-api"
+    api "org.slf4j:slf4j-api"
 
-    runtime "org.apache.hadoop:hadoop-client-runtime"
+    runtimeOnly "org.apache.hadoop:hadoop-client-runtime"
 
-    testCompile "junit:junit"
-    testCompile "org.assertj:assertj-core"
-    testCompile "org.mockito:mockito-core"
+    testImplementation "junit:junit"
+    testImplementation "org.assertj:assertj-core"
+    testImplementation "org.mockito:mockito-core"
 }
 
 shadowJar {

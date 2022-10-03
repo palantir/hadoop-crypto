@@ -41,5 +41,4 @@ public final class InMemoryKeyStorageStrategy implements KeyStorageStrategy {
     public void remove(String fileKey) {
         store.remove(fileKey);
     }
-
 }
