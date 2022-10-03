@@ -72,8 +72,8 @@ public final class FsCipherInputStream extends FSInputStream {
     }
 
     @Override
-    public int read(byte[] buffer, int offset, int length) throws IOException {
-        return delegate.read(buffer, offset, length);
+    public int read(byte[] buf, int off, int len) throws IOException {
+        return delegate.read(buf, off, len);
     }
 
     @Override
