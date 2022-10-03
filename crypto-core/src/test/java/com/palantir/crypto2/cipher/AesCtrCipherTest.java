@@ -104,7 +104,6 @@ public final class AesCtrCipherTest extends AbstractSeekableCipherTest {
         testEncryptDecrypt(encryptCipher, decryptCipher);
     }
 
-
     @Test
     public void testIvOverflow() {
         KeyMaterial baseKeyMaterial = generateKeyMaterial();

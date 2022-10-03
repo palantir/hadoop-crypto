@@ -42,13 +42,12 @@ public final class FsCipherInputStream extends FSInputStream {
      */
     @Deprecated
     public FsCipherInputStream(FSDataInputStream delegate, SeekableCipher cipher) {
-        this.delegate = new DefaultSeekableInputStream(
-                new DecryptingSeekableInput(new FsSeekableInput(delegate), cipher));
+        this.delegate =
+                new DefaultSeekableInputStream(new DecryptingSeekableInput(new FsSeekableInput(delegate), cipher));
     }
 
     public FsCipherInputStream(FSDataInputStream delegate, KeyMaterial keyMaterial, String algorithm) {
-        SeekableInput decrypted = CryptoStreamFactory.decrypt(
-                new FsSeekableInput(delegate), keyMaterial, algorithm);
+        SeekableInput decrypted = CryptoStreamFactory.decrypt(new FsSeekableInput(delegate), keyMaterial, algorithm);
         this.delegate = new DefaultSeekableInputStream(decrypted);
     }
 
@@ -113,5 +112,4 @@ public final class FsCipherInputStream extends FSInputStream {
             input.close();
         }
     }
-
 }
