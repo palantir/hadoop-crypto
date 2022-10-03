@@ -5,25 +5,25 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.palantir.javaformat:gradle-palantir-java-format:2.27.0'
-        classpath 'com.palantir.gradle.externalpublish:gradle-external-publish-plugin:1.11.0'
-        classpath 'gradle.plugin.com.github.jengelman.gradle.plugins:shadow:7.0.0'
         classpath 'com.palantir.baseline:gradle-baseline-java:4.180.0'
-        classpath 'com.palantir.gradle.consistentversions:gradle-consistent-versions:2.1.0'
+        classpath 'com.palantir.gradle.consistentversions:gradle-consistent-versions:2.11.0'
+        classpath 'com.palantir.gradle.externalpublish:gradle-external-publish-plugin:1.11.0'
+        classpath 'com.palantir.gradle.gitversion:gradle-git-version:0.15.0'
+        classpath 'com.palantir.javaformat:gradle-palantir-java-format:2.27.0'
+        classpath 'gradle.plugin.com.github.jengelman.gradle.plugins:shadow:7.0.0'
+        classpath 'gradle.plugin.org.inferred:gradle-processors:3.7.0'
     }
 }
 
-plugins {
-    id 'com.palantir.git-version' version '0.12.3'
- id 'org.inferred.processors' version '3.7.0'
-}
 
 apply plugin: 'com.palantir.external-publish'
 apply plugin: 'com.palantir.baseline'
 apply plugin: 'com.palantir.consistent-versions'
+apply plugin: 'com.palantir.git-version'
 
 allprojects {
     apply plugin: 'com.palantir.java-format'
+
     group 'com.palantir.hadoop-crypto2'
     version gitVersion()
 
@@ -41,6 +41,6 @@ subprojects {
     sourceCompatibility = 1.8
 
     dependencies {
-        processor "org.immutables:value"
+        processor 'org.immutables:value'
     }
 }
