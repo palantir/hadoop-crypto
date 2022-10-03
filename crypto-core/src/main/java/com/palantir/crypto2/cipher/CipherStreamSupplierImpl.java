@@ -25,7 +25,7 @@ import javax.crypto.CipherOutputStream;
 public final class CipherStreamSupplierImpl implements CipherStreamSupplier {
 
     @Override
-    public  CipherInputStream getInputStream(InputStream is, Cipher cipher) {
+    public CipherInputStream getInputStream(InputStream is, Cipher cipher) {
         return new CipherInputStream(is, cipher);
     }
 
@@ -33,5 +33,4 @@ public final class CipherStreamSupplierImpl implements CipherStreamSupplier {
     public CipherOutputStream getOutputStream(OutputStream os, Cipher cipher) {
         return new CipherOutputStream(os, cipher);
     }
-
 }

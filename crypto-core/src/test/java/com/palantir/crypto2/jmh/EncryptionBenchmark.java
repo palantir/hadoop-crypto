@@ -131,19 +131,15 @@ public class EncryptionBenchmark {
 
         // TODO(ckozak): implement BlackholeOutputStream wrapper around jmh Blackhole rather than buffering
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try (CtrCryptoOutputStream output = new CtrCryptoOutputStream(
-                props, baos, state.key.getSecretKey().getEncoded(), state.key.getIv())) {
+        try (CtrCryptoOutputStream output =
+                new CtrCryptoOutputStream(props, baos, state.key.getSecretKey().getEncoded(), state.key.getIv())) {
             state.writeStrategy.writeTo(state.data, output);
         }
         return baos.toByteArray();
     }
 
     private byte[] encrypt(
-            WriteStrategy writeStrategy,
-            byte[] bytes,
-            Cipher cipher,
-            Key key,
-            AlgorithmParameterSpec spec) {
+            WriteStrategy writeStrategy, byte[] bytes, Cipher cipher, Key key, AlgorithmParameterSpec spec) {
         try {
             cipher.init(Cipher.ENCRYPT_MODE, key, spec);
             // TODO(ckozak): implement BlackholeOutputStream wrapper around jmh Blackhole rather than buffering
@@ -159,8 +155,8 @@ public class EncryptionBenchmark {
 
     public static void main(String[] _args) throws RunnerException {
         new Runner(new OptionsBuilder()
-                .include(EncryptionBenchmark.class.getSimpleName())
-                .build())
+                        .include(EncryptionBenchmark.class.getSimpleName())
+                        .build())
                 .run();
     }
 }
