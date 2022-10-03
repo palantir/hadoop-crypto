@@ -50,8 +50,8 @@ public final class DefaultSeekableInputStream extends InputStream implements See
     }
 
     @Override
-    public int read(byte[] bytes, int offset, int length) throws IOException {
-        return input.read(bytes, offset, length);
+    public int read(byte[] buf, int off, int len) throws IOException {
+        return input.read(buf, off, len);
     }
 
     @Override
