@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import com.google.common.collect.ImmutableSet;
 import java.security.InvalidKeyException;
 import java.util.Set;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public final class KeySerializerV1Test extends KeySerializerTest {
 

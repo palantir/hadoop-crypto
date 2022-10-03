@@ -25,8 +25,8 @@ import java.io.OutputStream;
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
 import javax.crypto.CipherOutputStream;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public final class CipherStreamSupplierImplTest {
 
@@ -35,7 +35,7 @@ public final class CipherStreamSupplierImplTest {
     private OutputStream os;
     private Cipher cipher;
 
-    @Before
+    @BeforeEach
     public void before() {
         is = mock(InputStream.class);
         os = mock(OutputStream.class);

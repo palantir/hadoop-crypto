@@ -38,38 +38,37 @@ import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.permission.FsPermission;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public final class DelegatingFileSystemTest {
 
     private static final Path remotePath = new Path("/test");
     private static final byte[] bytes = "data".getBytes(StandardCharsets.UTF_8);
 
-    @Rule
-    public TemporaryFolder folder = new TemporaryFolder();
+    @TempDir
+    public File folder;
 
     @Mock
     private FileSystem delegate;
 
     private DelegatingFileSystem delegatingFs;
 
-    @Before
+    @BeforeEach
     public void before() throws IOException {
         when(delegate.getConf()).thenReturn(new Configuration());
         when(delegate.getUri()).thenReturn(URI.create("foo://bar"));
-        when(delegate.getFileStatus(remotePath)).thenReturn(new FileStatus(0, false, 0, 0, 0, remotePath));
         delegatingFs = new DelegatingFileSystem(delegate) {};
     }
 
     @Test
     public void testCopyFromLocal() throws IOException {
+        when(delegate.getFileStatus(remotePath)).thenReturn(new FileStatus(0, false, 0, 0, 0, remotePath));
         testCopyFromLocal(src -> delegatingFs.copyFromLocalFile(src, remotePath));
         testCopyFromLocal(src -> delegatingFs.copyFromLocalFile(false, src, remotePath));
         testCopyFromLocal(src -> delegatingFs.copyFromLocalFile(false, true, src, remotePath));
@@ -81,7 +80,7 @@ public final class DelegatingFileSystemTest {
     }
 
     private void testCopyFromLocal(ThrowingConsumer<Path> copyFromLocal) throws IOException {
-        File localFile = folder.newFile();
+        File localFile = new File(folder, "test.bin");
         Path src = new Path(localFile.getAbsolutePath());
         Files.write(bytes, localFile);
 
@@ -95,13 +94,14 @@ public final class DelegatingFileSystemTest {
 
     @Test
     public void testCopyToLocal() throws IOException {
+        when(delegate.getFileStatus(remotePath)).thenReturn(new FileStatus(0, false, 0, 0, 0, remotePath));
         testCopyToLocal(dst -> delegatingFs.copyToLocalFile(remotePath, dst));
         testCopyToLocal(dst -> delegatingFs.copyToLocalFile(false, remotePath, dst));
         testCopyToLocal(dst -> delegatingFs.copyToLocalFile(false, remotePath, dst, false));
     }
 
     private void testCopyToLocal(ThrowingConsumer<Path> copyToLocal) throws IOException {
-        File localFile = folder.newFile();
+        File localFile = new File(folder, "test.bin");
         Path dst = new Path(localFile.getAbsolutePath());
 
         when(delegate.open(remotePath, 4096)).thenReturn(new FSDataInputStream(new ByteArrayFsInputStream(bytes)));
@@ -130,23 +130,28 @@ public final class DelegatingFileSystemTest {
         }
 
         @Override
-        public void seek(long _pos) throws IOException {
+        public void seek(long _pos) {
             throw new UnsupportedOperationException();
         }
 
         @Override
-        public long getPos() throws IOException {
+        public long getPos() {
             throw new UnsupportedOperationException();
         }
 
         @Override
-        public boolean seekToNewSource(long _targetPos) throws IOException {
+        public boolean seekToNewSource(long _targetPos) {
             return false;
         }
 
         @Override
-        public int read() throws IOException {
+        public int read() {
             return in.read();
+        }
+
+        @Override
+        public int read(byte[] buf, int off, int len) {
+            return in.read(buf, off, len);
         }
     }
 }

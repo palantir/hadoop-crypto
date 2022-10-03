@@ -14,11 +14,13 @@ dependencies {
     annotationProcessor 'org.openjdk.jmh:jmh-generator-annprocess'
     compileOnly 'org.openjdk.jmh:jmh-generator-annprocess'
 
-    testImplementation 'junit:junit'
+    testImplementation 'com.palantir.safe-logging:preconditions-assertj'
     testImplementation 'org.assertj:assertj-core'
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api'
+    testImplementation 'org.junit.jupiter:junit-jupiter-params'
     testImplementation 'org.mockito:mockito-core'
     testImplementation 'org.openjdk.jmh:jmh-core'
-    testImplementation 'com.palantir.safe-logging:preconditions-assertj'
 }
 
 project.task(type: JavaExec, 'benchmarks') {

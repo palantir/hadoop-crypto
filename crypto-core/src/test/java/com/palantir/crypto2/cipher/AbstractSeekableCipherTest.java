@@ -29,8 +29,8 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.ShortBufferException;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public abstract class AbstractSeekableCipherTest {
 
@@ -46,7 +46,7 @@ public abstract class AbstractSeekableCipherTest {
 
     abstract SeekableCipher getCipher(KeyMaterial initKeyMaterial);
 
-    @Before
+    @BeforeEach
     public final void before() {
         keyMaterial = generateKeyMaterial();
         seekableCipher = getCipher(keyMaterial);

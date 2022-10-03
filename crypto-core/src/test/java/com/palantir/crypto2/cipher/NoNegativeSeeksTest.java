@@ -22,7 +22,7 @@ import com.palantir.crypto2.io.DecryptingSeekableInput;
 import com.palantir.crypto2.keys.KeyMaterial;
 import com.palantir.seekio.SeekableInput;
 import java.io.IOException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public final class NoNegativeSeeksTest {
 

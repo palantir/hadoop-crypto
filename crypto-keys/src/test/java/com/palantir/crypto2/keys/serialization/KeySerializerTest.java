@@ -23,7 +23,7 @@ import com.palantir.crypto2.keys.KeyMaterial;
 import com.palantir.crypto2.keys.TestKeyPairs;
 import java.security.KeyPair;
 import java.util.Set;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public abstract class KeySerializerTest {
 

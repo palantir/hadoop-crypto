@@ -32,8 +32,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ThreadLocalRandom;
 import org.apache.commons.crypto.stream.CtrCryptoInputStream;
 import org.apache.commons.crypto.stream.CtrCryptoOutputStream;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 
 public final class CryptoStreamFactoryTest {
 
@@ -42,12 +44,13 @@ public final class CryptoStreamFactoryTest {
 
     private KeyMaterial keyMaterial;
 
-    @Before
+    @BeforeEach
     public void before() {
         keyMaterial = AesCtrCipher.generateKeyMaterial();
     }
 
     @Test
+    @EnabledOnOs(OS.LINUX)
     public void ensureDefaultIsApache() {
         OutputStream encrypted = CryptoStreamFactory.encrypt(null, keyMaterial, AesCtrCipher.ALGORITHM);
         SeekableInput decrypted =

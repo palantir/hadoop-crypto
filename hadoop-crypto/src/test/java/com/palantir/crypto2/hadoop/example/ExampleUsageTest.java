@@ -23,6 +23,7 @@ import com.palantir.crypto2.hadoop.EncryptedFileSystem;
 import com.palantir.crypto2.hadoop.FileKeyStorageStrategy;
 import com.palantir.crypto2.hadoop.TestKeyPairs;
 import com.palantir.crypto2.keys.KeyStorageStrategy;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -33,14 +34,13 @@ import java.security.KeyPair;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
-public final class ExampleUsage {
+public final class ExampleUsageTest {
 
-    @Rule
-    public TemporaryFolder folder = new TemporaryFolder();
+    @TempDir
+    public File folder;
 
     @Test
     public void encryptedFileSystem_exampleUse() throws URISyntaxException, IOException {
@@ -54,7 +54,7 @@ public final class ExampleUsage {
 
         // Init data and local path to write to
         byte[] data = "test".getBytes(StandardCharsets.UTF_8);
-        Path path = new Path(folder.newFile().getAbsolutePath());
+        Path path = new Path(new File(folder, "test.bin").getAbsolutePath());
 
         // Write data out to the encrypted stream
         OutputStream eos = efs.create(path);

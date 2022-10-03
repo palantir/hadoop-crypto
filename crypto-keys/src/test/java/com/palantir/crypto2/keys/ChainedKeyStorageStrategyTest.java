@@ -24,8 +24,8 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import com.google.common.collect.ImmutableList;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
 
 public final class ChainedKeyStorageStrategyTest {
@@ -36,7 +36,7 @@ public final class ChainedKeyStorageStrategyTest {
     private KeyMaterial keyMaterial;
     private String key;
 
-    @Before
+    @BeforeEach
     public void before() {
         key = "key";
 

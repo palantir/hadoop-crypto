@@ -22,15 +22,15 @@ import com.palantir.seekio.InMemorySeekableDataInput;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Random;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public final class ApacheCtrDecryptingSeekableInputTests {
     private static final int NUM_BYTES = 1024 * 1024;
     private static final Random random = new Random(0);
     private static byte[] data;
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeClass() throws IOException {
         data = new byte[NUM_BYTES];
         random.nextBytes(data);

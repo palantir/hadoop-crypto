@@ -50,10 +50,9 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.RawLocalFileSystem;
 import org.apache.hadoop.fs.permission.FsPermission;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 public final class EncryptedFileSystemTest {
 
@@ -70,16 +69,16 @@ public final class EncryptedFileSystemTest {
     private KeyStorageStrategy mockKeyStore;
     private EncryptedFileSystem mockedEfs;
 
-    @Rule
-    public TemporaryFolder folder = new TemporaryFolder();
+    @TempDir
+    public File folder;
 
-    @Before
+    @BeforeEach
     public void before() throws IOException, URISyntaxException {
         delegateFs = new RawLocalFileSystem();
-        delegateFs.initialize(new URI("file://" + folder.getRoot().getAbsolutePath()), new Configuration());
+        delegateFs.initialize(new URI("file://" + folder.getAbsolutePath()), new Configuration());
         keyStore = new InMemoryKeyStorageStrategy();
         efs = new EncryptedFileSystem(delegateFs, keyStore);
-        path = new Path(folder.newFile().getAbsolutePath());
+        path = new Path(new File(folder, "test.bin").getAbsolutePath());
         newPath = path.suffix("renamed");
 
         OutputStream os = efs.create(path);
@@ -284,7 +283,7 @@ public final class EncryptedFileSystemTest {
 
         Configuration conf = new Configuration();
         conf.set(EncryptedFileSystem.CIPHER_ALGORITHM_KEY, cipherAlg);
-        delegateFs = FileSystem.newInstance(new URI(folder.getRoot().getAbsolutePath()), conf);
+        delegateFs = FileSystem.newInstance(new URI(folder.getAbsolutePath()), conf);
         efs = new EncryptedFileSystem(delegateFs, new InMemoryKeyStorageStrategy());
 
         assertThat(efs.getCipherAlgorithm()).isEqualTo(cipherAlg);
@@ -296,7 +295,7 @@ public final class EncryptedFileSystemTest {
 
         Configuration conf = new Configuration();
         conf.set(EncryptedFileSystem.DEPRECATED_CIPHER_ALGORITHM_KEY, cipherAlg);
-        delegateFs = FileSystem.newInstance(new URI(folder.getRoot().getAbsolutePath()), conf);
+        delegateFs = FileSystem.newInstance(new URI(folder.getAbsolutePath()), conf);
         efs = new EncryptedFileSystem(delegateFs, new InMemoryKeyStorageStrategy());
 
         assertThat(efs.getCipherAlgorithm()).isEqualTo(cipherAlg);
@@ -310,7 +309,7 @@ public final class EncryptedFileSystemTest {
         Configuration conf = new Configuration();
         conf.set(EncryptedFileSystem.CIPHER_ALGORITHM_KEY, cipherAlg);
         conf.set(EncryptedFileSystem.DEPRECATED_CIPHER_ALGORITHM_KEY, deprecatedCipherAlg);
-        delegateFs = FileSystem.newInstance(new URI(folder.getRoot().getAbsolutePath()), conf);
+        delegateFs = FileSystem.newInstance(new URI(folder.getAbsolutePath()), conf);
 
         assertThatExceptionOfType(IllegalStateException.class)
                 .isThrownBy(() -> new EncryptedFileSystem(delegateFs, new InMemoryKeyStorageStrategy()))
@@ -324,7 +323,7 @@ public final class EncryptedFileSystemTest {
         Configuration conf = new Configuration();
         conf.set(EncryptedFileSystem.CIPHER_ALGORITHM_KEY, cipherAlg);
         conf.set(EncryptedFileSystem.DEPRECATED_CIPHER_ALGORITHM_KEY, cipherAlg);
-        delegateFs = FileSystem.newInstance(new URI(folder.getRoot().getAbsolutePath()), conf);
+        delegateFs = FileSystem.newInstance(new URI(folder.getAbsolutePath()), conf);
         efs = new EncryptedFileSystem(delegateFs, new InMemoryKeyStorageStrategy());
 
         assertThat(efs.getCipherAlgorithm()).isEqualTo(cipherAlg);
@@ -340,7 +339,7 @@ public final class EncryptedFileSystemTest {
 
     @Test
     public void testDelete_recursiveDelete() throws IOException {
-        Path folderPath = new Path(folder.getRoot().getAbsolutePath());
+        Path folderPath = new Path(folder.getAbsolutePath());
 
         assertThatExceptionOfType(UnsupportedOperationException.class)
                 .isThrownBy(() -> efs.delete(folderPath, true))
@@ -349,7 +348,7 @@ public final class EncryptedFileSystemTest {
 
     @Test
     public void testDelete_nonRecursiveDeleteOnDir() throws IOException {
-        Path folderPath = new Path(folder.getRoot().getAbsolutePath());
+        Path folderPath = new Path(folder.getAbsolutePath());
 
         assertThatExceptionOfType(IOException.class)
                 .isThrownBy(() -> efs.delete(folderPath, false))
@@ -383,7 +382,7 @@ public final class EncryptedFileSystemTest {
 
     @Test // https://github.com/palantir/hadoop-crypto/issues/27
     public void testCopyFromLocalFile() throws IOException {
-        File file = folder.newFile();
+        File file = new File(folder, "local.bin");
         byte[] data = "data".getBytes(StandardCharsets.UTF_8);
 
         Files.write(file.toPath(), data);
