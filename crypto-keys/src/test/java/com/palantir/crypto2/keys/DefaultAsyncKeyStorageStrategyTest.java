@@ -100,5 +100,4 @@ public final class DefaultAsyncKeyStorageStrategyTest {
         assertThat(throwable).hasCauseInstanceOf(IllegalStateException.class);
         return null;
     }
-
 }

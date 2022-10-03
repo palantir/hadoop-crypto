@@ -28,9 +28,8 @@ public final class ApacheCiphers {
      * Properties)} will only try to use the OpenSSL cipher implementation which uses AES-NI.
      */
     public static Properties forceOpenSsl(Properties properties) {
-        properties.setProperty(CryptoCipherFactory.CLASSES_KEY,
-                CryptoCipherFactory.CipherProvider.OPENSSL.getClassName());
+        properties.setProperty(
+                CryptoCipherFactory.CLASSES_KEY, CryptoCipherFactory.CipherProvider.OPENSSL.getClassName());
         return properties;
     }
-
 }

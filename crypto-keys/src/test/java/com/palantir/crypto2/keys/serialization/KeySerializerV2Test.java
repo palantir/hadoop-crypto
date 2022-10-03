@@ -33,5 +33,4 @@ public final class KeySerializerV2Test extends KeySerializerTest {
         Set<Integer> wrappingKeySizes = ImmutableSet.of(1024, 2048);
         testWrapAndUnwrap(symmetricKeySizes, wrappingKeySizes);
     }
-
 }

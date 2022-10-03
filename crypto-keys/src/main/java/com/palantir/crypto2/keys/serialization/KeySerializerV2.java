@@ -90,8 +90,11 @@ enum KeySerializerV2 implements KeySerializer {
 
         try {
             int version = stream.read();
-            Preconditions.checkArgument(VERSION == version,
-                    "Invalid serialization format version. Expected %s but found %s", VERSION, version);
+            Preconditions.checkArgument(
+                    VERSION == version,
+                    "Invalid serialization format version. Expected %s but found %s",
+                    VERSION,
+                    version);
 
             int algorithmLength = stream.readInt();
             byte[] algorithmBytes = new byte[algorithmLength];
@@ -117,5 +120,4 @@ enum KeySerializerV2 implements KeySerializer {
     public int getVersion() {
         return VERSION;
     }
-
 }
