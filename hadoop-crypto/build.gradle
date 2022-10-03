@@ -2,15 +2,21 @@ apply from: "${rootDir}/gradle/openssl.gradle"
 apply plugin: 'com.github.johnrengelman.shadow'
 
 dependencies {
-    api project(":crypto-core")
-    api "org.apache.hadoop:hadoop-client-api"
-    api "org.slf4j:slf4j-api"
+    api project(':crypto-core')
+    api 'org.apache.hadoop:hadoop-client-api'
 
-    runtimeOnly "org.apache.hadoop:hadoop-client-runtime"
+    implementation project(':crypto-keys')
+    implementation 'com.google.guava:guava'
+    implementation 'com.palantir.safe-logging:logger'
+    implementation 'com.palantir.safe-logging:preconditions'
+    implementation 'com.palantir.safe-logging:safe-logging'
+    implementation 'com.palantir.seek-io:seek-io'
 
-    testImplementation "junit:junit"
-    testImplementation "org.assertj:assertj-core"
-    testImplementation "org.mockito:mockito-core"
+    runtimeOnly 'org.apache.hadoop:hadoop-client-runtime'
+
+    testImplementation 'junit:junit'
+    testImplementation 'org.assertj:assertj-core'
+    testImplementation 'org.mockito:mockito-core'
 }
 
 shadowJar {

@@ -19,6 +19,7 @@ package com.palantir.crypto2.keys.serialization;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 import com.palantir.crypto2.keys.KeyMaterial;
+import com.palantir.logsafe.exceptions.SafeRuntimeException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
@@ -112,7 +113,7 @@ enum KeySerializerV2 implements KeySerializer {
             SecretKey secretKey = (SecretKey) keyUnwrappingCipher.unwrap(secretKeyBytes, algorithm, Cipher.SECRET_KEY);
             return KeyMaterial.of(secretKey, iv);
         } catch (InvalidKeyException | NoSuchAlgorithmException | IOException e) {
-            throw new RuntimeException("Unable to unwrap key", e);
+            throw new SafeRuntimeException("Unable to unwrap key", e);
         }
     }
 

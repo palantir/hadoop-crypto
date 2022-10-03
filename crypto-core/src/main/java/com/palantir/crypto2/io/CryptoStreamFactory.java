@@ -22,6 +22,10 @@ import com.palantir.crypto2.cipher.ApacheCiphers;
 import com.palantir.crypto2.cipher.SeekableCipher;
 import com.palantir.crypto2.cipher.SeekableCipherFactory;
 import com.palantir.crypto2.keys.KeyMaterial;
+import com.palantir.logsafe.exceptions.SafeIllegalStateException;
+import com.palantir.logsafe.exceptions.SafeNullPointerException;
+import com.palantir.logsafe.logger.SafeLogger;
+import com.palantir.logsafe.logger.SafeLoggerFactory;
 import com.palantir.seekio.SeekableInput;
 import java.io.FilterOutputStream;
 import java.io.IOException;
@@ -33,12 +37,10 @@ import javax.crypto.Cipher;
 import javax.crypto.CipherOutputStream;
 import javax.crypto.SecretKey;
 import org.apache.commons.crypto.stream.CtrCryptoOutputStream;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public final class CryptoStreamFactory {
 
-    private static final Logger log = LoggerFactory.getLogger(CryptoStreamFactory.class);
+    private static final SafeLogger log = SafeLoggerFactory.get(CryptoStreamFactory.class);
     private static final Properties PROPS = ApacheCiphers.forceOpenSsl(new Properties());
     private static final String AES_ALGORITHM = "AES/CTR/NoPadding";
 
@@ -76,7 +78,7 @@ public final class CryptoStreamFactory {
         try {
             return new ApacheCtrDecryptingSeekableInput(encryptedInput, keyMaterial);
         } catch (IOException e) {
-            throw new IllegalStateException("Failed to create ApacheCtrDecryptingSeekableInput", e);
+            throw new SafeIllegalStateException("Failed to create ApacheCtrDecryptingSeekableInput", e);
         }
     }
 
@@ -105,7 +107,7 @@ public final class CryptoStreamFactory {
         try {
             return createApacheEncryptedStream(output, keyMaterial);
         } catch (IOException e) {
-            throw new IllegalStateException("Failed to create CtrCryptoOutputStream", e);
+            throw new SafeIllegalStateException("Failed to create CtrCryptoOutputStream", e);
         }
     }
 
@@ -191,7 +193,7 @@ public final class CryptoStreamFactory {
 
         private static void validateArgs(byte[] buffer, int off, int len) {
             if (buffer == null) {
-                throw new NullPointerException("buffer is required");
+                throw new SafeNullPointerException("buffer is required");
             }
             if (off < 0 || len < 0 || buffer.length < off + len) {
                 throw new IndexOutOfBoundsException();
