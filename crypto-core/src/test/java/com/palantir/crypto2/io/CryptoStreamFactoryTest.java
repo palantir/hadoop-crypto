@@ -32,7 +32,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ThreadLocalRandom;
 import org.apache.commons.crypto.stream.CtrCryptoInputStream;
 import org.apache.commons.crypto.stream.CtrCryptoOutputStream;
-import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -105,15 +104,5 @@ public final class CryptoStreamFactoryTest {
             }
         }
         assertThat(baos.toByteArray()).isEqualTo(data);
-    }
-
-    private static boolean isOpenSslAvailable() {
-        Assume.
-        try {
-            ApacheCtrDecryptingSeekableInput.getCipherInstance().close();
-            return true;
-        } catch (IOException e) {
-            return false;
-        }
     }
 }
