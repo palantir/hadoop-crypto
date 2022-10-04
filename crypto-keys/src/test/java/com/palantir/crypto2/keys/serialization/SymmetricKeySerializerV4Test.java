@@ -19,7 +19,7 @@ package com.palantir.crypto2.keys.serialization;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.palantir.crypto2.keys.KeyMaterial;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public final class SymmetricKeySerializerV4Test {
 

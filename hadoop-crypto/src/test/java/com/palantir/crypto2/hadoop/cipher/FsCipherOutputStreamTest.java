@@ -28,8 +28,8 @@ import java.nio.charset.StandardCharsets;
 import javax.crypto.Cipher;
 import javax.crypto.CipherOutputStream;
 import org.apache.hadoop.fs.FSDataOutputStream;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public final class FsCipherOutputStreamTest {
 
@@ -42,7 +42,7 @@ public final class FsCipherOutputStreamTest {
     private CipherOutputStream cos;
     private FsCipherOutputStream scos;
 
-    @Before
+    @BeforeEach
     public void before() {
         initCipher = mock(Cipher.class);
         os = mock(FSDataOutputStream.class);

@@ -29,8 +29,8 @@ import org.apache.hadoop.fs.FileChecksum;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public final class PathConvertingFileSystemTest {
 
@@ -46,7 +46,7 @@ public final class PathConvertingFileSystemTest {
     private FileChecksum fileChecksum;
     private PathConvertingFileSystem convertingFs;
 
-    @Before
+    @BeforeEach
     public void before() {
         delegate = mock(FileSystem.class);
         inputStream = mock(FSDataInputStream.class);

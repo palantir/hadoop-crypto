@@ -24,8 +24,8 @@ import com.palantir.crypto2.keys.TestKeyPairs;
 import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import javax.crypto.SecretKey;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public final class KeyMaterialsTest {
 
@@ -37,7 +37,7 @@ public final class KeyMaterialsTest {
     private KeyPair keyPair;
     private SecretKey symmetricKey;
 
-    @Before
+    @BeforeEach
     public void before() {
         keyPair = TestKeyPairs.generateKeyPair();
         symmetricKey = KeyMaterials.generateKey(KEY_ALG, KEY_SIZE);

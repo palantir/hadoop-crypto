@@ -22,8 +22,8 @@ import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.Base64;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public final class KeyPairsTest {
 
@@ -31,7 +31,7 @@ public final class KeyPairsTest {
     private PrivateKey privateKey;
     private PublicKey publicKey;
 
-    @Before
+    @BeforeEach
     public void before() {
         keyPair = TestKeyPairs.generateKeyPair();
         privateKey = keyPair.getPrivate();

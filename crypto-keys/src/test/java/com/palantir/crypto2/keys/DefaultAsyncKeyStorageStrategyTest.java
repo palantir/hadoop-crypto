@@ -24,9 +24,8 @@ import static org.mockito.Mockito.when;
 
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public final class DefaultAsyncKeyStorageStrategyTest {
 
@@ -37,7 +36,7 @@ public final class DefaultAsyncKeyStorageStrategyTest {
     private KeyStorageStrategy delegate;
     private DefaultAsyncKeyStorageStrategy keys;
 
-    @Before
+    @BeforeEach
     public void before() {
         keyMaterial = mock(KeyMaterial.class);
         delegate = mock(KeyStorageStrategy.class);
@@ -57,7 +56,9 @@ public final class DefaultAsyncKeyStorageStrategyTest {
         doThrow(IllegalStateException.class).when(delegate).put(KEY, keyMaterial);
 
         keys.put(KEY, keyMaterial)
-                .thenRun(Assert::fail)
+                .thenRun(() -> {
+                    throw new AssertionError("test");
+                })
                 .exceptionally(this::verifyIllegalStateThrown)
                 .join();
     }
@@ -74,7 +75,9 @@ public final class DefaultAsyncKeyStorageStrategyTest {
         doThrow(IllegalStateException.class).when(delegate).get(KEY);
 
         keys.get(KEY)
-                .thenRun(Assert::fail)
+                .thenRun(() -> {
+                    throw new AssertionError("test");
+                })
                 .exceptionally(this::verifyIllegalStateThrown)
                 .join();
     }
@@ -91,7 +94,9 @@ public final class DefaultAsyncKeyStorageStrategyTest {
         doThrow(IllegalStateException.class).when(delegate).remove(KEY);
 
         keys.remove(KEY)
-                .thenRun(Assert::fail)
+                .thenRun(() -> {
+                    throw new AssertionError("test");
+                })
                 .exceptionally(this::verifyIllegalStateThrown)
                 .join();
     }

@@ -19,7 +19,7 @@ package com.palantir.crypto2.keys;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.security.PublicKey;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public final class PublicKeysTest {
 

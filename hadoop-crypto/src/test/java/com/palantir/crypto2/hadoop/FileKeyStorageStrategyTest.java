@@ -30,11 +30,9 @@ import java.security.NoSuchProviderException;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 public final class FileKeyStorageStrategyTest {
 
@@ -44,19 +42,16 @@ public final class FileKeyStorageStrategyTest {
     private KeyPair pair;
     private String path;
 
-    @Rule
-    public TemporaryFolder folder = new TemporaryFolder();
+    @TempDir
+    public java.nio.file.Path folder;
 
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
-
-    @Before
+    @BeforeEach
     public void before() throws NoSuchAlgorithmException, NoSuchProviderException, IOException, URISyntaxException {
         pair = TestKeyPairs.generateKeyPair();
         keyMaterial = AesCtrCipher.generateKeyMaterial();
         fs = FileSystem.get(new URI("file:///"), new Configuration());
         keyStore = new FileKeyStorageStrategy(fs, pair);
-        path = folder.newFile().getAbsolutePath();
+        path = folder.resolve("test").toAbsolutePath().toString();
     }
 
     @Test

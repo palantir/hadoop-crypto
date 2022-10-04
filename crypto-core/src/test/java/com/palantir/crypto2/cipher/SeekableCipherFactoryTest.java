@@ -21,17 +21,12 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.Mockito.mock;
 
 import com.palantir.crypto2.keys.KeyMaterial;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
 
 public final class SeekableCipherFactoryTest {
 
     private static final String AES_CTR = AesCtrCipher.ALGORITHM;
     private static final String AES_CBC = AesCbcCipher.ALGORITHM;
-
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
 
     @Test
     public void testGenerateKeyMaterial_aesCtr() {

@@ -35,11 +35,9 @@ import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 public final class StandaloneEncryptedFileSystemTest {
 
@@ -53,13 +51,10 @@ public final class StandaloneEncryptedFileSystemTest {
     private Path path;
     private Path pathWithScheme;
 
-    @Rule
-    public TemporaryFolder folder = new TemporaryFolder();
+    @TempDir
+    public java.nio.file.Path folder;
 
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
-
-    @Before
+    @BeforeEach
     public void before() throws IOException {
         KeyPair keyPair = TestKeyPairs.generateKeyPair();
         conf = getBaseConf();
@@ -72,7 +67,7 @@ public final class StandaloneEncryptedFileSystemTest {
 
         efs = FileSystem.newInstance(EFS_URI, conf);
         rawFs = FileSystem.newInstance(URI.create("file:///"), conf);
-        path = new Path(folder.newFile().getAbsolutePath());
+        path = new Path(folder.resolve("test.bin").toAbsolutePath().toString());
         pathWithScheme = new Path("efile://", path);
     }
 
@@ -105,7 +100,7 @@ public final class StandaloneEncryptedFileSystemTest {
 
     @Test
     public void testDelete() throws IOException {
-        File rootFolder = folder.newFolder();
+        File rootFolder = folder.resolve("delete").toFile();
 
         Path path1 = writeData(rootFolder);
 
@@ -122,7 +117,7 @@ public final class StandaloneEncryptedFileSystemTest {
 
     @Test
     public void testRecursiveDelete() throws IOException {
-        File rootFolder = folder.newFolder();
+        File rootFolder = folder.resolve("recursiveDelete").toFile();
         Path rootPath = new Path(rootFolder.getAbsolutePath());
 
         Path path1 = writeData(rootFolder);
@@ -151,7 +146,7 @@ public final class StandaloneEncryptedFileSystemTest {
 
     @Test
     public void testRename() throws IOException {
-        File rootFolder = folder.newFolder();
+        File rootFolder = folder.resolve("rename").toFile();
         Path rootPath = new Path(rootFolder.getAbsolutePath());
         Path dstPath = new Path(rootPath, UUID.randomUUID().toString());
 
@@ -167,8 +162,8 @@ public final class StandaloneEncryptedFileSystemTest {
 
     @Test
     public void testRecursiveRename() throws IOException {
-        File rootFolder = folder.newFolder();
-        File dstFolder = folder.newFolder();
+        File rootFolder = folder.resolve("root").toFile();
+        File dstFolder = folder.resolve("dest").toFile();
         Path rootPath = new Path(rootFolder.getAbsolutePath());
         Path dstPath = new Path(dstFolder.getAbsolutePath());
 
@@ -199,7 +194,7 @@ public final class StandaloneEncryptedFileSystemTest {
 
     private Path writeData(File rootFolder) throws IOException {
         // Write encrypted data
-        java.nio.file.Path filePath = Files.createTempFile(rootFolder.toPath(), "prefix", "suffix");
+        java.nio.file.Path filePath = new File(rootFolder, "test.bin").toPath();
         Path newPath = new Path(filePath.toAbsolutePath().toString());
 
         try (OutputStream os = efs.create(newPath)) {
@@ -291,7 +286,7 @@ public final class StandaloneEncryptedFileSystemTest {
 
     @Test // https://github.com/palantir/hadoop-crypto/issues/27
     public void testCopyFromLocalFile() throws IOException {
-        File file = folder.newFile();
+        File file = folder.resolve("local.bin").toFile();
 
         Files.write(file.toPath(), DATA_BYTES);
         efs.copyFromLocalFile(new Path(file.getAbsolutePath()), path);

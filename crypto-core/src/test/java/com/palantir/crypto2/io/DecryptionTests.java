@@ -18,8 +18,6 @@ package com.palantir.crypto2.io;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.google.common.base.Throwables;
-import com.google.common.collect.ImmutableList;
 import com.google.common.io.ByteStreams;
 import com.palantir.crypto2.cipher.AesCbcCipher;
 import com.palantir.crypto2.cipher.AesCtrCipher;
@@ -31,16 +29,18 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Random;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import java.util.stream.Stream;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.extension.ParameterContext;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.aggregator.AggregateWith;
+import org.junit.jupiter.params.aggregator.ArgumentsAccessor;
+import org.junit.jupiter.params.aggregator.ArgumentsAggregationException;
+import org.junit.jupiter.params.aggregator.ArgumentsAggregator;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
-@RunWith(Parameterized.class)
 public final class DecryptionTests {
 
     private static final boolean JCE = true;
@@ -52,44 +52,45 @@ public final class DecryptionTests {
     private static final Random random = new Random(0);
     private static byte[] data;
 
-    private SeekableInput cis;
-
-    @Rule
-    public TemporaryFolder tempFolder = new TemporaryFolder();
-
-    @BeforeClass
-    public static void beforeClass() throws IOException {
+    @BeforeAll
+    public static void beforeClass() {
         data = new byte[NUM_BYTES];
         random.nextBytes(data);
     }
 
-    @Parameterized.Parameters
-    public static Collection<TestCase> ciphers() {
-        return ImmutableList.of(
-                new TestCase(AES_CTR, JCE, JCE),
-                new TestCase(AES_CTR, APACHE, APACHE),
-                new TestCase(AES_CTR, JCE, APACHE),
-                new TestCase(AES_CTR, APACHE, JCE),
-                new TestCase(AES_CBC, JCE, JCE));
+    public static Stream<Arguments> ciphers() {
+        return Stream.of(
+                Arguments.of(AES_CTR, JCE, JCE),
+                Arguments.of(AES_CTR, APACHE, APACHE),
+                Arguments.of(AES_CTR, JCE, APACHE),
+                Arguments.of(AES_CTR, APACHE, JCE),
+                Arguments.of(AES_CBC, JCE, JCE));
     }
 
-    public DecryptionTests(TestCase testCase) {
-        try {
-            ByteArrayOutputStream os = new ByteArrayOutputStream();
-            KeyMaterial keyMaterial = SeekableCipherFactory.generateKeyMaterial(testCase.alg);
-            OutputStream cos = CryptoStreamFactory.encrypt(os, keyMaterial, testCase.alg, testCase.forceJceEncrypt);
-            cos.write(data);
-            cos.close();
-
-            InMemorySeekableDataInput input = new InMemorySeekableDataInput(os.toByteArray());
-            cis = CryptoStreamFactory.decrypt(input, keyMaterial, testCase.alg, testCase.forceJceDecrypt);
-        } catch (IOException e) {
-            throw Throwables.propagate(e);
+    static class StreamAggregator implements ArgumentsAggregator {
+        @Override
+        public Object aggregateArguments(ArgumentsAccessor accessor, ParameterContext _context)
+                throws ArgumentsAggregationException {
+            try {
+                String algorithm = accessor.getString(0);
+                Boolean forceJceEncrypt = accessor.getBoolean(1);
+                Boolean forceJceDecrypt = accessor.getBoolean(2);
+                ByteArrayOutputStream os = new ByteArrayOutputStream();
+                KeyMaterial keyMaterial = SeekableCipherFactory.generateKeyMaterial(algorithm);
+                try (OutputStream cos = CryptoStreamFactory.encrypt(os, keyMaterial, algorithm, forceJceEncrypt)) {
+                    cos.write(data);
+                }
+                InMemorySeekableDataInput input = new InMemorySeekableDataInput(os.toByteArray());
+                return CryptoStreamFactory.decrypt(input, keyMaterial, algorithm, forceJceDecrypt);
+            } catch (Exception e) {
+                throw new ArgumentsAggregationException("Could not create stream", e);
+            }
         }
     }
 
-    @Test
-    public void testDecrypt() throws IOException {
+    @ParameterizedTest
+    @MethodSource("ciphers")
+    public void testDecrypt(@AggregateWith(StreamAggregator.class) SeekableInput cis) throws IOException {
         assertThat(cis.getPos()).isZero();
 
         byte[] decrypted = new byte[NUM_BYTES];
@@ -99,56 +100,52 @@ public final class DecryptionTests {
         assertThat(decrypted).isEqualTo(data);
     }
 
-    @Test
-    public void testSeek_firstBlock() throws IOException {
-        testSeek(0);
+    @ParameterizedTest
+    @MethodSource("ciphers")
+    public void testSeek_firstBlock(@AggregateWith(StreamAggregator.class) SeekableInput cis) throws IOException {
+        testSeek(cis, 0);
     }
 
-    @Test
-    public void testSeek_firstBlockAndOffset() throws IOException {
-        testSeek(1);
+    @ParameterizedTest
+    @MethodSource("ciphers")
+    public void testSeek_firstBlockAndOffset(@AggregateWith(StreamAggregator.class) SeekableInput cis)
+            throws IOException {
+        testSeek(cis, 1);
     }
 
-    @Test
-    public void testSeek_manyBlocks() throws IOException {
+    @ParameterizedTest
+    @MethodSource("ciphers")
+    public void testSeek_manyBlocks(@AggregateWith(StreamAggregator.class) SeekableInput cis) throws IOException {
         int pos = BLOCK_SIZE * 10;
-        testSeek(pos);
+        testSeek(cis, pos);
     }
 
-    @Test
-    public void testSeek_manyBlocksAndOffset() throws IOException {
+    @ParameterizedTest
+    @MethodSource("ciphers")
+    public void testSeek_manyBlocksAndOffset(@AggregateWith(StreamAggregator.class) SeekableInput cis)
+            throws IOException {
         int pos = BLOCK_SIZE * 10 + 1;
-        testSeek(pos);
+        testSeek(cis, pos);
     }
 
-    @Test
-    public void testSeek_onePastEndOfData() throws IOException {
+    @ParameterizedTest
+    @MethodSource("ciphers")
+    public void testSeek_onePastEndOfData(@AggregateWith(StreamAggregator.class) SeekableInput cis) throws IOException {
         cis.seek(NUM_BYTES);
         assertThat(cis.read(new byte[1], 0, 1)).isEqualTo(-1);
     }
 
-    @Test
-    public void testSeek_manyBlocksAndNegativeOffset() throws IOException {
+    @ParameterizedTest
+    @MethodSource("ciphers")
+    public void testSeek_manyBlocksAndNegativeOffset(@AggregateWith(StreamAggregator.class) SeekableInput cis)
+            throws IOException {
         int pos = BLOCK_SIZE * 10 - 1;
-        testSeek(pos);
+        testSeek(cis, pos);
     }
 
-    private void testSeek(int seekPos) throws IOException {
-        cis.seek(seekPos);
-
-        assertThat(cis.getPos()).isEqualTo(seekPos);
-
-        byte[] decrypted = new byte[NUM_BYTES - seekPos];
-        readFully(cis, decrypted);
-
-        byte[] expected = Arrays.copyOfRange(data, seekPos, NUM_BYTES);
-
-        assertThat(decrypted).hasSameSizeAs(expected);
-        assertThat(decrypted).isEqualTo(expected);
-    }
-
-    @Test
-    public void testBulkRead() throws IOException {
+    @ParameterizedTest
+    @MethodSource("ciphers")
+    public void testBulkRead(@AggregateWith(StreamAggregator.class) SeekableInput cis) throws IOException {
         long startPos = cis.getPos();
         byte[] buffer = new byte[NUM_BYTES];
         int offset = 0;
@@ -167,20 +164,21 @@ public final class DecryptionTests {
         cis.close();
     }
 
-    private static void readFully(SeekableInput input, byte[] decrypted) throws IOException {
-        ByteStreams.readFully(new DefaultSeekableInputStream(input), decrypted);
+    private static void testSeek(SeekableInput cis, int seekPos) throws IOException {
+        cis.seek(seekPos);
+
+        assertThat(cis.getPos()).isEqualTo(seekPos);
+
+        byte[] decrypted = new byte[NUM_BYTES - seekPos];
+        readFully(cis, decrypted);
+
+        byte[] expected = Arrays.copyOfRange(data, seekPos, NUM_BYTES);
+
+        assertThat(decrypted).hasSameSizeAs(expected);
+        assertThat(decrypted).isEqualTo(expected);
     }
 
-    @SuppressWarnings("VisibilityModifier")
-    private static final class TestCase {
-        String alg;
-        boolean forceJceEncrypt;
-        boolean forceJceDecrypt;
-
-        TestCase(String alg, boolean forceJceEncrypt, boolean forceJceDecrypt) {
-            this.alg = alg;
-            this.forceJceEncrypt = forceJceEncrypt;
-            this.forceJceDecrypt = forceJceDecrypt;
-        }
+    private static void readFully(SeekableInput input, byte[] decrypted) throws IOException {
+        ByteStreams.readFully(new DefaultSeekableInputStream(input), decrypted);
     }
 }

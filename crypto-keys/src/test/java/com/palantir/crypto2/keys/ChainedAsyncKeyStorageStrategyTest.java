@@ -31,8 +31,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.Executor;
 import org.jmock.lib.concurrent.DeterministicExecutor;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public final class ChainedAsyncKeyStorageStrategyTest {
 
@@ -45,7 +45,7 @@ public final class ChainedAsyncKeyStorageStrategyTest {
     private AsyncKeyStorageStrategy successfulStrategy;
     private ChainedAsyncKeyStorageStrategy chained;
 
-    @Before
+    @BeforeEach
     public void before() {
         keyMaterial = mock(KeyMaterial.class);
         failingStrategy = mock(AsyncKeyStorageStrategy.class);
