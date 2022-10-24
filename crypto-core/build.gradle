@@ -11,8 +11,8 @@ dependencies {
     implementation 'com.palantir.safe-logging:preconditions'
     implementation 'com.palantir.safe-logging:safe-logging'
 
-    annotationProcessor 'org.openjdk.jmh:jmh-generator-annprocess'
-    compileOnly 'org.openjdk.jmh:jmh-generator-annprocess'
+    testAnnotationProcessor 'org.openjdk.jmh:jmh-generator-annprocess'
+    testCompileOnly 'org.openjdk.jmh:jmh-generator-annprocess'
 
     testImplementation 'com.palantir.safe-logging:preconditions-assertj'
     testImplementation 'org.assertj:assertj-core'
