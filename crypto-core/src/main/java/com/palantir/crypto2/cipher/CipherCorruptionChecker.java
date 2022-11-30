@@ -13,7 +13,7 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 public final class CipherCorruptionChecker {
-    private static final int LOOPS = 1000;
+    private static final int LOOPS = 10000;
 
     private CipherCorruptionChecker() {}
 
