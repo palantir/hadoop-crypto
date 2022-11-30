@@ -13,7 +13,7 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 public final class CipherCorruptionChecker {
-    private static final int LOOPS = 1000000;
+    private static final int LOOPS = 1000;
 
     private CipherCorruptionChecker() {}
 
@@ -33,7 +33,7 @@ public final class CipherCorruptionChecker {
             Cipher encrypt = Cipher.getInstance("AES/CTR/NoPadding", "SunJCE");
             Cipher decrypt = Cipher.getInstance("AES/CTR/NoPadding", "SunJCE");
 
-            for (int j = 0; j < 1000; j++) {
+            for (int j = 0; j < 10000; j++) {
                 byte[][] unencryptedData = new byte[LOOPS][];
                 byte[][] encryptedData = new byte[LOOPS][];
 
