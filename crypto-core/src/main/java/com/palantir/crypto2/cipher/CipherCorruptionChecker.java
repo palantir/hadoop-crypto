@@ -57,7 +57,9 @@ public final class CipherCorruptionChecker {
 
             for (int i = 0; i < loops; i++) {
                 random.nextBytes(original);
-                encrypt.doFinal(original, 0, LEN, encrypted);
+                encrypt.update(original, 0, 1, encrypted, 0);
+                encrypt.update(original, 1, 1, encrypted, 1);
+                encrypt.doFinal(original, 2, LEN - 2, encrypted, 2);
 
                 decrypt.update(encrypted, 0, 1, decrypted, 0);
                 decrypt.update(encrypted, 1, 1, decrypted, 1);
