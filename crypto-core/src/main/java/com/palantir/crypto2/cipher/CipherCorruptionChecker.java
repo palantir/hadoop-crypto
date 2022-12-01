@@ -1,19 +1,17 @@
 package com.palantir.crypto2.cipher;
 
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
+import java.security.GeneralSecurityException;
 import java.security.Key;
-import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
 import java.util.Arrays;
 import javax.crypto.Cipher;
-import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 public final class CipherCorruptionChecker {
-    private static final int LOOPS = 1000;
+    private static final int LOOPS = 100000;
+    private static final int LEN = 15;
 
     private CipherCorruptionChecker() {}
 
@@ -32,39 +30,28 @@ public final class CipherCorruptionChecker {
 
             Cipher encrypt = Cipher.getInstance("AES/CTR/NoPadding", "SunJCE");
             Cipher decrypt = Cipher.getInstance("AES/CTR/NoPadding", "SunJCE");
+            encrypt.init(Cipher.ENCRYPT_MODE, key, iv);
+            decrypt.init(Cipher.DECRYPT_MODE, key, iv);
 
-            for (int j = 0; j < 100000; j++) {
-                byte[][] unencryptedData = new byte[LOOPS][];
-                byte[][] encryptedData = new byte[LOOPS][];
+            byte[] original = new byte[LEN];
+            byte[] encrypted = new byte[LEN];
+            byte[] decrypted = new byte[LEN];
 
-                encrypt.init(Cipher.ENCRYPT_MODE, key, iv);
-                for (int i = 0; i < LOOPS; i++) {
-                    int size = (i % 15) + 1;
-                    byte[] unencrypted = new byte[size];
-                    random.nextBytes(unencrypted);
-                    unencryptedData[i] = unencrypted;
+            for (int i = 0; i < LOOPS; i++) {
+                random.nextBytes(original);
+                encrypt.doFinal(original, 0, LEN, encrypted);
 
-                    byte[] encrypted = encrypt.update(unencrypted);
-                    encryptedData[i] = encrypted;
-                }
-
-                decrypt.init(Cipher.DECRYPT_MODE, key, iv);
-                for (int i = 0; i < LOOPS; i++) {
-                    byte[] decrypted = decrypt.update(encryptedData[i]);
-                    byte[] original = unencryptedData[i];
-
-                    if (!Arrays.equals(original, decrypted)) {
-                        return true;
-                    }
+                decrypt.update(encrypted, 0, 1, decrypted, 0);
+                decrypt.update(encrypted, 1, 1, decrypted, 1);
+                decrypt.doFinal(encrypted, 2, LEN - 2, decrypted, 2);
+                if (!Arrays.equals(original, decrypted)) {
+                    return true;
                 }
             }
             return false;
         } catch (NoSuchProviderException _e) {
             return false;
-        } catch (InvalidAlgorithmParameterException
-                | NoSuchPaddingException
-                | NoSuchAlgorithmException
-                | InvalidKeyException e) {
+        } catch (GeneralSecurityException e) {
             throw new RuntimeException(e);
         }
     }
