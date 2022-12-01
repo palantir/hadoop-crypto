@@ -15,7 +15,14 @@ public final class CipherCorruptionChecker {
 
     private CipherCorruptionChecker() {}
 
-    public static boolean isCorruptionPresent() {
+    private static boolean isCorruptionPresent() {
+        for (int i = 0; i < 100_000; i++) {
+            isCorruptionPresent(1);
+        }
+        isCorruptionPresent(LOOPS);
+    }
+
+    public static boolean isCorruptionPresent(int loops) {
         try {
             SecureRandom random = new SecureRandom();
 
@@ -25,7 +32,6 @@ public final class CipherCorruptionChecker {
 
             byte[] ivBytes = new byte[16];
             random.nextBytes(ivBytes);
-
             IvParameterSpec iv = new IvParameterSpec(ivBytes);
 
             Cipher encrypt = Cipher.getInstance("AES/CTR/NoPadding", "SunJCE");
@@ -37,7 +43,7 @@ public final class CipherCorruptionChecker {
             byte[] encrypted = new byte[LEN];
             byte[] decrypted = new byte[LEN];
 
-            for (int i = 0; i < LOOPS; i++) {
+            for (int i = 0; i < loops; i++) {
                 random.nextBytes(original);
                 encrypt.doFinal(original, 0, LEN, encrypted);
 
