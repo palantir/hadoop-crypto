@@ -15,14 +15,14 @@ public final class CipherCorruptionChecker {
 
     private CipherCorruptionChecker() {}
 
-    private static boolean isCorruptionPresent() {
+    public static boolean isCorruptionPresent() {
         for (int i = 0; i < 100_000; i++) {
             isCorruptionPresent(1);
         }
         return isCorruptionPresent(LOOPS);
     }
 
-    public static boolean isCorruptionPresent(int loops) {
+    private static boolean isCorruptionPresent(int loops) {
         try {
             SecureRandom random = new SecureRandom();
 
