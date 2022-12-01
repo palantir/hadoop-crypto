@@ -31,6 +31,9 @@ public final class CipherStreamSupplierImpl implements CipherStreamSupplier {
 
     @Override
     public CipherOutputStream getOutputStream(OutputStream os, Cipher cipher) {
+        if (Jdk8292158.isAffectedByJdkAesCtrCorruption(cipher.getAlgorithm())) {
+            throw Jdk8292158.cannotEncryptAesCtrSafely();
+        }
         return new CipherOutputStream(os, cipher);
     }
 }
