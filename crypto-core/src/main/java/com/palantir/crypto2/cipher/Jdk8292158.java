@@ -18,6 +18,7 @@ package com.palantir.crypto2.cipher;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Splitter;
+import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
 import com.palantir.logsafe.SafeArg;
@@ -35,6 +36,7 @@ import java.util.Comparator;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 
@@ -54,8 +56,9 @@ public final class Jdk8292158 {
     static final ImmutableSet<String> jdk8292158ImpactedCpuFlags =
             ImmutableSet.of("vaes", "avx512bw", "avx512vl", "vpclmulqdq");
 
-    private static final BooleanSupplier isAffectedByJdkAesCtrCorruption = () -> isAffectedByJdkAesCtrCorruption(
-            Runtime.version(), architecture(), ProcessHandle.current().info());
+    private static final Supplier<Boolean> isAffectedByJdkAesCtrCorruption =
+            Suppliers.memoize(() -> isAffectedByJdkAesCtrCorruption(
+                    Runtime.version(), architecture(), ProcessHandle.current().info()));
 
     private Jdk8292158() {}
 
@@ -84,7 +87,7 @@ public final class Jdk8292158 {
      * @throws SafeIllegalStateException is this JVM and CPU is affected by JDK-8292158 AES-CTR corruption
      */
     public static boolean isAffectedByJdkAesCtrCorruption(@Nullable String algorithm) {
-        return algorithm != null && algorithm.contains("AES/CTR") && isAffectedByJdkAesCtrCorruption.getAsBoolean();
+        return algorithm != null && algorithm.contains("AES/CTR") && isAffectedByJdkAesCtrCorruption.get();
     }
 
     @VisibleForTesting
