@@ -19,7 +19,7 @@ public final class CipherCorruptionChecker {
         for (int i = 0; i < 100_000; i++) {
             isCorruptionPresent(1);
         }
-        isCorruptionPresent(LOOPS);
+        return isCorruptionPresent(LOOPS);
     }
 
     public static boolean isCorruptionPresent(int loops) {
