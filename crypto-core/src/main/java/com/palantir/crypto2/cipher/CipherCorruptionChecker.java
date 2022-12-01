@@ -11,7 +11,7 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 public final class CipherCorruptionChecker {
-    private static final int LOOPS = 100000;
+    private static final int LOOPS = 100000000;
     private static final int LEN = 15;
 
     private CipherCorruptionChecker() {}
