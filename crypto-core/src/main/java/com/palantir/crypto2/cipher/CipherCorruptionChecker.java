@@ -5,12 +5,13 @@ import java.security.Key;
 import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
 import java.util.Arrays;
+import java.util.stream.IntStream;
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 public final class CipherCorruptionChecker {
-    private static final int LOOPS = 10000000;
+    private static final int LOOPS = 100000;
     private static final int LEN = 15;
 
     private CipherCorruptionChecker() {}
@@ -19,7 +20,10 @@ public final class CipherCorruptionChecker {
         for (int i = 0; i < 100_000; i++) {
             isCorruptionPresent(1);
         }
-        return isCorruptionPresent(LOOPS);
+        return IntStream.range(0, 64)
+                .parallel()
+                .mapToObj(_index -> isCorruptionPresent(LOOPS))
+                .reduce(false, Boolean::logicalOr);
     }
 
     private static boolean isCorruptionPresent(int loops) {
