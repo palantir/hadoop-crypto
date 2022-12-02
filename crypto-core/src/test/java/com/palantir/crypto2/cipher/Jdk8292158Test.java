@@ -19,6 +19,8 @@ package com.palantir.crypto2.cipher;
 import static com.palantir.logsafe.testing.Assertions.assertThatLoggableExceptionThrownBy;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assumptions.assumeThatThrownBy;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -47,6 +49,21 @@ class Jdk8292158Test {
     @Test
     void aesCbcIsNotAffected() {
         assertThat(Jdk8292158.isAffectedByJdkAesCtrCorruption("AES/CBC/PKCS5Padding"))
+                .isFalse();
+    }
+
+    @Test
+    void throwsWhenAffected() {
+        assumeTrue(Jdk8292158.isAesCtrBroken());
+        assumeThatThrownBy(() -> Jdk8292158.isAffectedByJdkAesCtrCorruption(AesCtrCipher.ALGORITHM))
+                .isInstanceOf(SafeIllegalStateException.class)
+                .hasMessageContaining("JVM and CPU architecture is affected by JDK-8292158");
+    }
+
+    @Test
+    void doesNotThrowWhenNotAffected() {
+        assumeFalse(Jdk8292158.isAesCtrBroken());
+        assertThat(Jdk8292158.isAffectedByJdkAesCtrCorruption(AesCtrCipher.ALGORITHM))
                 .isFalse();
     }
 
