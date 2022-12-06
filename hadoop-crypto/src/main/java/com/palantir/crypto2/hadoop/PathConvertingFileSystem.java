@@ -139,20 +139,9 @@ public final class PathConvertingFileSystem extends DelegatingFileSystem {
         return fromFunc.apply(path);
     }
 
-    private FileStatus toReturnFileStatus(FileStatus status) throws IOException {
-        // same as FileStatus copy constructor
-        return new FileStatus(
-                status.getLen(),
-                status.isDirectory(),
-                status.getReplication(),
-                status.getBlockSize(),
-                status.getModificationTime(),
-                status.getAccessTime(),
-                status.getPermission(),
-                status.getOwner(),
-                status.getGroup(),
-                status.isSymlink() ? status.getSymlink() : null, // getSymlink throws if file is not a symlink
-                from(status.getPath()));
+    private FileStatus toReturnFileStatus(FileStatus status) {
+        status.setPath(from(status.getPath()));
+        return status;
     }
 
 }

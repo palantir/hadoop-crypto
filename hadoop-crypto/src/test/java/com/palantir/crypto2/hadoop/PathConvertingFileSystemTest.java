@@ -119,18 +119,22 @@ public final class PathConvertingFileSystemTest {
 
     @Test
     public void listStatus() throws Exception {
-        when(delegate.listStatus(DELEGATE_PATH)).thenReturn(new FileStatus[] {fileStatus(DELEGATE_PATH)});
+        FileStatus delegateFileStatus = fileStatus(DELEGATE_PATH);
+        when(delegate.listStatus(DELEGATE_PATH)).thenReturn(new FileStatus[] {delegateFileStatus});
         FileStatus[] fileStatuses = convertingFs.listStatus(PATH);
 
         assertThat(fileStatuses).containsExactly(fileStatus(RETURN_PATH));
+        assertThat(fileStatus(RETURN_PATH)).isEqualTo(delegateFileStatus);
     }
 
     @Test
     public void getFileStatus() throws Exception {
-        when(delegate.getFileStatus(DELEGATE_PATH)).thenReturn(fileStatus(DELEGATE_PATH));
-        FileStatus fileStatus = convertingFs.getFileStatus(PATH);
+        FileStatus delegateFileStatus = fileStatus(DELEGATE_PATH);
+        when(delegate.getFileStatus(DELEGATE_PATH)).thenReturn(delegateFileStatus);
+        FileStatus convertedFileStatus = convertingFs.getFileStatus(PATH);
 
-        assertThat(fileStatus).isEqualTo(fileStatus(RETURN_PATH));
+        // The returned status is the same object returned by the delegate, the path converted in-place
+        assertThat(convertedFileStatus).isEqualTo(fileStatus(RETURN_PATH)).isSameAs(delegateFileStatus);
     }
 
     @Test
