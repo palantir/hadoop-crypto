@@ -123,10 +123,8 @@ public final class PathConvertingFileSystemTest {
         when(delegate.listStatus(DELEGATE_PATH)).thenReturn(new FileStatus[] {delegateFileStatus});
         FileStatus[] fileStatuses = convertingFs.listStatus(PATH);
 
-        assertThat(fileStatuses)
-                .satisfiesExactly(status ->
-                        // The returned status is the same object returned by the delegate, the path converted in-place
-                        assertThat(status).isEqualTo(fileStatus(RETURN_PATH)).isSameAs(delegateFileStatus));
+        assertThat(fileStatuses).containsExactly(fileStatus(RETURN_PATH));
+        assertThat(fileStatus(RETURN_PATH)).isEqualTo(delegateFileStatus);
     }
 
     @Test
