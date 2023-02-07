@@ -5,6 +5,7 @@ buildscript {
     }
 
     dependencies {
+        classpath 'com.palantir.jakartapackagealignment:jakarta-package-alignment:0.3.0'
         classpath 'com.palantir.gradle.jdks:gradle-jdks:0.28.0'
         classpath 'com.palantir.gradle.jdkslatest:gradle-jdks-latest:0.6.0'
         classpath 'com.palantir.baseline:gradle-baseline-java:4.188.0'
@@ -27,6 +28,7 @@ apply plugin: 'com.palantir.jdks.latest'
 
 allprojects {
     apply plugin: 'com.palantir.java-format'
+    apply plugin: 'com.palantir.jakarta-package-alignment'
 
     group 'com.palantir.hadoop-crypto2'
     version gitVersion()
