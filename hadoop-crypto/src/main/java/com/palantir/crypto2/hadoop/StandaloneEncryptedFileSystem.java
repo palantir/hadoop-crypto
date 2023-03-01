@@ -164,6 +164,9 @@ public final class StandaloneEncryptedFileSystem extends FilterFileSystem {
 
     private static Function<URI, URI> setUriSchemeFunc(final String scheme) {
         return uri -> {
+            if (uri.getScheme() == null) {
+                return uri;
+            }
             try {
                 return new URI(
                         scheme,
