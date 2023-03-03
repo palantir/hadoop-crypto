@@ -16,6 +16,7 @@
 
 package com.palantir.crypto2.hadoop;
 
+import com.google.common.annotations.VisibleForTesting;
 import java.io.IOException;
 import java.net.URI;
 import java.util.EnumSet;
@@ -146,7 +147,8 @@ public final class PathConvertingFileSystem extends DelegatingFileSystem {
         return fs.getFileChecksum(to(path));
     }
 
-    private Path to(Path path) {
+    @VisibleForTesting
+    Path to(Path path) {
         return toFunc.apply(path);
     }
 

@@ -296,6 +296,25 @@ public final class StandaloneEncryptedFileSystemTest {
         assertThat(readBytes).containsExactly(DATA_BYTES);
     }
 
+    /**
+     * Preserving paths with no scheme present is helpful to bypass validation in
+     * {@link org.apache.hadoop.fs.s3native.S3xLoginHelper#checkPath} when using S3A.
+     */
+    @Test
+    public void testNoScheme() {
+        // Convert the file path, because that normally happens by the time FileSystem calls checkPath internally
+        StandaloneEncryptedFileSystem standaloneEncryptedFileSystem = (StandaloneEncryptedFileSystem) efs;
+        EncryptedFileSystem encryptedFileSystem =
+                (EncryptedFileSystem) standaloneEncryptedFileSystem.getRawFileSystem();
+        PathConvertingFileSystem pathConvertingFileSystem =
+                (PathConvertingFileSystem) encryptedFileSystem.getRawFileSystem();
+        Path convertedPath = pathConvertingFileSystem.to(path);
+
+        // Just like the original path, the converted path should not have a scheme
+        assertThat(path.toUri().getScheme()).isNull();
+        assertThat(convertedPath.toUri().getScheme()).isNull();
+    }
+
     private static Configuration getBaseConf() {
         Configuration conf = new Configuration();
         conf.set("fs.efile.impl", StandaloneEncryptedFileSystem.class.getCanonicalName());
