@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.security.KeyPair;
@@ -35,6 +36,7 @@ import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.util.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -294,6 +296,97 @@ public final class StandaloneEncryptedFileSystemTest {
         FSDataInputStream input = efs.open(path);
         byte[] readBytes = ByteStreams.toByteArray(input);
         assertThat(readBytes).containsExactly(DATA_BYTES);
+    }
+
+    /**
+     * This validation logic for {@link S3MimicingFileSystem#checkPath} is copied exactly from
+     * {@link org.apache.hadoop.fs.s3a.S3AFileSystem} and {@link org.apache.hadoop.fs.s3native.S3xLoginHelper}.
+     */
+    static class S3MimicingFileSystem extends DelegatingFileSystem {
+        protected S3MimicingFileSystem(FileSystem delegate) {
+            super(delegate);
+        }
+
+        @Override
+        public void checkPath(Path path) {
+            checkPath(getConf(), getUri(), path, getDefaultPort());
+            super.checkPath(path);
+        }
+
+        @SuppressWarnings({"ReferenceEquality", "OperatorPrecedence"})
+        private void checkPath(Configuration conf, URI fsUri, Path path, int defaultPort) {
+            URI pathUri = path.toUri();
+            String thatScheme = pathUri.getScheme();
+            if (thatScheme != null) {
+                URI thisUri = canonicalizeUri(fsUri, defaultPort);
+                String thisScheme = thisUri.getScheme();
+                if (StringUtils.equalsIgnoreCase(thisScheme, thatScheme)) {
+                    String thisHost = thisUri.getHost();
+                    String thatHost = pathUri.getHost();
+                    if (thatHost == null && thisHost != null) {
+                        URI defaultUri = FileSystem.getDefaultUri(conf);
+                        if (StringUtils.equalsIgnoreCase(thisScheme, defaultUri.getScheme())) {
+                            pathUri = defaultUri;
+                        } else {
+                            pathUri = null;
+                        }
+                    }
+
+                    if (pathUri != null) {
+                        pathUri = canonicalizeUri(pathUri, defaultPort);
+                        thatHost = pathUri.getHost();
+                        if (thisHost == thatHost
+                                || thisHost != null && StringUtils.equalsIgnoreCase(thisHost, thatHost)) {
+                            return;
+                        }
+                    }
+                }
+
+                throw new IllegalArgumentException("Wrong FS " + toString(pathUri) + " -expected " + fsUri);
+            }
+        }
+
+        @SuppressWarnings("ParameterAssignment")
+        private URI canonicalizeUri(URI uri, int defaultPort) {
+            if (uri.getPort() == -1 && defaultPort > 0) {
+                try {
+                    uri = new URI(
+                            uri.getScheme(),
+                            uri.getUserInfo(),
+                            uri.getHost(),
+                            defaultPort,
+                            uri.getPath(),
+                            uri.getQuery(),
+                            uri.getFragment());
+                } catch (URISyntaxException var3) {
+                    throw new AssertionError("Valid URI became unparseable: " + uri);
+                }
+            }
+
+            return uri;
+        }
+
+        private String toString(URI pathUri) {
+            return pathUri != null
+                    ? String.format("%s://%s/%s", pathUri.getScheme(), pathUri.getHost(), pathUri.getPath())
+                    : "(null URI)";
+        }
+    }
+
+    @Test
+    public void testS3WorksWhenNoDefaultFsSet() {
+        S3MimicingFileSystem s3MimicingEfs = new S3MimicingFileSystem(efs);
+
+        // Convert the file path, because that normally happens by the time FileSystem calls checkPath internally
+        StandaloneEncryptedFileSystem standaloneEncryptedFileSystem = (StandaloneEncryptedFileSystem) efs;
+        EncryptedFileSystem encryptedFileSystem =
+                (EncryptedFileSystem) standaloneEncryptedFileSystem.getRawFileSystem();
+        PathConvertingFileSystem pathConvertingFileSystem =
+                (PathConvertingFileSystem) encryptedFileSystem.getRawFileSystem();
+        path = pathConvertingFileSystem.to(path);
+
+        // Actually test that S3's logic to check the path should work. Most methods check this validation first.
+        s3MimicingEfs.checkPath(path);
     }
 
     private static Configuration getBaseConf() {
