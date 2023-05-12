@@ -16,6 +16,8 @@
 
 package com.palantir.crypto2.keys;
 
+import java.io.IOException;
+
 /**
  * The strategy used to store the per file {@link KeyMaterial} used for encryption operations.
  */
@@ -24,15 +26,15 @@ public interface KeyStorageStrategy {
     /**
      * Stores the {@link KeyMaterial} for a file with the given {@code fileKey}.
      */
-    void put(String fileKey, KeyMaterial keyMaterial);
+    void put(String fileKey, KeyMaterial keyMaterial) throws IOException;
 
     /**
      * Retrieves the {@link KeyMaterial} for a file with the given {@code fileKey}.
      */
-    KeyMaterial get(String fileKey);
+    KeyMaterial get(String fileKey) throws IOException;
 
     /**
      * Removes the {@link KeyMaterial} for a file with the given {@code fileKey}.
      */
-    void remove(String fileKey);
+    void remove(String fileKey) throws IOException;
 }

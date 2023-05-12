@@ -18,6 +18,8 @@ package com.palantir.crypto2.hadoop;
 
 import com.palantir.crypto2.keys.KeyMaterial;
 import com.palantir.crypto2.keys.KeyStorageStrategy;
+import java.io.IOException;
+import java.nio.file.NoSuchFileException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,17 +30,21 @@ public final class InMemoryKeyStorageStrategy implements KeyStorageStrategy {
     public InMemoryKeyStorageStrategy() {}
 
     @Override
-    public void put(String fileKey, KeyMaterial keyMaterial) {
+    public void put(String fileKey, KeyMaterial keyMaterial) throws IOException {
         store.put(fileKey, keyMaterial);
     }
 
     @Override
-    public KeyMaterial get(String fileKey) {
+    public KeyMaterial get(String fileKey) throws IOException {
         return store.get(fileKey);
     }
 
     @Override
-    public void remove(String fileKey) {
+    public void remove(String fileKey) throws IOException {
+        if (!store.containsKey(fileKey)) {
+            // Mimic what the non-test-in-memory version would do if trying to remove it
+            throw new NoSuchFileException(fileKey);
+        }
         store.remove(fileKey);
     }
 }
