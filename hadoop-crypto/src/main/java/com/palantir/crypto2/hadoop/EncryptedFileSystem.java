@@ -171,10 +171,14 @@ public final class EncryptedFileSystem extends DelegatingFileSystem {
         if (recursive) {
             throw new UnsupportedOperationException("EncryptedFileSystem does not support recursive deletes");
         }
-        // If delete fails partway through, after deleting key but not file, make it possible to fully delete
-        // the file on a subsequent call.
-        tryRemoveKey(path);
-        return fs.delete(path, false);
+
+        // Note: this code used to be ordered in reverse, deleting the key before the file. That was reordered
+        // with the reasoning that leaving around an extra keymaterial file is less scary than an undecryptable file.
+        try {
+            return fs.delete(path, false);
+        } finally {
+            tryRemoveKey(path);
+        }
     }
 
     @Override
