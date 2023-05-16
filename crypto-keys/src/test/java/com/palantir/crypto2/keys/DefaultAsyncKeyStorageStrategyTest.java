@@ -24,7 +24,6 @@ import static org.mockito.Mockito.when;
 
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
-import java.io.IOException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -46,14 +45,14 @@ public final class DefaultAsyncKeyStorageStrategyTest {
     }
 
     @Test
-    public void testPut() throws IOException {
+    public void testPut() {
         keys.put(KEY, keyMaterial).join();
 
         verify(delegate).put(KEY, keyMaterial);
     }
 
     @Test
-    public void testPut_exception() throws IOException {
+    public void testPut_exception() {
         doThrow(IllegalStateException.class).when(delegate).put(KEY, keyMaterial);
 
         keys.put(KEY, keyMaterial)
@@ -65,14 +64,14 @@ public final class DefaultAsyncKeyStorageStrategyTest {
     }
 
     @Test
-    public void testGet() throws IOException {
+    public void testGet() {
         when(delegate.get(KEY)).thenReturn(keyMaterial);
 
         assertThat(keys.get(KEY).join()).isEqualTo(keyMaterial);
     }
 
     @Test
-    public void testGet_exception() throws IOException {
+    public void testGet_exception() {
         doThrow(IllegalStateException.class).when(delegate).get(KEY);
 
         keys.get(KEY)
@@ -84,14 +83,14 @@ public final class DefaultAsyncKeyStorageStrategyTest {
     }
 
     @Test
-    public void testRemove() throws IOException {
+    public void testRemove() {
         keys.remove(KEY).join();
 
         verify(delegate).remove(KEY);
     }
 
     @Test
-    public void testRemove_exception() throws IOException {
+    public void testRemove_exception() {
         doThrow(IllegalStateException.class).when(delegate).remove(KEY);
 
         keys.remove(KEY)

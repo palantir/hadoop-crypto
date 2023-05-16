@@ -16,7 +16,6 @@
 
 package com.palantir.crypto2.keys;
 
-import com.google.common.base.Throwables;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 
@@ -34,11 +33,7 @@ public final class DefaultAsyncKeyStorageStrategy implements AsyncKeyStorageStra
     public CompletableFuture<Void> put(String fileKey, KeyMaterial keyMaterial) {
         return CompletableFuture.supplyAsync(
                 () -> {
-                    try {
-                        keys.put(fileKey, keyMaterial);
-                    } catch (Exception ex) {
-                        throw Throwables.propagate(ex);
-                    }
+                    keys.put(fileKey, keyMaterial);
                     return null;
                 },
                 executor);
@@ -46,27 +41,15 @@ public final class DefaultAsyncKeyStorageStrategy implements AsyncKeyStorageStra
 
     @Override
     public CompletableFuture<KeyMaterial> get(String fileKey) {
-        return CompletableFuture.supplyAsync(
-                () -> {
-                    try {
-                        return keys.get(fileKey);
-                    } catch (Exception ex) {
-                        throw Throwables.propagate(ex);
-                    }
-                },
-                executor);
+        return CompletableFuture.supplyAsync(() -> keys.get(fileKey), executor);
     }
 
     @Override
     public CompletableFuture<Void> remove(String fileKey) {
         return CompletableFuture.supplyAsync(
                 () -> {
-                    try {
-                        keys.remove(fileKey);
-                        return null;
-                    } catch (Exception ex) {
-                        throw Throwables.propagate(ex);
-                    }
+                    keys.remove(fileKey);
+                    return null;
                 },
                 executor);
     }

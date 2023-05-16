@@ -16,6 +16,7 @@
 
 package com.palantir.crypto2.hadoop;
 
+import com.google.common.base.Throwables;
 import com.google.common.io.ByteStreams;
 import com.palantir.crypto2.keys.KeyMaterial;
 import com.palantir.crypto2.keys.KeyStorageStrategy;
@@ -57,25 +58,33 @@ public final class FileKeyStorageStrategy implements KeyStorageStrategy {
     }
 
     @Override
-    public void put(String fileKey, KeyMaterial keyMaterial) throws IOException {
+    public void put(String fileKey, KeyMaterial keyMaterial) {
         try (OutputStream stream = fs.create(getKeyPath(fileKey))) {
             byte[] wrappedKey = KeyMaterials.wrap(keyMaterial, publicKey);
             stream.write(wrappedKey);
+        } catch (IOException e) {
+            throw Throwables.propagate(e);
         }
     }
 
     @Override
-    public KeyMaterial get(String fileKey) throws IOException {
+    public KeyMaterial get(String fileKey) {
         Preconditions.checkArgument(privateKey.isPresent(), "Private key is absent but required to get key material");
         try (InputStream stream = fs.open(getKeyPath(fileKey))) {
             byte[] wrappedKey = ByteStreams.toByteArray(stream);
             return KeyMaterials.unwrap(wrappedKey, privateKey.get());
+        } catch (IOException e) {
+            throw Throwables.propagate(e);
         }
     }
 
     @Override
-    public void remove(String fileKey) throws IOException {
-        fs.delete(getKeyPath(fileKey), false);
+    public void remove(String fileKey) {
+        try {
+            fs.delete(getKeyPath(fileKey), false);
+        } catch (IOException e) {
+            throw Throwables.propagate(e);
+        }
     }
 
     private static Path getKeyPath(String fileKey) {

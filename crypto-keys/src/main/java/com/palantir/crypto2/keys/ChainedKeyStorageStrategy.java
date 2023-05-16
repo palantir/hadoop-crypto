@@ -22,7 +22,6 @@ import com.palantir.logsafe.Preconditions;
 import com.palantir.logsafe.SafeArg;
 import com.palantir.logsafe.logger.SafeLogger;
 import com.palantir.logsafe.logger.SafeLoggerFactory;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -48,14 +47,14 @@ public final class ChainedKeyStorageStrategy implements KeyStorageStrategy {
     }
 
     @Override
-    public void put(String fileKey, KeyMaterial keyMaterial) throws IOException {
+    public void put(String fileKey, KeyMaterial keyMaterial) {
         for (KeyStorageStrategy strategy : strategies) {
             strategy.put(fileKey, keyMaterial);
         }
     }
 
     @Override
-    public KeyMaterial get(String fileKey) throws IOException {
+    public KeyMaterial get(String fileKey) {
         List<Exception> suppressedExceptions = new ArrayList<>();
         for (KeyStorageStrategy strategy : strategies) {
             try {
@@ -76,7 +75,7 @@ public final class ChainedKeyStorageStrategy implements KeyStorageStrategy {
     }
 
     @Override
-    public void remove(String fileKey) throws IOException {
+    public void remove(String fileKey) {
         for (KeyStorageStrategy strategy : strategies) {
             strategy.remove(fileKey);
         }

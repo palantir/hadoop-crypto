@@ -24,7 +24,6 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import com.google.common.collect.ImmutableList;
-import java.io.IOException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
@@ -38,7 +37,7 @@ public final class ChainedKeyStorageStrategyTest {
     private String key;
 
     @BeforeEach
-    public void before() throws IOException {
+    public void before() {
         key = "key";
 
         successfulStrategy = mock(KeyStorageStrategy.class);
@@ -52,7 +51,7 @@ public final class ChainedKeyStorageStrategyTest {
     }
 
     @Test
-    public void testAllPutsCalled() throws IOException {
+    public void testAllPutsCalled() {
         chained.put(key, keyMaterial);
 
         InOrder inOrder = inOrder(successfulStrategy, failingStrategy);
@@ -62,7 +61,7 @@ public final class ChainedKeyStorageStrategyTest {
     }
 
     @Test
-    public void testGetSucceeds() throws IOException {
+    public void testGetSucceeds() {
         assertThat(chained.get(key)).isEqualTo(keyMaterial);
 
         InOrder inOrder = inOrder(successfulStrategy, failingStrategy);
@@ -71,7 +70,7 @@ public final class ChainedKeyStorageStrategyTest {
     }
 
     @Test
-    public void testFailedGetIgnored() throws IOException {
+    public void testFailedGetIgnored() {
         chained = new ChainedKeyStorageStrategy(failingStrategy, successfulStrategy);
 
         assertThat(chained.get(key)).isEqualTo(keyMaterial);
@@ -94,7 +93,7 @@ public final class ChainedKeyStorageStrategyTest {
     }
 
     @Test
-    public void testAllDeletesCalled() throws IOException {
+    public void testAllDeletesCalled() {
         chained.remove(key);
 
         InOrder inOrder = inOrder(successfulStrategy, failingStrategy);
