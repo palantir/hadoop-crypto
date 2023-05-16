@@ -39,6 +39,10 @@ public final class InMemoryKeyStorageStrategy implements KeyStorageStrategy {
 
     @Override
     public void remove(String fileKey) {
+        if (!store.containsKey(fileKey)) {
+            // Mimic how the non-test-in-memory version could throw an exception if trying to remove a non-existent key
+            throw new RuntimeException(fileKey);
+        }
         store.remove(fileKey);
     }
 }
