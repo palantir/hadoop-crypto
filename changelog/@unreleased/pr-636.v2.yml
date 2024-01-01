@@ -1,0 +1,10 @@
+type: improvement
+improvement:
+  description: |-
+    To avoid potential stream corruption, throw if JDK-8292158 may cause AES-CTR encryption corruption.
+
+    Determine if JVM is impacted by JDK-8292158 which can corrupt AES-CTR encryption streams. This bug impacts JDKs up to 11.0.18, 15.0.10, 17.0.6, 19.0.2 and when running on CPUs with AVX-512 vectorized AES support.
+
+    See https://bugs.openjdk.org/browse/JDK-8292158 introduced by https://bugs.openjdk.org/browse/JDK-8233741
+  links:
+  - https://github.com/palantir/hadoop-crypto/pull/636

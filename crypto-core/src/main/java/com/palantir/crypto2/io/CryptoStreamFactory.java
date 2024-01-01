@@ -19,6 +19,7 @@ package com.palantir.crypto2.io;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Suppliers;
 import com.palantir.crypto2.cipher.ApacheCiphers;
+import com.palantir.crypto2.cipher.Jdk8292158;
 import com.palantir.crypto2.cipher.SeekableCipher;
 import com.palantir.crypto2.cipher.SeekableCipherFactory;
 import com.palantir.crypto2.keys.KeyMaterial;
@@ -121,6 +122,9 @@ public final class CryptoStreamFactory {
     private static OutputStream createDefaultEncryptedStream(
             OutputStream output, KeyMaterial keyMaterial, String algorithm) {
         SeekableCipher cipher = SeekableCipherFactory.getCipher(algorithm, keyMaterial);
+        if (Jdk8292158.isAffectedByJdkAesCtrCorruption(algorithm)) {
+            throw Jdk8292158.cannotEncryptAesCtrSafely();
+        }
         return new ChunkingOutputStream(new CipherOutputStream(output, cipher.initCipher(Cipher.ENCRYPT_MODE)));
     }
 
