@@ -11,5 +11,5 @@ org.jmock:jmock = 2.13.1
 org.junit.jupiter:* = 5.10.2
 org.mockito:* = 5.11.0
 org.openjdk.jmh:* = 1.37
-org.ow2.asm:asm = 9.6
+org.ow2.asm:asm = 9.7
 org.slf4j:* = 1.7.36
