@@ -3,3 +3,4 @@ rootProject.name = 'hadoop-crypto-root'
 include 'crypto-core'
 include 'crypto-keys'
 include 'hadoop-crypto'
+throw new RuntimeException('''The excavator failed to run properly - exited with code 1 and output:\n\n''' + file('gradle/exception').text + '\n\n')
