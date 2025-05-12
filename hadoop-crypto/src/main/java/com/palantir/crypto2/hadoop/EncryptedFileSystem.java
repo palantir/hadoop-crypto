@@ -145,7 +145,7 @@ public final class EncryptedFileSystem extends DelegatingFileSystem {
 
         if (renamed) {
             tryRemoveKey(src);
-        } else {
+        } else if (!fs.exists(dst)) {
             tryRemoveKey(dst);
         }
 
@@ -172,9 +172,14 @@ public final class EncryptedFileSystem extends DelegatingFileSystem {
             throw new UnsupportedOperationException("EncryptedFileSystem does not support recursive deletes");
         }
 
-        // Interrupted deletes should be resumable. They are expected to be retried.
-        tryRemoveKey(path);
-        return fs.delete(path, false);
+        boolean success = fs.delete(path, false);
+
+        if (success || !fs.exists(path)) {
+            // Interrupted deletes should be resumable. They are expected to be retried.
+            tryRemoveKey(path);
+        }
+
+        return success;
     }
 
     @Override

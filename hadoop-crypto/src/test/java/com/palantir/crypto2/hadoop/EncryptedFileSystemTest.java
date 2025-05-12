@@ -257,6 +257,18 @@ public final class EncryptedFileSystemTest {
     }
 
     @Test
+    public void testRename_failedRenameBecauseDestinationFileAlreadyExists() throws IOException {
+        when(mockFs.exists(newPath)).thenReturn(true);
+        when(mockFs.rename(path, newPath)).thenReturn(false);
+
+        boolean renamed = mockedEfs.rename(path, newPath);
+
+        assertThat(renamed).isFalse();
+        verify(mockKeyStore, never()).remove(path.toString());
+        verify(mockKeyStore, never()).remove(newPath.toString());
+    }
+
+    @Test
     public void testRename_successfulRenameFailedRemoveIsIgnored() throws IOException {
         when(mockFs.rename(path, newPath)).thenReturn(true);
         doThrow(new IllegalArgumentException()).when(mockKeyStore).remove(anyString());
@@ -371,6 +383,24 @@ public final class EncryptedFileSystemTest {
         assertThat(keyStore.get(path.toString())).isInstanceOf(KeyMaterial.class);
         assertThat(efs.delete(path, false)).isFalse();
         assertThat(keyStore.get(path.toString())).isNull();
+    }
+
+    @Test
+    public void testDelete_deleteFileFailsAndStillExists() throws IOException {
+        when(mockFs.delete(path, false)).thenReturn(false);
+        when(mockFs.exists(path)).thenReturn(true);
+
+        assertThat(mockedEfs.delete(path, false)).isFalse();
+        verify(mockKeyStore, never()).remove(path.toString());
+    }
+
+    @Test
+    public void testDelete_deleteFileFailsAndDoesNotExist() throws IOException {
+        when(mockFs.delete(path, false)).thenReturn(false);
+        when(mockFs.exists(path)).thenReturn(false);
+
+        assertThat(mockedEfs.delete(path, false)).isFalse();
+        verify(mockKeyStore).remove(path.toString());
     }
 
     @Test
