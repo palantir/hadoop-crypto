@@ -264,6 +264,20 @@ public final class EncryptedFileSystemTest {
         boolean renamed = mockedEfs.rename(path, newPath);
 
         assertThat(renamed).isFalse();
+        verify(mockKeyStore, never()).put(eq(newPath.toString()), any());
+        verify(mockKeyStore, never()).remove(path.toString());
+        verify(mockKeyStore, never()).remove(newPath.toString());
+    }
+
+    @Test
+    public void testRename_failedRenameButDestinationFileExistsAfterCreation() throws IOException {
+        when(mockFs.exists(newPath)).thenReturn(false, true);
+        when(mockFs.rename(path, newPath)).thenReturn(false);
+
+        boolean renamed = mockedEfs.rename(path, newPath);
+
+        assertThat(renamed).isFalse();
+        verify(mockKeyStore).put(eq(newPath.toString()), any());
         verify(mockKeyStore, never()).remove(path.toString());
         verify(mockKeyStore, never()).remove(newPath.toString());
     }

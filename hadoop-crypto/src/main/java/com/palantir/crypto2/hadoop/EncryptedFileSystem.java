@@ -137,6 +137,11 @@ public final class EncryptedFileSystem extends DelegatingFileSystem {
 
     @Override
     public boolean rename(Path src, Path dst) throws IOException {
+        // Should not overwrite if a file already exists in the destination
+        if (fs.exists(dst)) {
+            return false;
+        }
+
         // Copy key material first so the encrypted file always has key material in the key store even if the
         // put or rename fails
         KeyMaterial keyMaterial = keyStore.get(src.toString());
@@ -146,6 +151,8 @@ public final class EncryptedFileSystem extends DelegatingFileSystem {
         if (renamed) {
             tryRemoveKey(src);
         } else if (!fs.exists(dst)) {
+            // The reason we check again if the destination exists before removing the key, is because there are edge
+            // cases where FileSystem#rename can create the new file but still claim failure.
             tryRemoveKey(dst);
         }
 
