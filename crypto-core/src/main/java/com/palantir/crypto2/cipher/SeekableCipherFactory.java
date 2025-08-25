@@ -17,6 +17,8 @@
 package com.palantir.crypto2.cipher;
 
 import com.palantir.crypto2.keys.KeyMaterial;
+import com.palantir.logsafe.SafeArg;
+import com.palantir.logsafe.exceptions.SafeIllegalArgumentException;
 
 public final class SeekableCipherFactory {
 
@@ -33,8 +35,8 @@ public final class SeekableCipherFactory {
             case AesCbcCipher.ALGORITHM:
                 return AesCbcCipher.generateKeyMaterial();
             default:
-                throw new IllegalArgumentException(
-                        String.format("No known SeekableCipher with algorithm: %s", cipherAlgorithm));
+                throw new SafeIllegalArgumentException(
+                        "No known SeekableCipher with algorithm", SafeArg.of("cipherAlgorithm", cipherAlgorithm));
         }
     }
 
@@ -55,8 +57,8 @@ public final class SeekableCipherFactory {
             case AesCbcCipher.ALGORITHM:
                 return getCipher(cipherAlgorithm, AesCbcCipher.generateKeyMaterial());
             default:
-                throw new IllegalArgumentException(
-                        String.format("No known SeekableCipher with algorithm: %s", cipherAlgorithm));
+                throw new SafeIllegalArgumentException(
+                        "No known SeekableCipher with algorithm", SafeArg.of("cipherAlgorithm", cipherAlgorithm));
         }
     }
 
@@ -71,8 +73,8 @@ public final class SeekableCipherFactory {
             case AesCbcCipher.ALGORITHM:
                 return new AesCbcCipher(keyMaterial);
             default:
-                throw new IllegalArgumentException(
-                        String.format("No known SeekableCipher with algorithm: %s", cipherAlgorithm));
+                throw new SafeIllegalArgumentException(
+                        "No known SeekableCipher with algorithm", SafeArg.of("cipherAlgorithm", cipherAlgorithm));
         }
     }
 }

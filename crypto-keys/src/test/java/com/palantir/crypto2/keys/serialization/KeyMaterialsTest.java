@@ -106,9 +106,9 @@ public final class KeyMaterialsTest {
 
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> KeyMaterials.unwrap(wrapped, keyPair.getPrivate()))
-                .withMessage(
-                        "Invalid serialization format version. Expected version in %s but found 0",
-                        KeySerializers.getAsymmetricSerializers().keySet());
+                .withMessageContaining("Invalid serialization format version")
+                .withMessageContaining(
+                        KeySerializers.getAsymmetricSerializers().keySet().toString());
     }
 
     @Test
@@ -135,9 +135,9 @@ public final class KeyMaterialsTest {
 
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> KeyMaterials.symmetricUnwrap(wrapped, symmetricKey))
-                .withMessage(
-                        "Invalid serialization format version. Expected version in %s but found 0",
-                        KeySerializers.getSymmetricSerializers().keySet());
+                .withMessageContaining("Invalid serialization format version")
+                .withMessageContaining(
+                        KeySerializers.getSymmetricSerializers().keySet().toString());
     }
 
     @Test

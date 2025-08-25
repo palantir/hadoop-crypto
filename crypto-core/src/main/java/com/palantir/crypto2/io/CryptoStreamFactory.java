@@ -24,6 +24,7 @@ import com.palantir.crypto2.cipher.SeekableCipherFactory;
 import com.palantir.crypto2.keys.KeyMaterial;
 import com.palantir.logsafe.exceptions.SafeIllegalStateException;
 import com.palantir.logsafe.exceptions.SafeNullPointerException;
+import com.palantir.logsafe.exceptions.SafeUnsupportedOperationException;
 import com.palantir.logsafe.logger.SafeLogger;
 import com.palantir.logsafe.logger.SafeLoggerFactory;
 import com.palantir.seekio.SeekableInput;
@@ -133,12 +134,12 @@ public final class CryptoStreamFactory {
 
         @Override
         public void seek(long _offset) {
-            throw new UnsupportedOperationException();
+            throw new SafeUnsupportedOperationException();
         }
 
         @Override
         public long getPos() {
-            throw new UnsupportedOperationException();
+            throw new SafeUnsupportedOperationException();
         }
 
         @Override

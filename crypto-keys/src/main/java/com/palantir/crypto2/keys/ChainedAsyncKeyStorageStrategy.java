@@ -20,6 +20,7 @@ import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.palantir.logsafe.Preconditions;
 import com.palantir.logsafe.SafeArg;
+import com.palantir.logsafe.exceptions.SafeRuntimeException;
 import com.palantir.logsafe.logger.SafeLogger;
 import com.palantir.logsafe.logger.SafeLoggerFactory;
 import java.util.ArrayList;
@@ -72,9 +73,10 @@ public final class ChainedAsyncKeyStorageStrategy implements AsyncKeyStorageStra
                                     e);
                         }
                     }
-                    RuntimeException toThrow = new RuntimeException(String.format(
-                            "Unable to get key material using any of the provided strategies: %s",
-                            Collections2.transform(strategies, s -> s.getClass().getCanonicalName())));
+                    RuntimeException toThrow = new SafeRuntimeException(
+                            "Unable to get key material using any of the provided strategies",
+                            SafeArg.of("strategies", Collections2.transform(strategies, s -> s.getClass()
+                                    .getCanonicalName())));
                     suppressedExceptions.forEach(toThrow::addSuppressed);
                     throw toThrow;
                 },

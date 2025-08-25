@@ -25,7 +25,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
@@ -107,9 +106,8 @@ public final class ChainedAsyncKeyStorageStrategyTest {
         assertThatExceptionOfType(CompletionException.class)
                 .isThrownBy(() -> chained.get(KEY).join())
                 .withCauseInstanceOf(RuntimeException.class)
-                .withMessageContaining(String.format(
-                        "Unable to get key material using any of the provided strategies: %s",
-                        ImmutableList.of(failingStrategy.getClass().getCanonicalName())));
+                .withMessageContaining("Unable to get key material using any of the provided strategies")
+                .withMessageContaining(failingStrategy.getClass().getCanonicalName());
     }
 
     @Test

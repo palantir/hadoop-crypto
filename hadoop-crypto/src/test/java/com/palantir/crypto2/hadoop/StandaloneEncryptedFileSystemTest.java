@@ -239,7 +239,8 @@ public final class StandaloneEncryptedFileSystemTest {
     public void testNoPublicKey() {
         assertThatExceptionOfType(NullPointerException.class)
                 .isThrownBy(() -> FileSystem.newInstance(EFS_URI, getBaseConf()))
-                .withMessage("Public Key must be configured for key %s", StandaloneEncryptedFileSystem.PUBLIC_KEY_CONF);
+                .withMessage(
+                        "Public Key must be configured for key: %s", StandaloneEncryptedFileSystem.PUBLIC_KEY_CONF);
     }
 
     @Test
@@ -249,7 +250,8 @@ public final class StandaloneEncryptedFileSystemTest {
 
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> FileSystem.newInstance(URI.create("nope:///"), conf))
-                .withMessage("URI scheme must begin with 'e' but received: nope");
+                .withMessageContaining("URI scheme must begin with 'e'")
+                .withMessageContaining("nope");
     }
 
     @Test

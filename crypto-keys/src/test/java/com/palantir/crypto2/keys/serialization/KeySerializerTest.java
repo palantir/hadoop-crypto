@@ -45,9 +45,8 @@ public abstract class KeySerializerTest {
 
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> getSerializer().unwrap(wrapped, keyPair.getPrivate()))
-                .withMessage(
-                        "Invalid serialization format version. Expected %s but found 0",
-                        getSerializer().getVersion());
+                .withMessageContaining("Invalid serialization format version")
+                .withMessageContaining("" + getSerializer().getVersion());
     }
 
     final void testWrapAndUnwrap(Set<Integer> symmetricKeySizes, Set<Integer> wrappingKeySizes) {

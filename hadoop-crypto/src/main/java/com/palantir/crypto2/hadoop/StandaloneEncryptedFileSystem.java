@@ -16,11 +16,13 @@
 
 package com.palantir.crypto2.hadoop;
 
-import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.palantir.crypto2.keys.KeyPairs;
 import com.palantir.crypto2.keys.KeyStorageStrategy;
+import com.palantir.logsafe.Preconditions;
+import com.palantir.logsafe.SafeArg;
+import com.palantir.logsafe.exceptions.SafeRuntimeException;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -84,7 +86,9 @@ public final class StandaloneEncryptedFileSystem extends FilterFileSystem {
     public void initialize(URI uri, Configuration conf) throws IOException {
         encryptedScheme = uri.getScheme();
         Preconditions.checkArgument(
-                encryptedScheme.startsWith("e"), "URI scheme must begin with 'e' but received: %s", encryptedScheme);
+                encryptedScheme.startsWith("e"),
+                "URI scheme must begin with 'e'",
+                SafeArg.of("encryptedScheme", encryptedScheme));
 
         delegate = getDelegateFileSystem(uri, conf);
 
@@ -108,7 +112,7 @@ public final class StandaloneEncryptedFileSystem extends FilterFileSystem {
 
     private static KeyPair getKeyPair(Configuration conf) {
         String publicKey = Preconditions.checkNotNull(
-                conf.get(PUBLIC_KEY_CONF), "Public Key must be configured for key %s", PUBLIC_KEY_CONF);
+                conf.get(PUBLIC_KEY_CONF), "Public Key must be configured for key: " + PUBLIC_KEY_CONF);
         String privateKey = conf.get(PRIVATE_KEY_CONF);
         String algorithm = conf.get(KEY_ALGORITHM_CONF, DEFAULT_ALGORITHM);
 
@@ -177,7 +181,7 @@ public final class StandaloneEncryptedFileSystem extends FilterFileSystem {
                         uri.getQuery(),
                         uri.getFragment());
             } catch (URISyntaxException e) {
-                throw new RuntimeException(e);
+                throw new SafeRuntimeException(e);
             }
         };
     }

@@ -76,7 +76,8 @@ public final class SeekableCipherFactoryTest {
     public void testGetCipher_invalidName() {
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> SeekableCipherFactory.getCipher("doesnt_exist"))
-                .withMessage("No known SeekableCipher with algorithm: doesnt_exist");
+                .withMessageContaining("No known SeekableCipher with algorithm")
+                .withMessageContaining("doesnt_exist");
     }
 
     @Test
@@ -85,6 +86,7 @@ public final class SeekableCipherFactoryTest {
 
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> SeekableCipherFactory.getCipher("doesnt_exist", keyMaterial))
-                .withMessage("No known SeekableCipher with algorithm: %s", "doesnt_exist");
+                .withMessageContaining("No known SeekableCipher with algorithm")
+                .withMessageContaining("doesnt_exist");
     }
 }

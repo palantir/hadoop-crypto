@@ -313,7 +313,9 @@ public final class EncryptedFileSystemTest {
 
         assertThatExceptionOfType(IllegalStateException.class)
                 .isThrownBy(() -> new EncryptedFileSystem(delegateFs, new InMemoryKeyStorageStrategy()))
-                .withMessage("Two incompatible ciphers configured: 'cipherAlg' and 'deprecatedCipherAlg'");
+                .withMessageContaining("Two incompatible ciphers configured")
+                .withMessageContaining("cipherAlg")
+                .withMessageContaining("deprecatedCipherAlg");
     }
 
     @Test

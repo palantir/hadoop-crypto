@@ -23,7 +23,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-import com.google.common.collect.ImmutableList;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
@@ -87,9 +86,8 @@ public final class ChainedKeyStorageStrategyTest {
 
         assertThatExceptionOfType(RuntimeException.class)
                 .isThrownBy(() -> chained.get(key))
-                .withMessage(
-                        "Unable to get key material for 'key' using any of the provided strategies: %s",
-                        ImmutableList.of(failingStrategy.getClass().getCanonicalName()));
+                .withMessageContaining("Unable to get key material for key using any of the provided strategies")
+                .withMessageContaining(failingStrategy.getClass().getCanonicalName());
     }
 
     @Test

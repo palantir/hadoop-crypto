@@ -18,6 +18,8 @@ package com.palantir.crypto2.cipher;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
+import com.palantir.logsafe.SafeArg;
+import com.palantir.logsafe.exceptions.SafeIllegalStateException;
 import java.security.Security;
 import java.util.List;
 
@@ -44,7 +46,7 @@ final class Ciphers {
                 return provider;
             }
         }
-        throw new IllegalStateException(
-                String.format("None of the acceptable JCE providers are available: %s", providers));
+        throw new SafeIllegalStateException(
+                "None of the acceptable JCE providers are available", SafeArg.of("providers", providers));
     }
 }
