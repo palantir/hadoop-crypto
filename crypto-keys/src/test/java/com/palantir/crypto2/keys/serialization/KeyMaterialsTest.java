@@ -16,11 +16,13 @@
 
 package com.palantir.crypto2.keys.serialization;
 
+import static com.palantir.logsafe.testing.Assertions.assertThatLoggableExceptionThrownBy;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import com.palantir.crypto2.keys.KeyMaterial;
 import com.palantir.crypto2.keys.TestKeyPairs;
+import com.palantir.logsafe.SafeArg;
 import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import javax.crypto.SecretKey;
@@ -104,11 +106,14 @@ public final class KeyMaterialsTest {
         byte[] wrapped = KeyMaterials.wrap(keyMaterial, keyPair.getPublic());
         wrapped[0] = 0x00;
 
-        assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> KeyMaterials.unwrap(wrapped, keyPair.getPrivate()))
-                .withMessageContaining("Invalid serialization format version")
-                .withMessageContaining(
-                        KeySerializers.getAsymmetricSerializers().keySet().toString());
+        assertThatLoggableExceptionThrownBy(() -> KeyMaterials.unwrap(wrapped, keyPair.getPrivate()))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasLogMessage("Invalid serialization format version")
+                .hasExactlyArgs(
+                        SafeArg.of(
+                                "expectedVersion",
+                                KeySerializers.getAsymmetricSerializers().keySet()),
+                        SafeArg.of("foundVersion", 0));
     }
 
     @Test
@@ -133,11 +138,14 @@ public final class KeyMaterialsTest {
         byte[] wrapped = KeyMaterials.symmetricWrap(keyMaterial, symmetricKey);
         wrapped[0] = 0x00;
 
-        assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> KeyMaterials.symmetricUnwrap(wrapped, symmetricKey))
-                .withMessageContaining("Invalid serialization format version")
-                .withMessageContaining(
-                        KeySerializers.getSymmetricSerializers().keySet().toString());
+        assertThatLoggableExceptionThrownBy(() -> KeyMaterials.symmetricUnwrap(wrapped, symmetricKey))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasLogMessage("Invalid serialization format version")
+                .hasExactlyArgs(
+                        SafeArg.of(
+                                "expectedVersion",
+                                KeySerializers.getSymmetricSerializers().keySet()),
+                        SafeArg.of("foundVersion", 0));
     }
 
     @Test

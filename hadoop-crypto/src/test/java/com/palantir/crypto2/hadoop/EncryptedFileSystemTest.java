@@ -16,6 +16,7 @@
 
 package com.palantir.crypto2.hadoop;
 
+import static com.palantir.logsafe.testing.Assertions.assertThatLoggableExceptionThrownBy;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
@@ -32,6 +33,7 @@ import com.google.common.io.ByteStreams;
 import com.palantir.crypto2.cipher.AesCtrCipher;
 import com.palantir.crypto2.keys.KeyMaterial;
 import com.palantir.crypto2.keys.KeyStorageStrategy;
+import com.palantir.logsafe.SafeArg;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -311,11 +313,11 @@ public final class EncryptedFileSystemTest {
         conf.set(EncryptedFileSystem.DEPRECATED_CIPHER_ALGORITHM_KEY, deprecatedCipherAlg);
         delegateFs = FileSystem.newInstance(new URI(folder.getAbsolutePath()), conf);
 
-        assertThatExceptionOfType(IllegalStateException.class)
-                .isThrownBy(() -> new EncryptedFileSystem(delegateFs, new InMemoryKeyStorageStrategy()))
-                .withMessageContaining("Two incompatible ciphers configured")
-                .withMessageContaining("cipherAlg")
-                .withMessageContaining("deprecatedCipherAlg");
+        assertThatLoggableExceptionThrownBy(() -> new EncryptedFileSystem(delegateFs, new InMemoryKeyStorageStrategy()))
+                .isInstanceOf(IllegalStateException.class)
+                .hasLogMessage("Two incompatible ciphers configured")
+                .hasExactlyArgs(
+                        SafeArg.of("cipher", "cipherAlg"), SafeArg.of("deprecatedCipher", "deprecatedCipherAlg"));
     }
 
     @Test
