@@ -16,11 +16,12 @@
 
 package com.palantir.crypto2.keys.serialization;
 
+import static com.palantir.logsafe.testing.Assertions.assertThatLoggableExceptionThrownBy;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import com.palantir.crypto2.keys.KeyMaterial;
 import com.palantir.crypto2.keys.TestKeyPairs;
+import com.palantir.logsafe.SafeArg;
 import java.security.KeyPair;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
@@ -43,11 +44,12 @@ public abstract class KeySerializerTest {
         byte[] wrapped = getSerializer().wrap(keyMaterial, keyPair.getPublic());
         wrapped[0] = 0x00;
 
-        assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> getSerializer().unwrap(wrapped, keyPair.getPrivate()))
-                .withMessage(
-                        "Invalid serialization format version. Expected %s but found 0",
-                        getSerializer().getVersion());
+        assertThatLoggableExceptionThrownBy(() -> getSerializer().unwrap(wrapped, keyPair.getPrivate()))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasLogMessage("Invalid serialization format version")
+                .hasExactlyArgs(
+                        SafeArg.of("foundVersion", 0),
+                        SafeArg.of("expectedVersion", getSerializer().getVersion()));
     }
 
     final void testWrapAndUnwrap(Set<Integer> symmetricKeySizes, Set<Integer> wrappingKeySizes) {

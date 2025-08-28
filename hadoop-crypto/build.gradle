@@ -14,6 +14,7 @@ dependencies {
 
     runtimeOnly 'org.apache.hadoop:hadoop-client-runtime'
 
+    testImplementation 'com.palantir.safe-logging:preconditions-assertj'
     testImplementation 'org.assertj:assertj-core'
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testImplementation 'org.junit.jupiter:junit-jupiter-api'

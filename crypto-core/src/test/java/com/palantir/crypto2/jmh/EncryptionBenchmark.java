@@ -19,6 +19,9 @@ package com.palantir.crypto2.jmh;
 import com.palantir.crypto2.cipher.ApacheCiphers;
 import com.palantir.crypto2.keys.KeyMaterial;
 import com.palantir.crypto2.keys.serialization.KeyMaterials;
+import com.palantir.logsafe.SafeArg;
+import com.palantir.logsafe.exceptions.SafeIllegalStateException;
+import com.palantir.logsafe.exceptions.SafeRuntimeException;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -84,7 +87,7 @@ public class EncryptionBenchmark {
         strategy.writeTo(data, baos);
         byte[] copy = baos.toByteArray();
         if (!Arrays.equals(data, copy)) {
-            throw new IllegalStateException("WriteStrategy failed: " + strategy);
+            throw new SafeIllegalStateException("WriteStrategy failed", SafeArg.of("strategy", strategy));
         }
     }
 
@@ -149,7 +152,7 @@ public class EncryptionBenchmark {
             }
             return baos.toByteArray();
         } catch (InvalidKeyException | InvalidAlgorithmParameterException | IOException e) {
-            throw new RuntimeException(e);
+            throw new SafeRuntimeException(e);
         }
     }
 

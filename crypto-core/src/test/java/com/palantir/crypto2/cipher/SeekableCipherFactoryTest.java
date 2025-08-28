@@ -16,11 +16,12 @@
 
 package com.palantir.crypto2.cipher;
 
+import static com.palantir.logsafe.testing.Assertions.assertThatLoggableExceptionThrownBy;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.Mockito.mock;
 
 import com.palantir.crypto2.keys.KeyMaterial;
+import com.palantir.logsafe.SafeArg;
 import org.junit.jupiter.api.Test;
 
 public final class SeekableCipherFactoryTest {
@@ -74,17 +75,19 @@ public final class SeekableCipherFactoryTest {
 
     @Test
     public void testGetCipher_invalidName() {
-        assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> SeekableCipherFactory.getCipher("doesnt_exist"))
-                .withMessage("No known SeekableCipher with algorithm: doesnt_exist");
+        assertThatLoggableExceptionThrownBy(() -> SeekableCipherFactory.getCipher("doesnt_exist"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasLogMessage("No known SeekableCipher with algorithm")
+                .hasExactlyArgs(SafeArg.of("cipherAlgorithm", "doesnt_exist"));
     }
 
     @Test
     public void testGetCipher_invalidNameKeyMaterial() {
         KeyMaterial keyMaterial = mock(KeyMaterial.class);
 
-        assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> SeekableCipherFactory.getCipher("doesnt_exist", keyMaterial))
-                .withMessage("No known SeekableCipher with algorithm: %s", "doesnt_exist");
+        assertThatLoggableExceptionThrownBy(() -> SeekableCipherFactory.getCipher("doesnt_exist", keyMaterial))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasLogMessage("No known SeekableCipher with algorithm")
+                .hasExactlyArgs(SafeArg.of("cipherAlgorithm", "doesnt_exist"));
     }
 }

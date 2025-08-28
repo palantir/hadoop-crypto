@@ -16,8 +16,9 @@
 
 package com.palantir.crypto2.keys.serialization;
 
-import com.google.common.base.Preconditions;
 import com.palantir.crypto2.keys.KeyMaterial;
+import com.palantir.logsafe.Preconditions;
+import com.palantir.logsafe.SafeArg;
 import com.palantir.logsafe.exceptions.SafeRuntimeException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -98,9 +99,9 @@ final class CipherSymmetricKeySerializer implements SymmetricKeySerializer {
             int readVersion = stream.read();
             Preconditions.checkArgument(
                     readVersion == version,
-                    "Invalid serialization format version. Expected %s but found %s",
-                    readVersion,
-                    version);
+                    "Invalid serialization format version",
+                    SafeArg.of("expectedVersion", readVersion),
+                    SafeArg.of("foundVersion", version));
 
             byte[] wrappingIv = new byte[ivSize];
             stream.readFully(wrappingIv);

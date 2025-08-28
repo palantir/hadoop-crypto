@@ -24,7 +24,10 @@ import com.palantir.crypto2.hadoop.cipher.FsCipherInputStream;
 import com.palantir.crypto2.io.CryptoStreamFactory;
 import com.palantir.crypto2.keys.KeyMaterial;
 import com.palantir.crypto2.keys.KeyStorageStrategy;
+import com.palantir.logsafe.SafeArg;
 import com.palantir.logsafe.UnsafeArg;
+import com.palantir.logsafe.exceptions.SafeIllegalStateException;
+import com.palantir.logsafe.exceptions.SafeUnsupportedOperationException;
 import com.palantir.logsafe.logger.SafeLogger;
 import com.palantir.logsafe.logger.SafeLoggerFactory;
 import java.io.IOException;
@@ -64,13 +67,11 @@ public final class EncryptedFileSystem extends DelegatingFileSystem {
 
     public static final String CIPHER_ALGORITHM_KEY = "fs.efs.cipher";
 
-    private final FileSystem fs;
     private final KeyStorageStrategy keyStore;
     private final String cipherAlgorithm;
 
     public EncryptedFileSystem(FileSystem fs, KeyStorageStrategy keyStore) {
         super(fs);
-        this.fs = fs;
         this.keyStore = keyStore;
         this.cipherAlgorithm = getCipherAlgorithm();
     }
@@ -169,7 +170,7 @@ public final class EncryptedFileSystem extends DelegatingFileSystem {
     @Override
     public boolean delete(Path path, boolean recursive) throws IOException {
         if (recursive) {
-            throw new UnsupportedOperationException("EncryptedFileSystem does not support recursive deletes");
+            throw new SafeUnsupportedOperationException("EncryptedFileSystem does not support recursive deletes");
         }
 
         // Interrupted deletes should be resumable. They are expected to be retried.
@@ -179,7 +180,7 @@ public final class EncryptedFileSystem extends DelegatingFileSystem {
 
     @Override
     public FSDataOutputStream append(Path _path, int _bufferSize, Progressable _progress) throws IOException {
-        throw new UnsupportedOperationException("appending to encrypted files is not supported");
+        throw new SafeUnsupportedOperationException("appending to encrypted files is not supported");
     }
 
     @VisibleForTesting
@@ -189,8 +190,10 @@ public final class EncryptedFileSystem extends DelegatingFileSystem {
 
         if (cipher.isPresent() && deprecatedCipher.isPresent()) {
             if (!cipher.get().equals(deprecatedCipher.get())) {
-                throw new IllegalStateException(String.format(
-                        "Two incompatible ciphers configured: '%s' and '%s'", cipher.get(), deprecatedCipher.get()));
+                throw new SafeIllegalStateException(
+                        "Two incompatible ciphers configured",
+                        SafeArg.of("cipher", cipher.get()),
+                        SafeArg.of("deprecatedCipher", deprecatedCipher.get()));
             }
         }
 

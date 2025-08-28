@@ -16,9 +16,10 @@
 
 package com.palantir.crypto2.keys.serialization;
 
-import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 import com.palantir.crypto2.keys.KeyMaterial;
+import com.palantir.logsafe.Preconditions;
+import com.palantir.logsafe.SafeArg;
 import com.palantir.logsafe.exceptions.SafeRuntimeException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -93,9 +94,9 @@ enum KeySerializerV2 implements KeySerializer {
             int version = stream.read();
             Preconditions.checkArgument(
                     VERSION == version,
-                    "Invalid serialization format version. Expected %s but found %s",
-                    VERSION,
-                    version);
+                    "Invalid serialization format version",
+                    SafeArg.of("expectedVersion", VERSION),
+                    SafeArg.of("foundVersion", version));
 
             int algorithmLength = stream.readInt();
             byte[] algorithmBytes = new byte[algorithmLength];

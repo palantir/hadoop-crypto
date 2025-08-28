@@ -16,10 +16,12 @@
 
 package com.palantir.crypto2.hadoop;
 
+import static com.palantir.logsafe.testing.Assertions.assertThatLoggableExceptionThrownBy;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import com.google.common.io.ByteStreams;
+import com.palantir.logsafe.SafeArg;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -239,7 +241,7 @@ public final class StandaloneEncryptedFileSystemTest {
     public void testNoPublicKey() {
         assertThatExceptionOfType(NullPointerException.class)
                 .isThrownBy(() -> FileSystem.newInstance(EFS_URI, getBaseConf()))
-                .withMessage("Public Key must be configured for key %s", StandaloneEncryptedFileSystem.PUBLIC_KEY_CONF);
+                .withMessage("Public Key must be configured for key: " + StandaloneEncryptedFileSystem.PUBLIC_KEY_CONF);
     }
 
     @Test
@@ -247,9 +249,10 @@ public final class StandaloneEncryptedFileSystemTest {
         conf = getBaseConf();
         conf.set("fs.nope.impl", StandaloneEncryptedFileSystem.class.getCanonicalName());
 
-        assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> FileSystem.newInstance(URI.create("nope:///"), conf))
-                .withMessage("URI scheme must begin with 'e' but received: nope");
+        assertThatLoggableExceptionThrownBy(() -> FileSystem.newInstance(URI.create("nope:///"), conf))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasLogMessage("URI scheme must begin with 'e'")
+                .hasExactlyArgs(SafeArg.of("encryptedScheme", "nope"));
     }
 
     @Test

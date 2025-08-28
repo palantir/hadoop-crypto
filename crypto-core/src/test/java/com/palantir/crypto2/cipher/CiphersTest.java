@@ -16,10 +16,12 @@
 
 package com.palantir.crypto2.cipher;
 
+import static com.palantir.logsafe.testing.Assertions.assertThatLoggableExceptionThrownBy;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import com.google.common.collect.ImmutableList;
+import com.palantir.logsafe.SafeArg;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
 public final class CiphersTest {
@@ -37,8 +39,9 @@ public final class CiphersTest {
 
     @Test
     public void testProvider_noneAvailable() {
-        assertThatExceptionOfType(IllegalStateException.class)
-                .isThrownBy(() -> Ciphers.getProvider(ImmutableList.of("Invalid")))
-                .withMessage("None of the acceptable JCE providers are available: [Invalid]");
+        assertThatLoggableExceptionThrownBy(() -> Ciphers.getProvider(ImmutableList.of("Invalid")))
+                .isInstanceOf(IllegalStateException.class)
+                .hasLogMessage("None of the acceptable JCE providers are available")
+                .hasExactlyArgs(SafeArg.of("providers", List.of("Invalid")));
     }
 }
