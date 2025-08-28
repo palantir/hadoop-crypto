@@ -16,9 +16,10 @@
 
 package com.palantir.crypto2.keys.serialization;
 
+import static com.palantir.logsafe.Preconditions.checkArgument;
+
 import com.google.common.base.Throwables;
 import com.palantir.crypto2.keys.KeyMaterial;
-import com.palantir.logsafe.Preconditions;
 import com.palantir.logsafe.SafeArg;
 import com.palantir.logsafe.exceptions.SafeRuntimeException;
 import com.palantir.logsafe.logger.SafeLogger;
@@ -95,7 +96,7 @@ public final class KeyMaterials {
 
     public static KeyMaterial unwrap(byte[] wrappedKeyMaterial, PrivateKey key) {
         int version = version(wrappedKeyMaterial);
-        Preconditions.checkArgument(
+        checkArgument(
                 ASYMMETRIC_SERIALIZERS.containsKey(version),
                 "Invalid serialization format version",
                 SafeArg.of("expectedVersion", ASYMMETRIC_SERIALIZERS.keySet()),
@@ -106,7 +107,7 @@ public final class KeyMaterials {
 
     public static KeyMaterial symmetricUnwrap(byte[] wrappedKeyMaterial, SecretKey key) {
         int version = version(wrappedKeyMaterial);
-        Preconditions.checkArgument(
+        checkArgument(
                 SYMMETRIC_SERIALIZERS.containsKey(version),
                 "Invalid serialization format version",
                 SafeArg.of("expectedVersion", SYMMETRIC_SERIALIZERS.keySet()),
