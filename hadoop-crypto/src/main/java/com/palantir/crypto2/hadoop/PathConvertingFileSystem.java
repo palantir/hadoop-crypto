@@ -20,17 +20,21 @@ import com.google.common.annotations.VisibleForTesting;
 import java.io.IOException;
 import java.net.URI;
 import java.util.EnumSet;
+import java.util.Optional;
 import java.util.function.Function;
 import org.apache.hadoop.fs.CreateFlag;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FSDataOutputStream;
+import org.apache.hadoop.fs.FSDataOutputStreamBuilder;
 import org.apache.hadoop.fs.FileChecksum;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Options.ChecksumOpt;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.permission.FsPermission;
+import org.apache.hadoop.fs.s3a.S3AFileSystem;
 import org.apache.hadoop.util.Progressable;
+import software.amazon.awssdk.services.s3.model.HeadObjectResponse;
 
 /**
  * A decorator {@link FileSystem} that delegates calls and converts paths to/from the delegate FileSystem.
@@ -94,6 +98,11 @@ public final class PathConvertingFileSystem extends DelegatingFileSystem {
     }
 
     @Override
+    public FSDataOutputStreamBuilder<?, ?> createFile(Path path) {
+        return this.fs.createFile(to(path));
+    }
+
+    @Override
     public FSDataOutputStream append(Path path, int bufferSize, Progressable progress) throws IOException {
         return delegate.append(to(path), bufferSize, progress);
     }
@@ -145,6 +154,14 @@ public final class PathConvertingFileSystem extends DelegatingFileSystem {
     @Override
     public FileChecksum getFileChecksum(Path path) throws IOException {
         return fs.getFileChecksum(to(path));
+    }
+
+    public Optional<HeadObjectResponse> getObjectMetadata(Path path) throws IOException {
+        if (fs instanceof S3AFileSystem s3Fs) {
+            return Optional.of(s3Fs.getS3AInternals().getObjectMetadata(to(path)));
+        } else {
+            return Optional.empty();
+        }
     }
 
     @VisibleForTesting

@@ -35,15 +35,20 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.util.EnumSet;
 import java.util.Optional;
+import java.util.UUID;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.CreateFlag;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FSDataOutputStream;
+import org.apache.hadoop.fs.FSDataOutputStreamBuilder;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Options.ChecksumOpt;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.permission.FsPermission;
+import org.apache.hadoop.fs.s3a.Constants;
+import org.apache.hadoop.fs.s3a.impl.CreateFileBuilder;
 import org.apache.hadoop.util.Progressable;
+import software.amazon.awssdk.services.s3.model.HeadObjectResponse;
 
 /**
  * A {@link FileSystem} wrapper that encrypts and decrypts the streams from the underlying {@link FileSystem}. The
@@ -56,6 +61,9 @@ public final class EncryptedFileSystem extends DelegatingFileSystem {
 
     private static final SafeLogger log = SafeLoggerFactory.get(EncryptedFileSystem.class);
     private static final String DEFAULT_CIPHER_ALGORITHM = AesCtrCipher.ALGORITHM;
+    private static final String S3_METADATA_KEY = "crypto-file-key-suffix";
+    private static final String S3_METADATA_KEY_HEADER =
+            Constants.FS_S3A_CREATE_HEADER + ".x-amz-meta-" + S3_METADATA_KEY;
 
     /**
      * This key has been deprecated.
@@ -85,7 +93,7 @@ public final class EncryptedFileSystem extends DelegatingFileSystem {
     public FSDataInputStream open(Path path, int bufferSize) throws IOException {
         FSDataInputStream encryptedStream = fs.open(path, bufferSize);
 
-        KeyMaterial keyMaterial = keyStore.get(path.toString());
+        KeyMaterial keyMaterial = keyStore.get(toKeyPath(path, getKeyPathSuffix(path)));
 
         return new FSDataInputStream(new FsCipherInputStream(encryptedStream, keyMaterial, cipherAlgorithm));
     }
@@ -100,10 +108,15 @@ public final class EncryptedFileSystem extends DelegatingFileSystem {
             long blockSize,
             Progressable progress)
             throws IOException {
-        FSDataOutputStream outputStream =
-                fs.create(path, permission, overwrite, bufferSize, replication, blockSize, progress);
+        FSDataOutputStreamBuilder<?, ?> outputStreamBuilder = fs.createFile(path)
+                .permission(permission)
+                .overwrite(overwrite)
+                .bufferSize(bufferSize)
+                .replication(replication)
+                .blockSize(blockSize)
+                .progress(progress);
 
-        return encrypt(outputStream, path);
+        return encrypt(outputStreamBuilder, path);
     }
 
     @Override
@@ -117,13 +130,38 @@ public final class EncryptedFileSystem extends DelegatingFileSystem {
             Progressable progress,
             ChecksumOpt checksumOpt)
             throws IOException {
-        FSDataOutputStream outputStream =
-                fs.create(path, permission, flags, bufferSize, replication, blockSize, progress, checksumOpt);
+        FSDataOutputStreamBuilder<?, ?> outputStreamBuilder = fs.createFile(path)
+                .permission(permission)
+                .bufferSize(bufferSize)
+                .replication(replication)
+                .blockSize(blockSize)
+                .progress(progress)
+                .checksumOpt(checksumOpt);
+        if (flags.contains(CreateFlag.CREATE)) {
+            outputStreamBuilder.create();
+        }
+        if (flags.contains(CreateFlag.APPEND)) {
+            outputStreamBuilder.append();
+        }
+        outputStreamBuilder.overwrite(flags.contains(CreateFlag.OVERWRITE));
 
-        return encrypt(outputStream, path);
+        return encrypt(outputStreamBuilder, path);
     }
 
-    private FSDataOutputStream encrypt(FSDataOutputStream encryptedStream, Path path) throws IOException {
+    private FSDataOutputStream encrypt(FSDataOutputStreamBuilder<?, ?> encryptedStreamBuilder, Path filePath)
+            throws IOException {
+        Optional<String> keyPathSuffix = Optional.empty();
+        if (encryptedStreamBuilder instanceof CreateFileBuilder createFileBuilder) {
+            String suffix = UUID.randomUUID().toString();
+            keyPathSuffix = Optional.of(suffix);
+            createFileBuilder.opt(S3_METADATA_KEY_HEADER, suffix);
+            if (log.isTraceEnabled()) {
+                log.trace("Encrypting with keyPathSuffix", SafeArg.of("path", filePath), SafeArg.of("suffix", suffix));
+            }
+        }
+        FSDataOutputStream encryptedStream = encryptedStreamBuilder.build();
+        String keyPath = toKeyPath(filePath, keyPathSuffix);
+
         KeyMaterial keyMaterial = SeekableCipherFactory.generateKeyMaterial(cipherAlgorithm);
         SeekableCipher cipher = SeekableCipherFactory.getCipher(cipherAlgorithm, keyMaterial);
 
@@ -131,7 +169,7 @@ public final class EncryptedFileSystem extends DelegatingFileSystem {
         OutputStream encryptedOs =
                 CryptoStreamFactory.encrypt(encryptedStream, cipher.getKeyMaterial(), cipherAlgorithm);
         FSDataOutputStream os = new FSDataOutputStream(encryptedOs, statistics);
-        keyStore.put(path.toString(), cipher.getKeyMaterial());
+        keyStore.put(keyPath, cipher.getKeyMaterial());
 
         return os;
     }
@@ -140,29 +178,29 @@ public final class EncryptedFileSystem extends DelegatingFileSystem {
     public boolean rename(Path src, Path dst) throws IOException {
         // Copy key material first so the encrypted file always has key material in the key store even if the
         // put or rename fails
-        KeyMaterial keyMaterial = keyStore.get(src.toString());
-        keyStore.put(dst.toString(), keyMaterial);
+        Optional<String> keyPathSuffix = getKeyPathSuffix(src);
+        String srcKeyPath = toKeyPath(src, keyPathSuffix);
+        String dstKeyPath = toKeyPath(dst, keyPathSuffix);
+        KeyMaterial keyMaterial = keyStore.get(srcKeyPath);
+        keyStore.put(dstKeyPath, keyMaterial);
         boolean renamed = fs.rename(src, dst);
 
         if (renamed) {
-            tryRemoveKey(src);
+            tryRemoveKey(srcKeyPath);
         } else {
-            tryRemoveKey(dst);
+            tryRemoveKey(dstKeyPath);
         }
 
         return renamed;
     }
 
-    private void tryRemoveKey(Path path) {
-        String fileKey = null;
+    private void tryRemoveKey(String fileKey) {
         try {
-            fileKey = path.toString();
             keyStore.remove(fileKey);
         } catch (Exception e) {
             log.warn(
                     "Unable to remove KeyMaterial for file",
                     UnsafeArg.of("fileKey", fileKey),
-                    UnsafeArg.of("path", path),
                     e);
         }
     }
@@ -174,13 +212,31 @@ public final class EncryptedFileSystem extends DelegatingFileSystem {
         }
 
         // Interrupted deletes should be resumable. They are expected to be retried.
-        tryRemoveKey(path);
+        tryRemoveKey(toKeyPath(path, getKeyPathSuffix(path)));
         return fs.delete(path, false);
     }
 
     @Override
     public FSDataOutputStream append(Path _path, int _bufferSize, Progressable _progress) throws IOException {
         throw new SafeUnsupportedOperationException("appending to encrypted files is not supported");
+    }
+
+    private Optional<String> getKeyPathSuffix(Path path) throws IOException {
+        if (fs instanceof PathConvertingFileSystem pathConvertingFs) {
+            Optional<HeadObjectResponse> objectMetadata = pathConvertingFs.getObjectMetadata(path);
+            if (objectMetadata.isPresent()) {
+                String suffix = objectMetadata.get().metadata().get(S3_METADATA_KEY);
+                if (log.isTraceEnabled()) {
+                    log.trace("Loaded keyPathSuffix", SafeArg.of("path", path), SafeArg.of("suffix", suffix));
+                }
+                return Optional.ofNullable(suffix);
+            }
+        }
+        return Optional.empty();
+    }
+
+    private String toKeyPath(Path path, Optional<String> keyPathSuffix) {
+        return path.toString() + keyPathSuffix.map(suffix -> "-crypto" + suffix).orElse("");
     }
 
     @VisibleForTesting

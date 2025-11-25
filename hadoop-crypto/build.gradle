@@ -11,6 +11,7 @@ dependencies {
     implementation 'com.palantir.safe-logging:preconditions'
     implementation 'com.palantir.safe-logging:safe-logging'
     implementation 'com.palantir.seek-io:seek-io'
+    implementation 'org.apache.hadoop:hadoop-aws'
 
     runtimeOnly 'org.apache.hadoop:hadoop-client-runtime'
 
