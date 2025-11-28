@@ -204,10 +204,7 @@ public final class EncryptedFileSystem extends DelegatingFileSystem {
         try {
             keyStore.remove(fileKey);
         } catch (Exception e) {
-            log.warn(
-                    "Unable to remove KeyMaterial for file",
-                    UnsafeArg.of("fileKey", fileKey),
-                    e);
+            log.warn("Unable to remove KeyMaterial for file", UnsafeArg.of("fileKey", fileKey), e);
         }
     }
 
