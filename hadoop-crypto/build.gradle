@@ -32,7 +32,6 @@ shadowJar {
         exclude(dependency('org.apache.hadoop:hadoop-client-api'))
         exclude(dependency('org.apache.hadoop:hadoop-client-runtime'))
         exclude(dependency('org.apache.hadoop:hadoop-aws'))
-        exclude(dependency('org.apache.hadoop:hadoop-aws'))
         exclude(dependency('software.amazon.awssdk:bundle'))
     }
 }
