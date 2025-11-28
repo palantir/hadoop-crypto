@@ -157,7 +157,8 @@ public final class EncryptedFileSystem extends DelegatingFileSystem {
     private FSDataOutputStream encrypt(FSDataOutputStreamBuilder<?, ?> encryptedStreamBuilder, Path filePath)
             throws IOException {
         Optional<String> keyPathSuffix = Optional.empty();
-        if (encryptedStreamBuilder instanceof CreateFileBuilder createFileBuilder) {
+        if (encryptedStreamBuilder instanceof CreateFileBuilder) {
+            CreateFileBuilder createFileBuilder = (CreateFileBuilder) encryptedStreamBuilder;
             String suffix = UUID.randomUUID().toString();
             keyPathSuffix = Optional.of(suffix);
             createFileBuilder.opt(S3_METADATA_KEY_HEADER, suffix);
