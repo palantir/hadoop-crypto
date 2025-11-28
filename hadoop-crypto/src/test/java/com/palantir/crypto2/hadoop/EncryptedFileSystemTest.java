@@ -20,6 +20,10 @@ import static com.palantir.logsafe.testing.Assertions.assertThatLoggableExceptio
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyShort;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
@@ -48,6 +52,8 @@ import java.util.Random;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.CreateFlag;
 import org.apache.hadoop.fs.FSDataInputStream;
+import org.apache.hadoop.fs.FSDataOutputStream;
+import org.apache.hadoop.fs.FSDataOutputStreamBuilder;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.RawLocalFileSystem;
@@ -104,6 +110,8 @@ public final class EncryptedFileSystemTest {
     public void testDelegateStreamIsClosed() throws IOException {
         EncryptedFileSystem fs = new EncryptedFileSystem(mockFs, new InMemoryKeyStorageStrategy());
 
+        FSDataOutputStreamBuilder fsDataOutputStreamBuilder = builderForOutputStream();
+        when(mockFs.createFile(path)).thenReturn(fsDataOutputStreamBuilder);
         fs.create(path); // populate key store
 
         FSDataInputStream is = mock(FSDataInputStream.class);
@@ -192,6 +200,8 @@ public final class EncryptedFileSystemTest {
 
     @Test
     public void testCreate_normalizePathPassedToKeyStore() throws IOException {
+        FSDataOutputStreamBuilder fsDataOutputStreamBuilder = builderForOutputStream();
+        when(mockFs.createFile(new Path("foo//bar"))).thenReturn(fsDataOutputStreamBuilder);
         mockedEfs.create(new Path("foo//bar"));
 
         verify(mockKeyStore).put(eq("foo/bar"), any(KeyMaterial.class));
@@ -395,5 +405,16 @@ public final class EncryptedFileSystemTest {
         FSDataInputStream input = efs.open(path);
         byte[] readBytes = ByteStreams.toByteArray(input);
         assertThat(readBytes).isEqualTo(data);
+    }
+
+    private static FSDataOutputStreamBuilder builderForOutputStream() throws IOException {
+        FSDataOutputStreamBuilder builder = mock(FSDataOutputStreamBuilder.class);
+        when(builder.permission(any())).thenReturn(builder);
+        when(builder.overwrite(anyBoolean())).thenReturn(builder);
+        when(builder.bufferSize(anyInt())).thenReturn(builder);
+        when(builder.replication(anyShort())).thenReturn(builder);
+        when(builder.blockSize(anyLong())).thenReturn(builder);
+        when(builder.build()).thenReturn(mock(FSDataOutputStream.class));
+        return builder;
     }
 }

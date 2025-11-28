@@ -17,8 +17,11 @@
 package com.palantir.crypto2.hadoop;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -27,8 +30,10 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.CompletableFuture;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.BlockLocation;
 import org.apache.hadoop.fs.FSDataInputStream;
@@ -36,6 +41,7 @@ import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FSInputStream;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.FutureDataInputStreamBuilder;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.permission.FsPermission;
 import org.junit.jupiter.api.BeforeEach;
@@ -104,10 +110,20 @@ public final class DelegatingFileSystemTest {
         File localFile = new File(folder, "test.bin");
         Path dst = new Path(localFile.getAbsolutePath());
 
-        when(delegate.open(remotePath, 4096)).thenReturn(new FSDataInputStream(new ByteArrayFsInputStream(bytes)));
+        FutureDataInputStreamBuilder futureDataInputStreamBuilder =
+                builderForInputStream(new ByteArrayFsInputStream(bytes));
+        when(delegate.openFile(remotePath)).thenReturn(futureDataInputStreamBuilder);
 
         copyToLocal.accept(dst);
         assertThat(Files.toByteArray(localFile)).isEqualTo(bytes);
+    }
+
+    public static FutureDataInputStreamBuilder builderForInputStream(InputStream is) throws IOException {
+        FutureDataInputStreamBuilder builder = mock(FutureDataInputStreamBuilder.class);
+        when(builder.opt(any(), anyString())).thenReturn(builder);
+        when(builder.optLong(any(), anyLong())).thenReturn(builder);
+        when(builder.build()).thenReturn(CompletableFuture.completedFuture(new FSDataInputStream(is)));
+        return builder;
     }
 
     @Test
