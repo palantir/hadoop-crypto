@@ -226,7 +226,8 @@ public final class EncryptedFileSystem extends DelegatingFileSystem {
     }
 
     private Optional<String> getKeyPathSuffix(Path path) throws IOException {
-        if (fs instanceof PathConvertingFileSystem pathConvertingFs) {
+        if (fs instanceof PathConvertingFileSystem) {
+            PathConvertingFileSystem pathConvertingFs = (PathConvertingFileSystem) fs;
             Optional<HeadObjectResponse> objectMetadata = pathConvertingFs.getObjectMetadata(path);
             if (objectMetadata.isPresent()) {
                 String suffix = objectMetadata.get().metadata().get(S3_METADATA_KEY);
