@@ -113,8 +113,10 @@ public final class EncryptedFileSystem extends DelegatingFileSystem {
                 .overwrite(overwrite)
                 .bufferSize(bufferSize)
                 .replication(replication)
-                .blockSize(blockSize)
-                .progress(progress);
+                .blockSize(blockSize);
+        if (progress != null) {
+            outputStreamBuilder.progress(progress);
+        }
 
         return encrypt(outputStreamBuilder, path);
     }
@@ -134,9 +136,13 @@ public final class EncryptedFileSystem extends DelegatingFileSystem {
                 .permission(permission)
                 .bufferSize(bufferSize)
                 .replication(replication)
-                .blockSize(blockSize)
-                .progress(progress)
-                .checksumOpt(checksumOpt);
+                .blockSize(blockSize);
+        if (progress != null) {
+            outputStreamBuilder.progress(progress);
+        }
+        if (checksumOpt != null) {
+            outputStreamBuilder.checksumOpt(checksumOpt);
+        }
         if (flags.contains(CreateFlag.CREATE)) {
             outputStreamBuilder.create();
         }
