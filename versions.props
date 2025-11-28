@@ -13,3 +13,4 @@ org.mockito:* = 5.15.2
 org.openjdk.jmh:* = 1.37
 org.ow2.asm:asm = 9.7.1
 org.slf4j:* = 1.7.36
+software.amazon.awssdk:* = 2.27.24

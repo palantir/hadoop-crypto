@@ -11,7 +11,10 @@ dependencies {
     implementation 'com.palantir.safe-logging:preconditions'
     implementation 'com.palantir.safe-logging:safe-logging'
     implementation 'com.palantir.seek-io:seek-io'
-    implementation 'org.apache.hadoop:hadoop-aws'
+    implementation ('org.apache.hadoop:hadoop-aws') {
+        exclude group: 'software.amazon.awssdk', module: 'bundle'
+    }
+    implementation 'software.amazon.awssdk:s3'
 
     runtimeOnly 'org.apache.hadoop:hadoop-client-runtime'
 
@@ -32,7 +35,7 @@ shadowJar {
         exclude(dependency('org.apache.hadoop:hadoop-client-api'))
         exclude(dependency('org.apache.hadoop:hadoop-client-runtime'))
         exclude(dependency('org.apache.hadoop:hadoop-aws'))
-        exclude(dependency('software.amazon.awssdk:bundle'))
+        exclude(dependency('software.amazon.awssdk:'))
     }
 }
 
