@@ -157,7 +157,8 @@ public final class PathConvertingFileSystem extends DelegatingFileSystem {
     }
 
     public Optional<HeadObjectResponse> getObjectMetadata(Path path) throws IOException {
-        if (fs instanceof S3AFileSystem s3Fs) {
+        if (fs instanceof S3AFileSystem) {
+            S3AFileSystem s3Fs = (S3AFileSystem) fs;
             return Optional.of(s3Fs.getS3AInternals().getObjectMetadata(to(path)));
         } else {
             return Optional.empty();
