@@ -222,12 +222,7 @@ public final class EncryptedFileSystem extends DelegatingFileSystem {
         return fs.delete(path, false);
     }
 
-    @Override
-    public boolean exists(Path path) throws IOException {
-        if (!super.exists(path)) {
-            return false;
-        }
-
+    public boolean keyFileExists(Path path) throws IOException {
         try {
             keyStore.get(toKeyPath(path, getKeyPathSuffix(path)));
             return true;

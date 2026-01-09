@@ -138,6 +138,10 @@ public final class StandaloneEncryptedFileSystem extends FilterFileSystem {
         return fs.exists(path);
     }
 
+    public boolean keyFileExists(Path path) throws IOException {
+        return fs.exists(path);
+    }
+
     @Override
     public boolean delete(Path path, boolean recursive) throws IOException {
         // Since StandaloneEncryptedFileSystem uses a FileKeyStorageStrategy, the delegate delete call on folders
