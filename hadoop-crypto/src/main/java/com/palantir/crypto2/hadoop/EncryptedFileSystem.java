@@ -109,6 +109,7 @@ public final class EncryptedFileSystem extends DelegatingFileSystem {
             Progressable progress)
             throws IOException {
         FSDataOutputStreamBuilder<?, ?> outputStreamBuilder = fs.createFile(path)
+                .recursive() // create parent directory if it does not exist
                 .permission(permission)
                 .overwrite(overwrite)
                 .bufferSize(bufferSize)
@@ -133,6 +134,7 @@ public final class EncryptedFileSystem extends DelegatingFileSystem {
             ChecksumOpt checksumOpt)
             throws IOException {
         FSDataOutputStreamBuilder<?, ?> outputStreamBuilder = fs.createFile(path)
+                .recursive() // create parent directory if it does not exist
                 .permission(permission)
                 .bufferSize(bufferSize)
                 .replication(replication)

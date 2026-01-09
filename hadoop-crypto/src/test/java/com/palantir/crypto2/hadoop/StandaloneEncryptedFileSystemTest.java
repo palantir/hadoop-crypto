@@ -103,7 +103,6 @@ public final class StandaloneEncryptedFileSystemTest {
     @Test
     public void testDelete() throws IOException {
         File rootFolder = folder.resolve("delete").toFile();
-        Files.createDirectories(rootFolder.toPath());
 
         Path path1 = writeData(rootFolder);
 
@@ -121,7 +120,6 @@ public final class StandaloneEncryptedFileSystemTest {
     @Test
     public void testRecursiveDelete() throws IOException {
         File rootFolder = folder.resolve("recursiveDelete").toFile();
-        Files.createDirectories(rootFolder.toPath());
         Path rootPath = new Path(rootFolder.getAbsolutePath());
 
         Path path1 = writeData(rootFolder);
@@ -151,7 +149,6 @@ public final class StandaloneEncryptedFileSystemTest {
     @Test
     public void testRename() throws IOException {
         File rootFolder = folder.resolve("rename").toFile();
-        Files.createDirectories(rootFolder.toPath());
         Path rootPath = new Path(rootFolder.getAbsolutePath());
         Path dstPath = new Path(rootPath, UUID.randomUUID().toString());
 
@@ -168,9 +165,7 @@ public final class StandaloneEncryptedFileSystemTest {
     @Test
     public void testRecursiveRename() throws IOException {
         File rootFolder = folder.resolve("root").toFile();
-        Files.createDirectories(rootFolder.toPath());
         File dstFolder = folder.resolve("dest").toFile();
-        Files.createDirectories(dstFolder.toPath());
         Path rootPath = new Path(rootFolder.getAbsolutePath());
         Path dstPath = new Path(dstFolder.getAbsolutePath());
 
