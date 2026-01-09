@@ -223,6 +223,21 @@ public final class EncryptedFileSystem extends DelegatingFileSystem {
     }
 
     @Override
+    public boolean exists(Path path) throws IOException {
+        if (!super.exists(path)) {
+            return false;
+        }
+
+        try {
+            keyStore.get(toKeyPath(path, getKeyPathSuffix(path)));
+            return true;
+        } catch (RuntimeException ex) {
+            log.warn("Raw file exists but missing in key store", SafeArg.of("path", path), ex);
+            return false;
+        }
+    }
+
+    @Override
     public FSDataOutputStream append(Path _path, int _bufferSize, Progressable _progress) throws IOException {
         throw new SafeUnsupportedOperationException("appending to encrypted files is not supported");
     }
