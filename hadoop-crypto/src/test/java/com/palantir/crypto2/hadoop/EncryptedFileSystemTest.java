@@ -414,6 +414,7 @@ public final class EncryptedFileSystemTest {
         when(builder.bufferSize(anyInt())).thenReturn(builder);
         when(builder.replication(anyShort())).thenReturn(builder);
         when(builder.blockSize(anyLong())).thenReturn(builder);
+        when(builder.recursive()).thenReturn(builder);
         when(builder.build()).thenReturn(mock(FSDataOutputStream.class));
         return builder;
     }
