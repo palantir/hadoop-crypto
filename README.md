@@ -5,6 +5,9 @@
 [![CircleCI Build Status](https://circleci.com/gh/palantir/hadoop-crypto/tree/develop.svg?style=shield)](https://circleci.com/gh/palantir/hadoop-crypto)
 ![Maven Central](https://img.shields.io/maven-central/v/com.palantir.hadoop-crypto2/hadoop-crypto)
 
+> [!IMPORTANT]  
+> Due to resource constraints, we've insourced hadoop-crypto. Palantirians can check it out [here](https://pl.ntr/2Bd).
+
 Seekable Crypto
 ===============
 *Seekable Crypto* is a Java library that provides the ability to seek within
