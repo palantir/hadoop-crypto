@@ -6,7 +6,7 @@
 ![Maven Central](https://img.shields.io/maven-central/v/com.palantir.hadoop-crypto2/hadoop-crypto)
 
 > [!IMPORTANT]  
-> Due to resource constraints, we've insourced hadoop-crypto. Palantirians can check it out [here](https://pl.ntr/2Bd).
+> We've insourced hadoop-crypto. Palantirians can check it out [here](https://pl.ntr/2Bd).
 
 Seekable Crypto
 ===============
