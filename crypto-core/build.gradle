@@ -1,13 +1,9 @@
-apply from: "${rootDir}/gradle/openssl.gradle"
-
 dependencies {
     api project(':crypto-keys')
 
     api 'com.google.guava:guava'
     api 'com.palantir.seek-io:seek-io'
-    api 'org.apache.commons:commons-crypto'
 
-    implementation 'com.palantir.safe-logging:logger'
     implementation 'com.palantir.safe-logging:preconditions'
     implementation 'com.palantir.safe-logging:safe-logging'
 

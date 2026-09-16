@@ -1,0 +1,27 @@
+dependencies {
+    api project(':crypto-core')
+    api 'com.palantir.seek-io:seek-io'
+    api 'org.apache.commons:commons-crypto'
+
+    implementation 'com.google.guava:guava'
+    implementation project(':crypto-keys')
+
+    testImplementation 'org.assertj:assertj-core'
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api'
+}
+
+tasks.named('checkImplicitDependenciesMain') {
+    // These compatibility classes retain the packages in which they were previously published by crypto-core.
+    ignore 'com.palantir.hadoop-crypto2', 'crypto-core'
+}
+
+tasks.named('checkImplicitDependenciesTest') {
+    // These compatibility classes retain the packages in which they were previously published by crypto-core.
+    ignore 'com.palantir.hadoop-crypto2', 'crypto-core'
+}
+
+tasks.named('checkUnusedDependenciesMain') {
+    // This is an optional extension artifact for crypto-core, despite the lack of direct type references.
+    ignore 'com.palantir.hadoop-crypto2', 'crypto-core'
+}

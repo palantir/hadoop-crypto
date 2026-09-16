@@ -16,76 +16,34 @@
 
 package com.palantir.crypto2.io;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Suppliers;
-import com.palantir.crypto2.cipher.ApacheCiphers;
 import com.palantir.crypto2.cipher.SeekableCipher;
 import com.palantir.crypto2.cipher.SeekableCipherFactory;
 import com.palantir.crypto2.keys.KeyMaterial;
-import com.palantir.logsafe.exceptions.SafeIllegalStateException;
 import com.palantir.logsafe.exceptions.SafeNullPointerException;
 import com.palantir.logsafe.exceptions.SafeUnsupportedOperationException;
-import com.palantir.logsafe.logger.SafeLogger;
-import com.palantir.logsafe.logger.SafeLoggerFactory;
 import com.palantir.seekio.SeekableInput;
 import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Properties;
-import java.util.function.Supplier;
 import javax.crypto.Cipher;
 import javax.crypto.CipherOutputStream;
-import javax.crypto.SecretKey;
-import org.apache.commons.crypto.stream.CtrCryptoOutputStream;
 
 public final class CryptoStreamFactory {
-
-    private static final SafeLogger log = SafeLoggerFactory.get(CryptoStreamFactory.class);
-    private static final Properties PROPS = ApacheCiphers.forceOpenSsl(new Properties());
-    private static final String AES_ALGORITHM = "AES/CTR/NoPadding";
-
-    private static final Supplier<Boolean> OPENSSL_IS_AVAILABLE = Suppliers.memoize(() -> {
-        try {
-            ApacheCtrDecryptingSeekableInput.getCipherInstance().close();
-            log.info("Detected OpenSSL: the openssl native implementation will be used for AES/CTR/NoPadding");
-            return true;
-        } catch (Throwable t) {
-            log.info(
-                    "Unable to initialize cipher with OpenSSL, falling back to "
-                            + "JCE implementation - see github.com/palantir/hadoop-crypto#faq",
-                    t);
-            return false;
-        }
-    });
 
     private CryptoStreamFactory() {}
 
     /**
      * Returns a {@link SeekableInput} that decrypts the given SeekableInput using the given {@link KeyMaterial} and
-     * cipher {@code algorithm}. When OpenSSL is available an implementation that uses AES-NI will be returned.
+     * cipher {@code algorithm}.
      */
     public static SeekableInput decrypt(SeekableInput encryptedInput, KeyMaterial keyMaterial, String algorithm) {
-        return decrypt(encryptedInput, keyMaterial, algorithm, false);
-    }
-
-    @VisibleForTesting
-    static SeekableInput decrypt(
-            SeekableInput encryptedInput, KeyMaterial keyMaterial, String algorithm, boolean forceJce) {
-        if (!algorithm.equals(AES_ALGORITHM) || !OPENSSL_IS_AVAILABLE.get() || forceJce) {
-            return new DecryptingSeekableInput(encryptedInput, SeekableCipherFactory.getCipher(algorithm, keyMaterial));
-        }
-
-        try {
-            return new ApacheCtrDecryptingSeekableInput(encryptedInput, keyMaterial);
-        } catch (IOException e) {
-            throw new SafeIllegalStateException("Failed to create ApacheCtrDecryptingSeekableInput", e);
-        }
+        return new DecryptingSeekableInput(encryptedInput, SeekableCipherFactory.getCipher(algorithm, keyMaterial));
     }
 
     /**
      * Returns an {@link InputStream} that decrypts the given InputStream using the given {@link KeyMaterial} and
-     * cipher {@code algorithm}. When OpenSSL is available an implementation that uses AES-NI will be returned.
+     * cipher {@code algorithm}.
      */
     public static InputStream decrypt(InputStream input, KeyMaterial keyMaterial, String algorithm) {
         return new DefaultSeekableInputStream(decrypt(new StreamSeekableInput(input), keyMaterial, algorithm));
@@ -93,34 +51,9 @@ public final class CryptoStreamFactory {
 
     /**
      * Returns an {@link OutputStream} that encrypts the given OutputStream using the given {@link KeyMaterial} and
-     * cipher {@code algorithm}. When OpenSSL is available an implementation that uses AES-NI will be returned.
+     * cipher {@code algorithm}.
      */
     public static OutputStream encrypt(OutputStream output, KeyMaterial keyMaterial, String algorithm) {
-        return encrypt(output, keyMaterial, algorithm, false);
-    }
-
-    @VisibleForTesting
-    static OutputStream encrypt(OutputStream output, KeyMaterial keyMaterial, String algorithm, boolean forceJce) {
-        if (!algorithm.equals(AES_ALGORITHM) || !OPENSSL_IS_AVAILABLE.get() || forceJce) {
-            return createDefaultEncryptedStream(output, keyMaterial, algorithm);
-        }
-
-        try {
-            return createApacheEncryptedStream(output, keyMaterial);
-        } catch (IOException e) {
-            throw new SafeIllegalStateException("Failed to create CtrCryptoOutputStream", e);
-        }
-    }
-
-    private static OutputStream createApacheEncryptedStream(OutputStream output, KeyMaterial keyMaterial)
-            throws IOException {
-        SecretKey secretKey = keyMaterial.getSecretKey();
-        byte[] iv = keyMaterial.getIv();
-        return new CtrCryptoOutputStream(PROPS, output, secretKey.getEncoded(), iv);
-    }
-
-    private static OutputStream createDefaultEncryptedStream(
-            OutputStream output, KeyMaterial keyMaterial, String algorithm) {
         SeekableCipher cipher = SeekableCipherFactory.getCipher(algorithm, keyMaterial);
         return new ChunkingOutputStream(new CipherOutputStream(output, cipher.initCipher(Cipher.ENCRYPT_MODE)));
     }

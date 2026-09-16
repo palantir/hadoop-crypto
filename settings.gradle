@@ -11,5 +11,6 @@ apply plugin: 'com.palantir.jdks.settings'
 rootProject.name = 'hadoop-crypto-root'
 
 include 'crypto-core'
+include 'apache-crypto'
 include 'crypto-keys'
 include 'hadoop-crypto'
