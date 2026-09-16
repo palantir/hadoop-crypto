@@ -59,6 +59,10 @@ public final class DelegatingFileSystemTest {
 
     private DelegatingFileSystem delegatingFs;
 
+    private interface ThrowingConsumer<T> {
+        void accept(T it) throws IOException;
+    }
+
     @BeforeEach
     public void before() throws IOException {
         when(delegate.getConf()).thenReturn(new Configuration());
@@ -73,10 +77,6 @@ public final class DelegatingFileSystemTest {
         testCopyFromLocal(src -> delegatingFs.copyFromLocalFile(false, src, remotePath));
         testCopyFromLocal(src -> delegatingFs.copyFromLocalFile(false, true, src, remotePath));
         testCopyFromLocal(src -> delegatingFs.copyFromLocalFile(false, true, new Path[] {src}, remotePath));
-    }
-
-    private interface ThrowingConsumer<T> {
-        void accept(T it) throws IOException;
     }
 
     private void testCopyFromLocal(ThrowingConsumer<Path> copyFromLocal) throws IOException {
