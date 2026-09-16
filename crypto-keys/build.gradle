@@ -1,4 +1,7 @@
 dependencies {
+    annotationProcessor 'org.immutables:value'
+    api 'org.immutables:value'
+
     implementation 'com.google.code.findbugs:jsr305'
     implementation 'com.google.errorprone:error_prone_annotations'
     implementation 'com.google.guava:guava'
