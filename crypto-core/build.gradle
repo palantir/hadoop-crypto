@@ -19,6 +19,13 @@ dependencies {
     testImplementation 'org.openjdk.jmh:jmh-core'
 }
 
+tasks.named('revapiAnalyze') {
+    def apacheCryptoProject = project.project(':apache-crypto')
+    project.dependencies.add('revapiNewApi', apacheCryptoProject)
+    project.dependencies.add('revapiNewApiElements', apacheCryptoProject)
+    jarsToReportBreaks.set(project.files(project.tasks.named('jar'), apacheCryptoProject.tasks.named('jar'), oldApiJars))
+}
+
 project.task(type: JavaExec, 'benchmarks') {
     main = 'org.openjdk.jmh.Main'
     classpath = sourceSets.main.runtimeClasspath
