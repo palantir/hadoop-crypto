@@ -1,4 +1,5 @@
 dependencies {
+    annotationProcessor 'org.immutables:value'
     compileOnly 'org.immutables:value::annotations'
 
     implementation 'com.google.code.findbugs:jsr305'
