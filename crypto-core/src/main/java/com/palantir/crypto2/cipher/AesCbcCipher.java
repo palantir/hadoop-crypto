@@ -16,12 +16,12 @@
 
 package com.palantir.crypto2.cipher;
 
-import com.google.common.base.Throwables;
 import com.palantir.crypto2.keys.KeyMaterial;
 import com.palantir.crypto2.keys.serialization.KeyMaterials;
 import com.palantir.logsafe.Preconditions;
 import com.palantir.logsafe.SafeArg;
 import com.palantir.logsafe.exceptions.SafeIllegalArgumentException;
+import com.palantir.logsafe.exceptions.SafeRuntimeException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -63,7 +63,7 @@ public final class AesCbcCipher implements SeekableCipher {
             cipher.init(opmode, key, new IvParameterSpec(initIv));
             return cipher;
         } catch (InvalidKeyException | InvalidAlgorithmParameterException e) {
-            throw Throwables.propagate(e);
+            throw new SafeRuntimeException("Unable to initialize AES/CBC cipher", e);
         }
     }
 
@@ -103,7 +103,7 @@ public final class AesCbcCipher implements SeekableCipher {
         try {
             return Cipher.getInstance(ALGORITHM, PROVIDER);
         } catch (NoSuchAlgorithmException | NoSuchProviderException | NoSuchPaddingException e) {
-            throw Throwables.propagate(e);
+            throw new SafeRuntimeException("Unable to create AES/CBC cipher", e);
         }
     }
 }

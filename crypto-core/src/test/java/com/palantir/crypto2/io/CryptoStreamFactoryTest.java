@@ -17,6 +17,7 @@
 package com.palantir.crypto2.io;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import com.google.common.io.ByteStreams;
 import com.palantir.crypto2.cipher.AesCtrCipher;
@@ -51,13 +52,15 @@ public final class CryptoStreamFactoryTest {
 
     @Test
     @EnabledOnOs(OS.LINUX)
-    public void ensureDefaultIsApache() {
-        OutputStream encrypted = CryptoStreamFactory.encrypt(null, keyMaterial, AesCtrCipher.ALGORITHM);
-        SeekableInput decrypted =
-                CryptoStreamFactory.decrypt((SeekableInput) null, keyMaterial, AesCtrCipher.ALGORITHM);
-
-        assertThat(encrypted).isInstanceOf(CtrCryptoOutputStream.class);
-        assertThat(decrypted).isInstanceOf(CtrCryptoInputStream.class);
+    public void ensureDefaultIsApache() throws IOException {
+        assumeTrue(CryptoStreamFactory.isOpenSslAvailable());
+        try (OutputStream encrypted =
+                        CryptoStreamFactory.encrypt(new ByteArrayOutputStream(), keyMaterial, AesCtrCipher.ALGORITHM);
+                SeekableInput decrypted = CryptoStreamFactory.decrypt(
+                        new InMemorySeekableDataInput(new byte[0]), keyMaterial, AesCtrCipher.ALGORITHM)) {
+            assertThat(encrypted).isInstanceOf(CtrCryptoOutputStream.class);
+            assertThat(decrypted).isInstanceOf(CtrCryptoInputStream.class);
+        }
     }
 
     @Test

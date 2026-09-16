@@ -16,8 +16,8 @@
 
 package com.palantir.crypto2.keys.serialization;
 
-import com.google.common.base.Throwables;
 import com.palantir.crypto2.keys.KeyMaterial;
+import com.palantir.logsafe.exceptions.SafeRuntimeException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -45,7 +45,7 @@ enum SymmetricKeySerializerV4 implements SymmetricKeySerializer {
                 | NoSuchPaddingException
                 | InvalidKeyException
                 | InvalidAlgorithmParameterException e) {
-            throw Throwables.propagate(e);
+            throw new SafeRuntimeException("Unable to initialize symmetric key cipher", e);
         }
     }
 

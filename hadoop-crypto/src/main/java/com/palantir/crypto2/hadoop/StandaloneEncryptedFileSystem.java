@@ -143,7 +143,7 @@ public final class StandaloneEncryptedFileSystem extends FilterFileSystem {
         // Since StandaloneEncryptedFileSystem uses a FileKeyStorageStrategy, the delegate delete call on folders
         // deletes both the payload files and the adjacent encryption materials. For files we can
         // rely on the EncryptedFileSystem handling removal of both the file and the key material.
-        if (fs.isFile(path)) {
+        if (fs.getFileStatus(path).isFile()) {
             return fs.delete(path, false);
         } else {
             return delegate.delete(path, recursive);
@@ -155,7 +155,7 @@ public final class StandaloneEncryptedFileSystem extends FilterFileSystem {
         // Since StandaloneEncryptedFileSystem uses a FileKeyStorageStrategy, the delegate rename call on folders
         // renames both the payload files and the adjacent encryption materials. For files we can
         // rely on the EncryptedFileSystem handling renaming both the file and the key material.
-        if (fs.isFile(src)) {
+        if (fs.getFileStatus(src).isFile()) {
             return fs.rename(src, dst);
         } else {
             return delegate.rename(src, dst);

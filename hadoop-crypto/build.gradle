@@ -1,5 +1,5 @@
 apply from: "${rootDir}/gradle/openssl.gradle"
-apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'com.gradleup.shadow'
 
 dependencies {
     api project(':crypto-core')
@@ -24,6 +24,8 @@ dependencies {
 
 shadowJar {
     mergeServiceFiles()
+    enableAutoRelocation = true
+    relocationPrefix = 'hadoop.crypto.shaded'
 
     dependencies {
         // The shadow jar is expected to be added to the Hadoop cli classpath
@@ -32,14 +34,3 @@ shadowJar {
         exclude(dependency('org.apache.hadoop:hadoop-client-runtime'))
     }
 }
-
-// Automatically shadow all included dependencies
-// https://imperceptiblethoughts.com/shadow/configuration/relocation/#automatically-relocating-dependencies
-import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation
-
-task relocateShadowJar(type: ConfigureShadowRelocation) {
-    target = tasks.shadowJar
-    prefix = "hadoop.crypto.shaded" // Default value is "shadow"
-}
-
-tasks.shadowJar.dependsOn tasks.relocateShadowJar

@@ -61,6 +61,11 @@ public final class CryptoStreamFactory {
 
     private CryptoStreamFactory() {}
 
+    @VisibleForTesting
+    static boolean isOpenSslAvailable() {
+        return OPENSSL_IS_AVAILABLE.get();
+    }
+
     /**
      * Returns a {@link SeekableInput} that decrypts the given SeekableInput using the given {@link KeyMaterial} and
      * cipher {@code algorithm}. When OpenSSL is available an implementation that uses AES-NI will be returned.

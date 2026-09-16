@@ -78,7 +78,7 @@ org.jmock:jmock:2.13.1 (1 constraints: 3905393b)
 
 org.jmock:jmock-testjar:2.13.1 (1 constraints: a707a672)
 
-org.junit.jupiter:junit-jupiter:6.1.3 (1 constraints: 0c050f36)
+org.junit.jupiter:junit-jupiter:6.1.3 (1 constraints: 4b071170)
 
 org.junit.jupiter:junit-jupiter-api:6.1.3 (5 constraints: 69438fee)
 
@@ -88,7 +88,7 @@ org.junit.jupiter:junit-jupiter-params:6.1.3 (2 constraints: 1213a63b)
 
 org.junit.platform:junit-platform-commons:6.1.3 (2 constraints: db20e44a)
 
-org.junit.platform:junit-platform-engine:6.1.3 (3 constraints: fe27e22c)
+org.junit.platform:junit-platform-engine:6.1.3 (2 constraints: f3227f08)
 
 org.junit.platform:junit-platform-launcher:6.1.3 (1 constraints: 0c050f36)
 

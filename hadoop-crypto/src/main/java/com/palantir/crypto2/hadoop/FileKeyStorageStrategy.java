@@ -16,12 +16,12 @@
 
 package com.palantir.crypto2.hadoop;
 
-import com.google.common.base.Throwables;
 import com.google.common.io.ByteStreams;
 import com.palantir.crypto2.keys.KeyMaterial;
 import com.palantir.crypto2.keys.KeyStorageStrategy;
 import com.palantir.crypto2.keys.serialization.KeyMaterials;
 import com.palantir.logsafe.Preconditions;
+import com.palantir.logsafe.exceptions.SafeUncheckedIoException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -63,7 +63,7 @@ public final class FileKeyStorageStrategy implements KeyStorageStrategy {
             byte[] wrappedKey = KeyMaterials.wrap(keyMaterial, publicKey);
             stream.write(wrappedKey);
         } catch (IOException e) {
-            throw Throwables.propagate(e);
+            throw new SafeUncheckedIoException("Unable to store key material", e);
         }
     }
 
@@ -74,7 +74,7 @@ public final class FileKeyStorageStrategy implements KeyStorageStrategy {
             byte[] wrappedKey = ByteStreams.toByteArray(stream);
             return KeyMaterials.unwrap(wrappedKey, privateKey.get());
         } catch (IOException e) {
-            throw Throwables.propagate(e);
+            throw new SafeUncheckedIoException("Unable to read key material", e);
         }
     }
 
@@ -83,7 +83,7 @@ public final class FileKeyStorageStrategy implements KeyStorageStrategy {
         try {
             fs.delete(getKeyPath(fileKey), false);
         } catch (IOException e) {
-            throw Throwables.propagate(e);
+            throw new SafeUncheckedIoException("Unable to remove key material", e);
         }
     }
 

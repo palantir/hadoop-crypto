@@ -16,7 +16,7 @@
 
 package com.palantir.crypto2.keys;
 
-import com.google.common.base.Throwables;
+import com.palantir.logsafe.exceptions.SafeRuntimeException;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
@@ -36,7 +36,7 @@ public final class PublicKeys {
             KeyFactory keyFactory = KeyFactory.getInstance(algorithm);
             return keyFactory.generatePublic(keySpec);
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-            throw Throwables.propagate(e);
+            throw new SafeRuntimeException("Unable to construct public key", e);
         }
     }
 }

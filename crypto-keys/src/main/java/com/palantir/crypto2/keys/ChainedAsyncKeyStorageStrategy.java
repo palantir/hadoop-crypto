@@ -75,8 +75,10 @@ public final class ChainedAsyncKeyStorageStrategy implements AsyncKeyStorageStra
                     }
                     RuntimeException toThrow = new SafeRuntimeException(
                             "Unable to get key material using any of the provided strategies",
-                            SafeArg.of("strategies", Collections2.transform(strategies, s -> s.getClass()
-                                    .getCanonicalName())));
+                            SafeArg.of(
+                                    "strategies",
+                                    Collections2.transform(
+                                            strategies, s -> s.getClass().getCanonicalName())));
                     suppressedExceptions.forEach(toThrow::addSuppressed);
                     throw toThrow;
                 },

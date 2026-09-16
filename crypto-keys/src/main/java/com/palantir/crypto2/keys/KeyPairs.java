@@ -16,7 +16,7 @@
 
 package com.palantir.crypto2.keys;
 
-import com.google.common.base.Throwables;
+import com.palantir.logsafe.exceptions.SafeRuntimeException;
 import java.security.GeneralSecurityException;
 import java.security.KeyFactory;
 import java.security.KeyPair;
@@ -51,7 +51,7 @@ public final class KeyPairs {
 
             return new KeyPair(keyFactory.generatePublic(publicKs), privateKey.orElse(null));
         } catch (GeneralSecurityException e) {
-            throw Throwables.propagate(e);
+            throw new SafeRuntimeException("Unable to construct key pair", e);
         }
     }
 }
