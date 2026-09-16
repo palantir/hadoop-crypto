@@ -1,5 +1,5 @@
 /*
- * (c) Copyright 2017 Palantir Technologies Inc. All rights reserved.
+ * (c) Copyright 2026 Palantir Technologies Inc. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,23 +16,13 @@
 
 package com.palantir.crypto2.keys;
 
-import javax.crypto.SecretKey;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import org.immutables.value.Value;
 
-// This class is not Jackson serializable due to SecretKey
-@Value.Immutable
-public abstract class KeyMaterial {
-
-    @Value.Parameter
-    public abstract SecretKey getSecretKey();
-
-    /**
-     * Initialization vector.
-     */
-    @Value.Parameter
-    public abstract byte[] getIv();
-
-    public static KeyMaterial of(SecretKey secretKey, byte[] iv) {
-        return ImmutableKeyMaterial.of(secretKey, iv);
-    }
-}
+@Target(ElementType.PACKAGE)
+@Retention(RetentionPolicy.SOURCE)
+@Value.Style(visibility = Value.Style.ImplementationVisibility.PACKAGE, overshadowImplementation = true, jdkOnly = true)
+@interface ImmutablesStyle {}

@@ -1,4 +1,6 @@
 dependencies {
+    compileOnly 'org.immutables:value::annotations'
+
     implementation 'com.google.code.findbugs:jsr305'
     implementation 'com.google.errorprone:error_prone_annotations'
     implementation 'com.google.guava:guava'

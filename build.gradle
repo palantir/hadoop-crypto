@@ -45,7 +45,7 @@ subprojects {
     apply plugin: 'org.inferred.processors'
     apply plugin: 'com.palantir.external-publish-jar'
 
-    tasks.check.dependsOn javadoc, checkUnusedDependencies
+    tasks.check.dependsOn javadoc, checkImplicitDependencies, checkUnusedDependencies
 
     dependencies {
         processor 'org.immutables:value'
