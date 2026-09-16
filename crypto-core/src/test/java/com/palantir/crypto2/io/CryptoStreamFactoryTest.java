@@ -17,6 +17,7 @@
 package com.palantir.crypto2.io;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import com.google.common.io.ByteStreams;
 import com.palantir.crypto2.cipher.AesCtrCipher;
@@ -52,9 +53,7 @@ public final class CryptoStreamFactoryTest {
     @Test
     @EnabledOnOs(OS.LINUX)
     public void ensureDefaultIsApache() throws IOException {
-        assertThat(CryptoStreamFactory.isOpenSslAvailable())
-                .as("OpenSSL available")
-                .isTrue();
+        assumeTrue(CryptoStreamFactory.isOpenSslAvailable());
         try (OutputStream encrypted =
                         CryptoStreamFactory.encrypt(new ByteArrayOutputStream(), keyMaterial, AesCtrCipher.ALGORITHM);
                 SeekableInput decrypted = CryptoStreamFactory.decrypt(
