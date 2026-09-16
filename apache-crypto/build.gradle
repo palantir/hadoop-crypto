@@ -25,3 +25,13 @@ tasks.named('checkUnusedDependenciesMain') {
     // This is an optional extension artifact for crypto-core, despite the lack of direct type references.
     ignore 'com.palantir.hadoop-crypto2', 'crypto-core'
 }
+
+test {
+    def separator = System.getProperty('path.separator')
+    def currentLibraryPath = System.getenv('LD_LIBRARY_PATH')
+    def opensslLibraryPath = '/usr/local/opt/openssl/lib' + separator + '/usr/lib/ssl'
+
+    environment 'LD_LIBRARY_PATH', currentLibraryPath == null
+            ? opensslLibraryPath
+            : currentLibraryPath + separator + opensslLibraryPath
+}
