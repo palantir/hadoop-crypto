@@ -2,15 +2,34 @@
 
 ## Executive summary
 
-For sustained 10–100 MiB encryption, the JDK `SunJCE` provider is the better choice on this host. It is 12–29% faster than Commons Crypto/OpenSSL for whole-buffer writes and 6–10% faster for 16 KiB chunked writes. At 1 MiB, steady-state encryption is approximately tied on JDK 17, while SunJCE is 8% faster on JDK 21 and 2% faster on JDK 25.
+The Blackhole-backed 16 KiB chunked follow-up removes output materialization from timed encryption. SunJCE sustains about 5.24–5.41 GiB/s on both JDK 21 and JDK 25. OpenSSL is approximately tied at 1–10 MiB, then falls behind SunJCE by 14–17% at 100 MiB. SunJCE encryption differs by less than 0.5% between JDK 21 and JDK 25.
 
 Decryption is much closer. OpenSSL ranges from 9% slower to 6% faster at 10–100 MiB, while it is 3–20% faster at 1 MiB. The I/O strategy has a larger effect than the provider for decryption: 16 KiB chunked reads allocate about one payload per operation and are generally faster than whole-buffer reads, which allocate about two payloads.
 
-Moving from JDK 17 to JDK 21 did not improve this workload. Most JDK 21 cells are 2–9% slower. JDK 25 recovers much of that difference, but there is no consistent newer-JDK advantage. OpenSSL is largely runtime-insensitive because the cipher work is native.
+Replacing `ByteArrayOutputStream` with `BlackholeOutputStream` reduces normalized encryption allocation from 3–356 MiB/op to about 9–20 KiB/op. This removes more than 99.4% of measured allocation and eliminates GC from most large-payload encryption iterations. It substantially improves JDK 21 large-payload score stability, although virtual-host noise remains visible in several JDK 25/OpenSSL cells.
 
-These are end-to-end stream results, including cipher construction, Java stream wrappers, output allocation, and copying. They are not raw AES engine measurements.
+The original matrices remain useful as end-to-end stream results including output allocation and copying. The Blackhole follow-up better isolates cipher and stream-wrapper throughput, but does not represent an application that retains encrypted output.
 
-## Representative 10 MiB results
+## Blackhole-backed 16 KiB chunked results
+
+Each entry is `MiB/s (milliseconds/operation)`. OpenSSL delta is relative to SunJCE; positive values mean OpenSSL is faster.
+
+| Runtime | Payload | SunJCE | OpenSSL | OpenSSL delta |
+| --- | ---: | ---: | ---: | ---: |
+| JDK 21 | 1 MiB | 5,238 (0.19) | 5,199 (0.19) | −0.8% |
+| JDK 21 | 10 MiB | 5,396 (1.85) | 5,419 (1.85) | +0.4% |
+| JDK 21 | 100 MiB | 5,350 (18.69) | 4,599 (21.75) | −14.0% |
+| JDK 25 | 1 MiB | 5,263 (0.19) | 5,176 (0.19) | −1.7% |
+| JDK 25 | 10 MiB | 5,413 (1.85) | 5,108 (1.96) | −5.6% |
+| JDK 25 | 100 MiB | 5,353 (18.68) | 4,458 (22.43) | −16.7% |
+
+SunJCE allocates about 19 KiB/op and OpenSSL about 9.5 KiB/op, nearly independent of payload size. The JDK 25 OpenSSL 10 MiB score has a wide 99.9% error interval, so its 5.6% deficit is directional rather than conclusive.
+
+Decryption is an unchanged control group. Matched old/new scores generally move by a few percent, consistent with run-to-run host variation, and normalized allocation is unchanged. The larger JDK 25 100 MiB decryption movement also has overlapping wide error intervals.
+
+For JDK 21, removing output materialization reduces relative JMH score error at 10/100 MiB from 29%/65% to 0.9%/4.3% for SunJCE and from 26%/79% to 2.8%/5.5% for OpenSSL. JDK 25 is mixed: most large cells improve, but the OpenSSL 10 MiB run remains noisy. The change removes GC-driven noise, not virtualization or CPU-scheduling noise.
+
+## Original output-materializing 10 MiB results
 
 Each entry is `MiB/s (milliseconds/operation)`. Higher throughput and lower latency are better.
 
@@ -44,7 +63,7 @@ Positive values mean OpenSSL is faster. The JDK 17 and JDK 21 1 MiB whole-buffer
 | JDK 25 | encrypt | whole buffer | −2% | −27% | −12% |
 | JDK 25 | encrypt | 16 KiB chunks | −5% | −8% | −8% |
 
-## Allocation behavior
+## Original allocation behavior
 
 - Decryption allocates approximately 2.0× the payload with whole-buffer reads and 1.0× with chunked reads for both providers.
 - SunJCE whole-buffer encryption allocates approximately 3.0× the payload.
@@ -75,6 +94,7 @@ The primary matrix is retained unchanged. The confirmation and steady-state raw 
 - Profiling: JMH GC profiler, including allocation rate, normalized bytes/op, collection count, and collection time.
 - Heap: 1 GiB.
 - Runs were executed serially.
+- Blackhole follow-up: JDK 21 and JDK 25 only, 16 KiB chunked I/O only, otherwise the same main-matrix protocol. Encryption writes output to a JMH `Blackhole`; decryption remains unchanged as a control.
 
 ## Environment
 
@@ -102,3 +122,8 @@ JDK 17/21 1 MiB whole-buffer encryption investigation:
 - [JDK 21 two-fork confirmation text](jdk21-confirmation.txt) / [JSON](jdk21-confirmation.json)
 - [JDK 17 long-warmup steady-state text](jdk17-steady-state.txt) / [JSON](jdk17-steady-state.json)
 - [JDK 21 long-warmup steady-state text](jdk21-steady-state.txt) / [JSON](jdk21-steady-state.json)
+
+Blackhole-backed 16 KiB chunked follow-up:
+
+- [JDK 21 text](jdk21-blackhole-chunked.txt) / [JSON](jdk21-blackhole-chunked.json)
+- [JDK 25 text](jdk25-blackhole-chunked.txt) / [JSON](jdk25-blackhole-chunked.json)

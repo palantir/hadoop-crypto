@@ -51,6 +51,7 @@ import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.Warmup;
+import org.openjdk.jmh.infra.Blackhole;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
@@ -89,7 +90,7 @@ public class EncryptionBenchmark {
             for (WriteStrategy strategy : WriteStrategy.values()) {
                 validateWriteStrategy(data, strategy);
             }
-            encryptedData = jdkEncrypt(WriteStrategy.ENTIRE_BUFFER, data, key);
+            encryptedData = createEncryptedData(data, key);
             validateDecryption(data, jdkDecrypt(writeStrategy, encryptedData, key), "JDK");
             validateDecryption(data, opensslDecrypt(writeStrategy, encryptedData, key), "OpenSSL");
         }
@@ -154,41 +155,40 @@ public class EncryptionBenchmark {
     }
 
     @Benchmark
-    public final byte[] gcmEncrypt(State state) throws NoSuchPaddingException, NoSuchAlgorithmException {
+    public final void gcmEncrypt(State state, Blackhole blackhole)
+            throws NoSuchPaddingException, NoSuchAlgorithmException {
         Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
         GCMParameterSpec gcmSpec = new GCMParameterSpec(8 * 16, state.key.getIv());
 
-        return encrypt(state.writeStrategy, state.data, cipher, state.key.getSecretKey(), gcmSpec);
+        encrypt(state.writeStrategy, state.data, cipher, state.key.getSecretKey(), gcmSpec, blackhole);
     }
 
     @Benchmark
-    public final byte[] jdkEncrypt(State state)
+    public final void jdkEncrypt(State state, Blackhole blackhole)
             throws NoSuchPaddingException, NoSuchAlgorithmException, NoSuchProviderException {
-        return jdkEncrypt(state.writeStrategy, state.data, state.key);
+        jdkEncrypt(state.writeStrategy, state.data, state.key, blackhole);
     }
 
-    private static byte[] jdkEncrypt(WriteStrategy writeStrategy, byte[] data, KeyMaterial key)
+    private static void jdkEncrypt(WriteStrategy writeStrategy, byte[] data, KeyMaterial key, Blackhole blackhole)
             throws NoSuchPaddingException, NoSuchAlgorithmException, NoSuchProviderException {
         Cipher cipher = Cipher.getInstance("AES/CTR/NoPadding", JDK_PROVIDER);
         IvParameterSpec ivSpec = new IvParameterSpec(key.getIv());
-        return encrypt(writeStrategy, data, cipher, key.getSecretKey(), ivSpec);
+        encrypt(writeStrategy, data, cipher, key.getSecretKey(), ivSpec, blackhole);
     }
 
     @Benchmark
-    public final byte[] opensslEncrypt(State state) throws IOException {
-        return opensslEncrypt(state.writeStrategy, state.data, state.key);
+    public final void opensslEncrypt(State state, Blackhole blackhole) throws IOException {
+        opensslEncrypt(state.writeStrategy, state.data, state.key, blackhole);
     }
 
-    private static byte[] opensslEncrypt(WriteStrategy writeStrategy, byte[] data, KeyMaterial key) throws IOException {
+    private static void opensslEncrypt(WriteStrategy writeStrategy, byte[] data, KeyMaterial key, Blackhole blackhole)
+            throws IOException {
         Properties props = ApacheCiphers.forceOpenSsl(new Properties());
 
-        // TODO(ckozak): implement BlackholeOutputStream wrapper around jmh Blackhole rather than buffering
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try (CtrCryptoOutputStream output =
-                new CtrCryptoOutputStream(props, baos, key.getSecretKey().getEncoded(), key.getIv())) {
+        try (CtrCryptoOutputStream output = new CtrCryptoOutputStream(
+                props, new BlackholeOutputStream(blackhole), key.getSecretKey().getEncoded(), key.getIv())) {
             writeStrategy.writeTo(data, output);
         }
-        return baos.toByteArray();
     }
 
     @Benchmark
@@ -227,11 +227,34 @@ public class EncryptionBenchmark {
         }
     }
 
-    private static byte[] encrypt(
+    private static byte[] createEncryptedData(byte[] data, KeyMaterial key)
+            throws NoSuchPaddingException, NoSuchAlgorithmException, NoSuchProviderException {
+        Cipher cipher = Cipher.getInstance("AES/CTR/NoPadding", JDK_PROVIDER);
+        return encryptToByteArray(
+                WriteStrategy.ENTIRE_BUFFER, data, cipher, key.getSecretKey(), new IvParameterSpec(key.getIv()));
+    }
+
+    private static void encrypt(
+            WriteStrategy writeStrategy,
+            byte[] bytes,
+            Cipher cipher,
+            Key key,
+            AlgorithmParameterSpec spec,
+            Blackhole blackhole) {
+        try {
+            cipher.init(Cipher.ENCRYPT_MODE, key, spec);
+            try (CipherOutputStream os = new CipherOutputStream(new BlackholeOutputStream(blackhole), cipher)) {
+                writeStrategy.writeTo(bytes, os);
+            }
+        } catch (InvalidKeyException | InvalidAlgorithmParameterException | IOException e) {
+            throw new SafeRuntimeException(e);
+        }
+    }
+
+    private static byte[] encryptToByteArray(
             WriteStrategy writeStrategy, byte[] bytes, Cipher cipher, Key key, AlgorithmParameterSpec spec) {
         try {
             cipher.init(Cipher.ENCRYPT_MODE, key, spec);
-            // TODO(ckozak): implement BlackholeOutputStream wrapper around jmh Blackhole rather than buffering
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             try (CipherOutputStream os = new CipherOutputStream(baos, cipher)) {
                 writeStrategy.writeTo(bytes, os);
@@ -239,6 +262,26 @@ public class EncryptionBenchmark {
             return baos.toByteArray();
         } catch (InvalidKeyException | InvalidAlgorithmParameterException | IOException e) {
             throw new SafeRuntimeException(e);
+        }
+    }
+
+    private static final class BlackholeOutputStream extends OutputStream {
+        private final Blackhole blackhole;
+
+        BlackholeOutputStream(Blackhole blackhole) {
+            this.blackhole = blackhole;
+        }
+
+        @Override
+        public void write(int value) {
+            blackhole.consume(value);
+        }
+
+        @Override
+        public void write(byte[] bytes, int off, int len) {
+            blackhole.consume(bytes);
+            blackhole.consume(off);
+            blackhole.consume(len);
         }
     }
 
