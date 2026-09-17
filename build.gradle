@@ -45,6 +45,11 @@ subprojects {
     apply plugin: 'java-library'
     apply plugin: 'com.palantir.external-publish-jar'
 
+    dependencies {
+        testRuntimeOnly 'org.junit.platform:junit-platform-engine'
+        testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    }
+
     tasks.check.dependsOn javadoc, checkImplicitDependencies, checkUnusedDependencies
 }
 
