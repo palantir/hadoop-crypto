@@ -5,7 +5,6 @@ dependencies {
 
     api 'com.google.guava:guava'
     api 'com.palantir.seek-io:seek-io'
-    api 'org.apache.commons:commons-crypto'
 
     implementation 'com.palantir.safe-logging:logger'
     implementation 'com.palantir.safe-logging:preconditions'
@@ -25,7 +24,7 @@ dependencies {
 
 project.task(type: JavaExec, 'benchmarks') {
     mainClass = 'org.openjdk.jmh.Main'
-    classpath = sourceSets.main.runtimeClasspath
+    classpath = sourceSets.test.runtimeClasspath
     maxHeapSize = '1024m'
     // add jvm args with `jvmArgs <arg>`
 

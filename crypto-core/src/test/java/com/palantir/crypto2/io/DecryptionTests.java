@@ -43,8 +43,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 public final class DecryptionTests {
 
-    private static final boolean JCE = true;
-    private static final boolean APACHE = !JCE;
     private static final String AES_CTR = AesCtrCipher.ALGORITHM;
     private static final String AES_CBC = AesCbcCipher.ALGORITHM;
     private static final int BLOCK_SIZE = 16;
@@ -59,12 +57,7 @@ public final class DecryptionTests {
     }
 
     public static Stream<Arguments> ciphers() {
-        return Stream.of(
-                Arguments.of(AES_CTR, JCE, JCE),
-                Arguments.of(AES_CTR, APACHE, APACHE),
-                Arguments.of(AES_CTR, JCE, APACHE),
-                Arguments.of(AES_CTR, APACHE, JCE),
-                Arguments.of(AES_CBC, JCE, JCE));
+        return Stream.of(Arguments.of(AES_CTR), Arguments.of(AES_CBC));
     }
 
     static class StreamAggregator implements ArgumentsAggregator {
@@ -73,15 +66,13 @@ public final class DecryptionTests {
                 throws ArgumentsAggregationException {
             try {
                 String algorithm = accessor.getString(0);
-                Boolean forceJceEncrypt = accessor.getBoolean(1);
-                Boolean forceJceDecrypt = accessor.getBoolean(2);
                 ByteArrayOutputStream os = new ByteArrayOutputStream();
                 KeyMaterial keyMaterial = SeekableCipherFactory.generateKeyMaterial(algorithm);
-                try (OutputStream cos = CryptoStreamFactory.encrypt(os, keyMaterial, algorithm, forceJceEncrypt)) {
+                try (OutputStream cos = CryptoStreamFactory.encrypt(os, keyMaterial, algorithm)) {
                     cos.write(data);
                 }
                 InMemorySeekableDataInput input = new InMemorySeekableDataInput(os.toByteArray());
-                return CryptoStreamFactory.decrypt(input, keyMaterial, algorithm, forceJceDecrypt);
+                return CryptoStreamFactory.decrypt(input, keyMaterial, algorithm);
             } catch (Exception e) {
                 throw new ArgumentsAggregationException("Could not create stream", e);
             }
