@@ -29,15 +29,13 @@ public final class SeekableCipherFactory {
      * {@value AesCtrCipher#ALGORITHM} and {@value AesCbcCipher#ALGORITHM}.
      */
     public static KeyMaterial generateKeyMaterial(String cipherAlgorithm) {
-        switch (cipherAlgorithm) {
-            case AesCtrCipher.ALGORITHM:
-                return AesCtrCipher.generateKeyMaterial();
-            case AesCbcCipher.ALGORITHM:
-                return AesCbcCipher.generateKeyMaterial();
-            default:
+        return switch (cipherAlgorithm) {
+            case AesCtrCipher.ALGORITHM -> AesCtrCipher.generateKeyMaterial();
+            case AesCbcCipher.ALGORITHM -> AesCbcCipher.generateKeyMaterial();
+            default ->
                 throw new SafeIllegalArgumentException(
                         "No known SeekableCipher with algorithm", SafeArg.of("cipherAlgorithm", cipherAlgorithm));
-        }
+        };
     }
 
     /**
@@ -51,15 +49,13 @@ public final class SeekableCipherFactory {
      */
     @Deprecated
     public static SeekableCipher getCipher(String cipherAlgorithm) {
-        switch (cipherAlgorithm) {
-            case AesCtrCipher.ALGORITHM:
-                return getCipher(cipherAlgorithm, AesCtrCipher.generateKeyMaterial());
-            case AesCbcCipher.ALGORITHM:
-                return getCipher(cipherAlgorithm, AesCbcCipher.generateKeyMaterial());
-            default:
+        return switch (cipherAlgorithm) {
+            case AesCtrCipher.ALGORITHM -> getCipher(cipherAlgorithm, AesCtrCipher.generateKeyMaterial());
+            case AesCbcCipher.ALGORITHM -> getCipher(cipherAlgorithm, AesCbcCipher.generateKeyMaterial());
+            default ->
                 throw new SafeIllegalArgumentException(
                         "No known SeekableCipher with algorithm", SafeArg.of("cipherAlgorithm", cipherAlgorithm));
-        }
+        };
     }
 
     /**
@@ -67,14 +63,12 @@ public final class SeekableCipherFactory {
      * given {@link KeyMaterial}.
      */
     public static SeekableCipher getCipher(String cipherAlgorithm, KeyMaterial keyMaterial) {
-        switch (cipherAlgorithm) {
-            case AesCtrCipher.ALGORITHM:
-                return new AesCtrCipher(keyMaterial);
-            case AesCbcCipher.ALGORITHM:
-                return new AesCbcCipher(keyMaterial);
-            default:
+        return switch (cipherAlgorithm) {
+            case AesCtrCipher.ALGORITHM -> new AesCtrCipher(keyMaterial);
+            case AesCbcCipher.ALGORITHM -> new AesCbcCipher(keyMaterial);
+            default ->
                 throw new SafeIllegalArgumentException(
                         "No known SeekableCipher with algorithm", SafeArg.of("cipherAlgorithm", cipherAlgorithm));
-        }
+        };
     }
 }
