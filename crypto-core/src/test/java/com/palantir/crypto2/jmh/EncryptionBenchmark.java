@@ -16,7 +16,6 @@
 
 package com.palantir.crypto2.jmh;
 
-import com.palantir.crypto2.cipher.ApacheCiphers;
 import com.palantir.crypto2.keys.KeyMaterial;
 import com.palantir.crypto2.keys.serialization.KeyMaterials;
 import com.palantir.logsafe.SafeArg;
@@ -31,14 +30,12 @@ import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.AlgorithmParameterSpec;
 import java.util.Arrays;
-import java.util.Properties;
 import java.util.Random;
 import javax.crypto.Cipher;
 import javax.crypto.CipherOutputStream;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.IvParameterSpec;
-import org.apache.commons.crypto.stream.CtrCryptoOutputStream;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Fork;
 import org.openjdk.jmh.annotations.Measurement;
@@ -126,19 +123,6 @@ public class EncryptionBenchmark {
         Cipher cipher = Cipher.getInstance("AES/CTR/NoPadding");
         IvParameterSpec ivSpec = new IvParameterSpec(state.key.getIv());
         return encrypt(state.writeStrategy, state.data, cipher, state.key.getSecretKey(), ivSpec);
-    }
-
-    @Benchmark
-    public final byte[] apacheEncrypt(State state) throws IOException {
-        Properties props = ApacheCiphers.forceOpenSsl(new Properties());
-
-        // TODO(ckozak): implement BlackholeOutputStream wrapper around jmh Blackhole rather than buffering
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try (CtrCryptoOutputStream output =
-                new CtrCryptoOutputStream(props, baos, state.key.getSecretKey().getEncoded(), state.key.getIv())) {
-            state.writeStrategy.writeTo(state.data, output);
-        }
-        return baos.toByteArray();
     }
 
     private byte[] encrypt(
