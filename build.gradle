@@ -58,5 +58,5 @@ javaVersions {
 }
 
 jdks {
-    daemonTarget = 25
+    daemonTarget = 21
 }
