@@ -19,7 +19,7 @@ org.apache.hadoop:hadoop-client-runtime:3.3.4 (1 constraints: 0c050736)
 org.immutables:value:2.12.2 (1 constraints: 3905373b)
 org.jetbrains:annotations:26.1.0 (1 constraints: 351170d1)
 org.jspecify:jspecify:1.0.1 (1 constraints: 140ae1b4)
-org.slf4j:slf4j-api:1.7.36 (2 constraints: 32215f9d)
+org.slf4j:slf4j-api:2.0.17 (2 constraints: 32215f9d)
 org.xerial.snappy:snappy-java:1.1.8.2 (2 constraints: 5f203863)
 
 [Test dependencies]
