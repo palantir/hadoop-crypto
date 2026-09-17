@@ -112,7 +112,9 @@ public final class EncryptedFileSystemTest {
     public void testDelegateStreamIsClosed() throws IOException {
         EncryptedFileSystem fs = new EncryptedFileSystem(mockFs, new InMemoryKeyStorageStrategy());
 
-        fs.create(path); // populate key store
+        try (FSDataOutputStream ignored = fs.create(path)) { // populate key store
+            // No content required.
+        }
 
         FSDataInputStream is = mock(FSDataInputStream.class);
         when(mockFs.open(path, 4096)).thenReturn(is);
@@ -200,7 +202,9 @@ public final class EncryptedFileSystemTest {
 
     @Test
     public void testCreate_normalizePathPassedToKeyStore() throws IOException {
-        mockedEfs.create(new Path("foo//bar"));
+        try (FSDataOutputStream ignored = mockedEfs.create(new Path("foo//bar"))) {
+            // No content required.
+        }
 
         verify(mockKeyStore).put(eq("foo/bar"), any(KeyMaterial.class));
         verifyNoMoreInteractions(mockKeyStore);

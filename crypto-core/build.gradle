@@ -25,7 +25,7 @@ dependencies {
 
 project.task(type: JavaExec, 'benchmarks') {
     mainClass = 'org.openjdk.jmh.Main'
-    classpath = sourceSets.main.runtimeClasspath
+    classpath = sourceSets.test.runtimeClasspath
     maxHeapSize = '1024m'
     // add jvm args with `jvmArgs <arg>`
 

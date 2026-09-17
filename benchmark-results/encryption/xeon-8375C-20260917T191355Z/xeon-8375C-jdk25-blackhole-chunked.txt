@@ -1,0 +1,1106 @@
+Initialized native services in: /home/palantir/.gradle/native
+Initialized jansi services in: /home/palantir/.gradle/native
+The current JVM process isn't compatible with build requirement. At least one daemon option is different.
+Wanted: DaemonRequestContext{jvmCriteria=/home/palantir/.gradle/gradle-jdks/amazon-corretto-25.0.4.8.1-glibc (from org.gradle.java.home), daemonOpts=[--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED, --add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED, --add-exports=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED, --add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED, --add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED, -Dfile.encoding=UTF-8, -Duser.country=US, -Duser.language=en, -Duser.variant], applyInstrumentationAgent=true, nativeServicesMode=ENABLED, priority=NORMAL}
+Actual: DefaultDaemonContext[uid=6ae7a8f3-2202-4205-8f22-9a1a3059182d,javaHome=/home/palantir/.gradle/gradle-jdks/amazon-corretto-25.0.4.8.1-linux-x64,javaVersion=25,javaVendor=Amazon.com Inc.,daemonRegistryDir=null,pid=0,idleTimeout=0,priority=NORMAL,applyInstrumentationAgent=false,nativeServicesMode=ENABLED,daemonOpts=-Dfile.encoding=UTF-8,-Duser.country=US,-Duser.language=en,-Duser.variant]
+
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.7.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Starting process 'command '/home/palantir/.gradle/gradle-jdks/amazon-corretto-25.0.4.8.1-glibc/bin/java''. Working directory: /home/palantir/.gradle/.tmp/tmp-jvm3787594781815320203probe Command: /home/palantir/.gradle/gradle-jdks/amazon-corretto-25.0.4.8.1-glibc/bin/java -Xmx32m -Xms32m -cp . JavaProbe
+Successfully started process 'command '/home/palantir/.gradle/gradle-jdks/amazon-corretto-25.0.4.8.1-glibc/bin/java''
+Received JVM installation metadata from '/home/palantir/.gradle/gradle-jdks/amazon-corretto-25.0.4.8.1-glibc': {JAVA_HOME=/home/palantir/.gradle/gradle-jdks/amazon-corretto-25.0.4.8.1-linux-x64, JAVA_VERSION=25.0.4.1, JAVA_VENDOR=Amazon.com Inc., RUNTIME_NAME=OpenJDK Runtime Environment, RUNTIME_VERSION=25.0.4.1+8-LTS, VM_NAME=OpenJDK 64-Bit Server VM, VM_VERSION=25.0.4.1+8-LTS, VM_VENDOR=Amazon.com Inc., OS_ARCH=amd64}
+Starting process 'Gradle build daemon'. Working directory: /home/palantir/.gradle/daemon/9.7.1 Command: /home/palantir/.gradle/gradle-jdks/amazon-corretto-25.0.4.8.1-glibc/bin/java --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.lang.invoke=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.prefs/java.util.prefs=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED --add-opens=java.base/java.nio.charset=ALL-UNNAMED --add-opens=java.base/java.net=ALL-UNNAMED --add-opens=java.base/java.util.concurrent=ALL-UNNAMED --add-opens=java.base/java.util.concurrent.atomic=ALL-UNNAMED --add-opens=java.xml/javax.xml.namespace=ALL-UNNAMED --add-opens=java.base/java.time=ALL-UNNAMED --enable-native-access=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED -Dfile.encoding=UTF-8 -Duser.country=US -Duser.language=en -Duser.variant -cp /home/palantir/.gradle/wrapper/dists/gradle-9.7.1-bin/5ig4he92f5ytb64voru2jaqat/gradle-9.7.1/lib/gradle-daemon-main-9.7.1.jar -javaagent:/home/palantir/.gradle/wrapper/dists/gradle-9.7.1-bin/5ig4he92f5ytb64voru2jaqat/gradle-9.7.1/lib/agents/gradle-instrumentation-agent-9.7.1.jar org.gradle.launcher.daemon.bootstrap.GradleDaemon 9.7.1
+Successfully started process 'Gradle build daemon'
+An attempt to start the daemon took 0.762 secs.
+The client will now receive all logging from the daemon (pid: 179559). The daemon log file: /home/palantir/.gradle/daemon/9.7.1/daemon-179559.out.log
+Daemon will be stopped at the end of the build 
+Using 4 worker leases.
+Operational build model parameters: {cachingModelBuilding=false, configurationCache=false, configurationCacheDisabledReason=null, configurationCacheParallelLoad=false, configurationCacheParallelStore=false, configureOnDemand=false, invalidateCoupledProjects=false, isolatedProjects=false, isolatedProjectsDiagnostics=false, isolatedProjectsDangerouslyIgnoreProblems=false, modelAsProjectDependency=false, modelBuilding=false, parallelModelBuilding=false, parallelProjectConfiguration=false, parallelProjectExecution=true, vintage=true}
+Received JVM installation metadata from '/home/palantir/.gradle/gradle-jdks/amazon-corretto-25.0.4.8.1-linux-x64': {JAVA_HOME=/home/palantir/.gradle/gradle-jdks/amazon-corretto-25.0.4.8.1-linux-x64, JAVA_VERSION=25.0.4.1, JAVA_VENDOR=Amazon.com Inc., RUNTIME_NAME=OpenJDK Runtime Environment, RUNTIME_VERSION=25.0.4.1+8-LTS, VM_NAME=OpenJDK 64-Bit Server VM, VM_VERSION=25.0.4.1+8-LTS, VM_VENDOR=Amazon.com Inc., OS_ARCH=amd64}
+Watching the file system is configured to be enabled if available
+Now considering [/home/palantir/git/hadoop-crypto] as hierarchies to watch
+File system watching is active
+Starting Build
+Starting process 'command 'ldd''. Working directory: /home/palantir/git/hadoop-crypto Command: ldd --version
+Successfully started process 'command 'ldd''
+Settings evaluated using settings file '/home/palantir/git/hadoop-crypto/settings.gradle'.
+Projects loaded. Root project using build file '/home/palantir/git/hadoop-crypto/build.gradle'.
+Included projects: [root project 'hadoop-crypto-root', project ':crypto-core', project ':crypto-keys', project ':hadoop-crypto']
+
+> Configure project :
+Evaluating root project 'hadoop-crypto-root' using build file '/home/palantir/git/hadoop-crypto/build.gradle'.
+found.git at /home/palantir/git/hadoop-crypto/.git
+Project hadoop-crypto-root SCM information is being collected from provider nebula.plugin.info.scm.GitScmProvider
+$CIRCLE_ARTIFACTS variable is not set, not configuring junit/profiling reports
+Starting process 'command 'ldd''. Working directory: /home/palantir/git/hadoop-crypto Command: ldd --version
+Successfully started process 'command 'ldd''
+Starting process 'command 'ldd''. Working directory: /home/palantir/git/hadoop-crypto Command: ldd --version
+Successfully started process 'command 'ldd''
+Starting process 'command 'ldd''. Working directory: /home/palantir/git/hadoop-crypto Command: ldd --version
+Successfully started process 'command 'ldd''
+Gradle JDK automanagement is enabled. The JDKs used for all subprojects are managed by the configured custom toolchains.
+Starting process 'command 'ldd''. Working directory: /home/palantir/git/hadoop-crypto Command: ldd --version
+Successfully started process 'command 'ldd''
+Starting process 'command 'ldd''. Working directory: /home/palantir/git/hadoop-crypto Command: ldd --version
+Successfully started process 'command 'ldd''
+Starting process 'command 'git''. Working directory: /home/palantir/git/hadoop-crypto Command: git describe --tags --always --first-parent --abbrev=7 --match=* HEAD
+Successfully started process 'command 'git''
+Starting process 'command 'git''. Working directory: /home/palantir/git/hadoop-crypto Command: git status --porcelain
+Successfully started process 'command 'git''
+found.git at /home/palantir/git/hadoop-crypto/.git
+Project crypto-core SCM information is being collected from rootProject extension
+found.git at /home/palantir/git/hadoop-crypto/.git
+Project crypto-keys SCM information is being collected from rootProject extension
+found.git at /home/palantir/git/hadoop-crypto/.git
+Project hadoop-crypto SCM information is being collected from rootProject extension
+
+> Configure project :crypto-core
+Evaluating project ':crypto-core' using build file '/home/palantir/git/hadoop-crypto/crypto-core/build.gradle'.
+project ':crypto-core' is considered a library because it has the 'com.palantir.external-publish-jar' plugin applied
+
+> Configure project :crypto-keys
+Evaluating project ':crypto-keys' using build file '/home/palantir/git/hadoop-crypto/crypto-keys/build.gradle'.
+project ':crypto-keys' is considered a library because it has the 'com.palantir.external-publish-jar' plugin applied
+
+> Configure project :hadoop-crypto
+Evaluating project ':hadoop-crypto' using build file '/home/palantir/git/hadoop-crypto/hadoop-crypto/build.gradle'.
+Skipping Develocity integration for Shadow plugin.
+project ':hadoop-crypto' is considered a library because it has the 'com.palantir.external-publish-jar' plugin applied
+Setting org.gradle.jvm.version attribute for shadowRuntimeElements configuration.
+Setting target JVM version to 17 for shadowRuntimeElements configuration.
+Adding shadowRuntimeElements variant to Java component.
+
+> Configure project :
+Computed locked configurations for root project 'hadoop-crypto-root': LockedConfigurations{productionConfigurations=[], testConfigurations=[]}
+Computed locked configurations for project ':crypto-core': LockedConfigurations{productionConfigurations=[configuration ':crypto-core:compileClasspath', configuration ':crypto-core:runtimeClasspath'], testConfigurations=[configuration ':crypto-core:testCompileClasspath', configuration ':crypto-core:testRuntimeClasspath']}
+Computed locked configurations for project ':crypto-keys': LockedConfigurations{productionConfigurations=[configuration ':crypto-keys:compileClasspath', configuration ':crypto-keys:runtimeClasspath'], testConfigurations=[configuration ':crypto-keys:testCompileClasspath', configuration ':crypto-keys:testRuntimeClasspath']}
+Computed locked configurations for project ':hadoop-crypto': LockedConfigurations{productionConfigurations=[configuration ':hadoop-crypto:compileClasspath', configuration ':hadoop-crypto:runtimeClasspath'], testConfigurations=[configuration ':hadoop-crypto:testCompileClasspath', configuration ':hadoop-crypto:testRuntimeClasspath']}
+Configuring locks for :. Locked configurations: []
+Configuring locks for :crypto-core. Locked configurations: [configuration ':crypto-core:compileClasspath', configuration ':crypto-core:runtimeClasspath', configuration ':crypto-core:testCompileClasspath', configuration ':crypto-core:testRuntimeClasspath']
+Configuring locks for :crypto-keys. Locked configurations: [configuration ':crypto-keys:compileClasspath', configuration ':crypto-keys:runtimeClasspath', configuration ':crypto-keys:testCompileClasspath', configuration ':crypto-keys:testRuntimeClasspath']
+Configuring locks for :hadoop-crypto. Locked configurations: [configuration ':hadoop-crypto:compileClasspath', configuration ':hadoop-crypto:runtimeClasspath', configuration ':hadoop-crypto:testCompileClasspath', configuration ':hadoop-crypto:testRuntimeClasspath']
+All projects evaluated.
+Task path ':crypto-core:benchmarks' matched project ':crypto-core'
+Task name matched 'benchmarks'
+Task path ':updatePalantirJavaFormatXml' matched project ':'
+Task name matched 'updatePalantirJavaFormatXml'
+Starting process 'command 'ldd''. Working directory: /home/palantir/git/hadoop-crypto Command: ldd --version
+Successfully started process 'command 'ldd''
+Task path ':updateWorkspaceXml' matched project ':'
+Task name matched 'updateWorkspaceXml'
+Selected primary task 'benchmarks' from project :crypto-core
+Starting process 'command '/home/palantir/.gradle/gradle-jdks/amazon-corretto-17.0.20.10.1-glibc/bin/java''. Working directory: /home/palantir/.gradle/.tmp/tmp-jvm16274722183500812793probe Command: /home/palantir/.gradle/gradle-jdks/amazon-corretto-17.0.20.10.1-glibc/bin/java -Xmx32m -Xms32m -cp . JavaProbe
+Successfully started process 'command '/home/palantir/.gradle/gradle-jdks/amazon-corretto-17.0.20.10.1-glibc/bin/java''
+Received JVM installation metadata from '/home/palantir/.gradle/gradle-jdks/amazon-corretto-17.0.20.10.1-glibc': {JAVA_HOME=/home/palantir/.gradle/gradle-jdks/amazon-corretto-17.0.20.10.1-linux-x64, JAVA_VERSION=17.0.20.1, JAVA_VENDOR=Amazon.com Inc., RUNTIME_NAME=OpenJDK Runtime Environment, RUNTIME_VERSION=17.0.20.1+10-LTS, VM_NAME=OpenJDK 64-Bit Server VM, VM_VERSION=17.0.20.1+10-LTS, VM_VENDOR=Amazon.com Inc., OS_ARCH=amd64}
+Starting process 'command '/home/palantir/.gradle/gradle-jdks/amazon-corretto-21.0.12.9.1-glibc/bin/java''. Working directory: /home/palantir/.gradle/.tmp/tmp-jvm3348669360177564410probe Command: /home/palantir/.gradle/gradle-jdks/amazon-corretto-21.0.12.9.1-glibc/bin/java -Xmx32m -Xms32m -cp . JavaProbe
+Successfully started process 'command '/home/palantir/.gradle/gradle-jdks/amazon-corretto-21.0.12.9.1-glibc/bin/java''
+Received JVM installation metadata from '/home/palantir/.gradle/gradle-jdks/amazon-corretto-21.0.12.9.1-glibc': {JAVA_HOME=/home/palantir/.gradle/gradle-jdks/amazon-corretto-21.0.12.9.1-linux-x64, JAVA_VERSION=21.0.12.1, JAVA_VENDOR=Amazon.com Inc., RUNTIME_NAME=OpenJDK Runtime Environment, RUNTIME_VERSION=21.0.12.1+9-LTS, VM_NAME=OpenJDK 64-Bit Server VM, VM_VERSION=21.0.12.1+9-LTS, VM_VENDOR=Amazon.com Inc., OS_ARCH=amd64}
+Selected primary task 'updatePalantirJavaFormatXml' from project :
+Selected primary task 'updateWorkspaceXml' from project :
+Tasks to be executed: [task ':crypto-keys:compileJava', task ':crypto-core:compileJava', task ':crypto-core:processResources', task ':crypto-core:classes', task ':crypto-core:compileTestJava', task ':crypto-core:processTestResources', task ':crypto-core:testClasses', task ':crypto-keys:processResources', task ':crypto-keys:classes', task ':crypto-keys:jar', task ':crypto-core:benchmarks', task ':updatePalantirJavaFormatXml', task ':updateWorkspaceXml']
+Tasks that were excluded: []
+Resolve mutations for :crypto-keys:compileJava (Thread[#82,Execution worker,5,main]) started.
+Resolve mutations for :crypto-core:processResources (Thread[#83,Execution worker Thread 2,5,main]) started.
+destroyer locations for task group 0 (Thread[#81,included builds,5,main]) started.
+Resolve mutations for :updatePalantirJavaFormatXml (Thread[#81,included builds,5,main]) started.
+destroyer locations for task group 1 (Thread[#84,Execution worker Thread 3,5,main]) started.
+:crypto-core:processResources (Thread[#83,Execution worker Thread 2,5,main]) started.
+:updatePalantirJavaFormatXml (Thread[#81,included builds,5,main]) started.
+:crypto-keys:compileJava (Thread[#82,Execution worker,5,main]) started.
+
+> Task :crypto-core:processResources NO-SOURCE
+Skipping task ':crypto-core:processResources' as it has no source files and no previous output files.
+Resolve mutations for :crypto-core:processTestResources (Thread[#84,Execution worker Thread 3,5,main]) started.
+:crypto-core:processTestResources (Thread[#84,Execution worker Thread 3,5,main]) started.
+
+> Task :crypto-core:processTestResources NO-SOURCE
+Skipping task ':crypto-core:processTestResources' as it has no source files and no previous output files.
+
+> Task :updatePalantirJavaFormatXml UP-TO-DATE
+Caching disabled for task ':updatePalantirJavaFormatXml' because:
+  Build cache is disabled
+  Caching has not been enabled for the task
+Skipping task ':updatePalantirJavaFormatXml' as it is up-to-date.
+Resolve mutations for :updateWorkspaceXml (Thread[#84,Execution worker Thread 3,5,main]) started.
+:updateWorkspaceXml (Thread[#83,Execution worker Thread 2,5,main]) started.
+
+> Task :updateWorkspaceXml UP-TO-DATE
+Caching disabled for task ':updateWorkspaceXml' because:
+  Build cache is disabled
+  Caching has not been enabled for the task
+Skipping task ':updateWorkspaceXml' as it is up-to-date.
+
+> Task :crypto-keys:compileJava UP-TO-DATE
+Custom actions are attached to task ':crypto-keys:compileJava'.
+Caching disabled for task ':crypto-keys:compileJava' because:
+  Build cache is disabled
+Skipping task ':crypto-keys:compileJava' as it is up-to-date.
+No compile result for :crypto-keys:compileJava
+work action resolve main (project ':crypto-keys') (Thread[#82,Execution worker,5,main]) started.
+Resolve mutations for :crypto-core:compileJava (Thread[#82,Execution worker,5,main]) started.
+:crypto-core:compileJava (Thread[#82,Execution worker,5,main]) started.
+Resolve mutations for :crypto-keys:processResources (Thread[#81,included builds,5,main]) started.
+:crypto-keys:processResources (Thread[#84,Execution worker Thread 3,5,main]) started.
+
+> Task :crypto-keys:processResources NO-SOURCE
+Skipping task ':crypto-keys:processResources' as it has no source files and no previous output files.
+Resolve mutations for :crypto-keys:classes (Thread[#84,Execution worker Thread 3,5,main]) started.
+:crypto-keys:classes (Thread[#84,Execution worker Thread 3,5,main]) started.
+
+> Task :crypto-keys:classes UP-TO-DATE
+Skipping task ':crypto-keys:classes' as it has no actions.
+Resolve mutations for :crypto-keys:jar (Thread[#84,Execution worker Thread 3,5,main]) started.
+:crypto-keys:jar (Thread[#84,Execution worker Thread 3,5,main]) started.
+
+> Task :crypto-keys:jar UP-TO-DATE
+Custom actions are attached to task ':crypto-keys:jar'.
+Caching disabled for task ':crypto-keys:jar' because:
+  Build cache is disabled
+  Not worth caching
+Skipping task ':crypto-keys:jar' as it is up-to-date.
+work action resolve crypto-keys-3.13.0-5-g775b6d2.dirty.jar (project ':crypto-keys') (Thread[#84,Execution worker Thread 3,5,main]) started.
+
+> Task :crypto-core:compileJava UP-TO-DATE
+Custom actions are attached to task ':crypto-core:compileJava'.
+Caching disabled for task ':crypto-core:compileJava' because:
+  Build cache is disabled
+Skipping task ':crypto-core:compileJava' as it is up-to-date.
+No compile result for :crypto-core:compileJava
+Resolve mutations for :crypto-core:classes (Thread[#82,Execution worker,5,main]) started.
+:crypto-core:classes (Thread[#82,Execution worker,5,main]) started.
+
+> Task :crypto-core:classes UP-TO-DATE
+Skipping task ':crypto-core:classes' as it has no actions.
+Resolve mutations for :crypto-core:compileTestJava (Thread[#84,Execution worker Thread 3,5,main]) started.
+:crypto-core:compileTestJava (Thread[#84,Execution worker Thread 3,5,main]) started.
+
+> Task :crypto-core:compileTestJava UP-TO-DATE
+Custom actions are attached to task ':crypto-core:compileTestJava'.
+Caching disabled for task ':crypto-core:compileTestJava' because:
+  Build cache is disabled
+Skipping task ':crypto-core:compileTestJava' as it is up-to-date.
+No compile result for :crypto-core:compileTestJava
+Resolve mutations for :crypto-core:testClasses (Thread[#82,Execution worker,5,main]) started.
+:crypto-core:testClasses (Thread[#82,Execution worker,5,main]) started.
+
+> Task :crypto-core:testClasses UP-TO-DATE
+Skipping task ':crypto-core:testClasses' as it has no actions.
+Resolve mutations for :crypto-core:benchmarks (Thread[#82,Execution worker,5,main]) started.
+:crypto-core:benchmarks (Thread[#82,Execution worker,5,main]) started.
+
+> Task :crypto-core:benchmarks
+Caching disabled for task ':crypto-core:benchmarks' because:
+  Build cache is disabled
+Task ':crypto-core:benchmarks' is not up-to-date because:
+  Task has not declared any outputs despite executing actions.
+Starting process 'command '/home/palantir/.gradle/gradle-jdks/amazon-corretto-21.0.12.9.1-glibc/bin/java''. Working directory: /home/palantir/git/hadoop-crypto/crypto-core Command: /home/palantir/.gradle/gradle-jdks/amazon-corretto-21.0.12.9.1-glibc/bin/java -Xmx1024m -Dfile.encoding=UTF-8 -Duser.country=US -Duser.language=en -Duser.variant -cp /home/palantir/git/hadoop-crypto/crypto-core/build/classes/java/test:/home/palantir/git/hadoop-crypto/crypto-core/build/resources/test:/home/palantir/git/hadoop-crypto/crypto-core/build/classes/java/main:/home/palantir/git/hadoop-crypto/crypto-core/build/resources/main:/home/palantir/git/hadoop-crypto/crypto-keys/build/libs/crypto-keys-3.13.0-5-g775b6d2.dirty.jar:/home/palantir/.gradle/caches/modules-2/files-2.1/com.google.guava/guava/33.7.1-jre/77e37866fb969b4ff6710faaefd3a86067730ada/guava-33.7.1-jre.jar:/home/palantir/.gradle/caches/modules-2/files-2.1/com.palantir.seek-io/seek-io/1.3.0/911204600adc3898b3a764b047cfe155b7b28870/seek-io-1.3.0.jar:/home/palantir/.gradle/caches/modules-2/files-2.1/org.apache.commons/commons-crypto/1.2.0/210e0d41962bcb36c7f872fd77f4facc0458f6a5/commons-crypto-1.2.0.jar:/home/palantir/.gradle/caches/modules-2/files-2.1/com.palantir.safe-logging/logger/3.19.0/61ca59a144b52b998c0591f0a47fbe4e26672a86/logger-3.19.0.jar:/home/palantir/.gradle/caches/modules-2/files-2.1/com.palantir.safe-logging/preconditions-assertj/3.19.0/86c13ae0246a1b4dc6e7a33fd8beaa5139a5be69/preconditions-assertj-3.19.0.jar:/home/palantir/.gradle/caches/modules-2/files-2.1/com.palantir.safe-logging/preconditions/3.19.0/da73878b4b7bcd05bc33a1b4ef6670aeb64089b6/preconditions-3.19.0.jar:/home/palantir/.gradle/caches/modules-2/files-2.1/com.palantir.safe-logging/logger-slf4j/3.19.0/a6d81cd108dfdb834c01e2a2e1c6b3645b0e962f/logger-slf4j-3.19.0.jar:/home/palantir/.gradle/caches/modules-2/files-2.1/com.palantir.safe-logging/logger-spi/3.19.0/a43bb41ba60b4ddfe73c98196964f6190e473b9c/logger-spi-3.19.0.jar:/home/palantir/.gradle/caches/modules-2/files-2.1/com.palantir.safe-logging/safe-logging/3.19.0/5b23bdd1e853f9f3c27cb78d2a07855e9bf869b/safe-logging-3.19.0.jar:/home/palantir/.gradle/caches/modules-2/files-2.1/org.junit.jupiter/junit-jupiter/6.1.3/cd72619e9eb4cf64e30a87615a4f9b50a80ce103/junit-jupiter-6.1.3.jar:/home/palantir/.gradle/caches/modules-2/files-2.1/org.assertj/assertj-core/3.27.7/2f4f64f054c9d618d4b1d89e7611559f5e2cfff7/assertj-core-3.27.7.jar:/home/palantir/.gradle/caches/modules-2/files-2.1/org.junit.jupiter/junit-jupiter-params/6.1.3/435fa4ec654c11fb82e666a47d9baefcee3f8df6/junit-jupiter-params-6.1.3.jar:/home/palantir/.gradle/caches/modules-2/files-2.1/org.junit.jupiter/junit-jupiter-engine/6.1.3/3778a548f15693db463c3d090b419c64b486b848/junit-jupiter-engine-6.1.3.jar:/home/palantir/.gradle/caches/modules-2/files-2.1/org.junit.jupiter/junit-jupiter-api/6.1.3/6a57f0ce4d6bfe9784d103077055ba39f3e6f638/junit-jupiter-api-6.1.3.jar:/home/palantir/.gradle/caches/modules-2/files-2.1/org.mockito/mockito-core/5.23.0/a5cf3cf244300e4cd05f779827cf50d373a8460e/mockito-core-5.23.0.jar:/home/palantir/.gradle/caches/modules-2/files-2.1/org.openjdk.jmh/jmh-core/1.37/896f27e49105b35ea1964319c83d12082e7a79ef/jmh-core-1.37.jar:/home/palantir/.gradle/caches/modules-2/files-2.1/org.junit.platform/junit-platform-launcher/6.1.3/dad54f7f53b702e6e6f873bc19903dfec870bf1b/junit-platform-launcher-6.1.3.jar:/home/palantir/.gradle/caches/modules-2/files-2.1/com.google.code.findbugs/jsr305/3.0.2/25ea2e8b0c338a877313bd4672d3fe056ea78f0d/jsr305-3.0.2.jar:/home/palantir/.gradle/caches/modules-2/files-2.1/com.google.errorprone/error_prone_annotations/2.50.0/74ba43e49ab1184d41634af2ef0047e82c4064b0/error_prone_annotations-2.50.0.jar:/home/palantir/.gradle/caches/modules-2/files-2.1/com.google.guava/failureaccess/1.0.3/aeaffd00d57023a2c947393ed251f0354f0985fc/failureaccess-1.0.3.jar:/home/palantir/.gradle/caches/modules-2/files-2.1/com.google.guava/listenablefuture/9999.0-empty-to-avoid-conflict-with-guava/b421526c5f297295adef1c886e5246c39d4ac629/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar:/home/palantir/.gradle/caches/modules-2/files-2.1/com.google.j2objc/j2objc-annotations/3.1/a892ca9507839bbdb900d64310ac98256cab992f/j2objc-annotations-3.1.jar:/home/palantir/.gradle/caches/modules-2/files-2.1/net.java.dev.jna/jna/5.13.0/1200e7ebeedbe0d10062093f32925a912020e747/jna-5.13.0.jar:/home/palantir/.gradle/caches/modules-2/files-2.1/org.jetbrains/annotations/26.1.0/c1e9226d7ca6661020c58c94397da0cc3673d5e4/annotations-26.1.0.jar:/home/palantir/.gradle/caches/modules-2/files-2.1/org.junit.platform/junit-platform-engine/6.1.3/e48a6061b576ebe36eac3b518dc917c23d119a91/junit-platform-engine-6.1.3.jar:/home/palantir/.gradle/caches/modules-2/files-2.1/org.junit.platform/junit-platform-commons/6.1.3/acb99d3482ea51fcbcc4f6ea8672761e2b3d5bb7/junit-platform-commons-6.1.3.jar:/home/palantir/.gradle/caches/modules-2/files-2.1/org.jspecify/jspecify/1.0.1/3d60fd98eb8ade73004f4195c37b6317e02cf3d7/jspecify-1.0.1.jar:/home/palantir/.gradle/caches/modules-2/files-2.1/org.slf4j/slf4j-api/2.0.17/d9e58ac9c7779ba3bf8142aff6c830617a7fe60f/slf4j-api-2.0.17.jar:/home/palantir/.gradle/caches/modules-2/files-2.1/net.bytebuddy/byte-buddy/1.18.3/c35b2e4bf0e22e4d492936d46506bb2e6d8fafc8/byte-buddy-1.18.3.jar:/home/palantir/.gradle/caches/modules-2/files-2.1/net.bytebuddy/byte-buddy-agent/1.17.7/fbf3d6d649ed37fc9e9c59480a05be0a26e3c2da/byte-buddy-agent-1.17.7.jar:/home/palantir/.gradle/caches/modules-2/files-2.1/net.sf.jopt-simple/jopt-simple/5.0.4/4fdac2fbe92dfad86aa6e9301736f6b4342a3f5c/jopt-simple-5.0.4.jar:/home/palantir/.gradle/caches/modules-2/files-2.1/org.apache.commons/commons-math3/3.6.1/e4ba98f1d4b3c80ec46392f25e094a6a2e58fcbf/commons-math3-3.6.1.jar:/home/palantir/.gradle/caches/modules-2/files-2.1/org.apiguardian/apiguardian-api/1.1.2/a231e0d844d2721b0fa1b238006d15c6ded6842a/apiguardian-api-1.1.2.jar:/home/palantir/.gradle/caches/modules-2/files-2.1/org.objenesis/objenesis/3.3/1049c09f1de4331e8193e579448d0916d75b7631/objenesis-3.3.jar:/home/palantir/.gradle/caches/modules-2/files-2.1/org.opentest4j/opentest4j/1.3.0/152ea56b3a72f655d4fd677fc0ef2596c3dd5e6e/opentest4j-1.3.0.jar org.openjdk.jmh.Main com.palantir.crypto2.jmh.EncryptionBenchmark.(jdk|openssl)(Encrypt|Decrypt) -bm thrpt -t 1 -f 1 -wi 3 -w 3s -i 4 -r 4s -to 10m -p numBytes=1048576,10485760,104857600 -p writeStrategy=CHUNKED -prof gc -rf json -rff /home/palantir/git/hadoop-crypto/benchmark-results/encryption/xeon-8375C-20260917T191355Z/xeon-8375C-jdk25-blackhole-chunked.json
+Successfully started process 'command '/home/palantir/.gradle/gradle-jdks/amazon-corretto-21.0.12.9.1-glibc/bin/java''
+# JMH version: 1.37
+# VM version: JDK 21.0.12.1, OpenJDK 64-Bit Server VM, 21.0.12.1+9-LTS
+# VM invoker: /home/palantir/.gradle/gradle-jdks/amazon-corretto-21.0.12.9.1-linux-x64/bin/java
+# VM options: -Xmx1024m -Dfile.encoding=UTF-8 -Duser.country=US -Duser.language=en -Duser.variant
+# Blackhole mode: compiler (auto-detected, use -Djmh.blackhole.autoDetect=false to disable)
+# Warmup: 3 iterations, 3 s each
+# Measurement: 4 iterations, 4 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Throughput, ops/time
+# Benchmark: com.palantir.crypto2.jmh.EncryptionBenchmark.jdkDecrypt
+# Parameters: (numBytes = 1048576, writeStrategy = CHUNKED)
+
+# Run progress: 0.00% complete, ETA 00:05:00
+# Fork: 1 of 1
+# Warmup Iteration   1: 3073.011 ops/s
+# Warmup Iteration   2: 3296.034 ops/s
+# Warmup Iteration   3: 3285.528 ops/s
+Iteration   1: 3310.211 ops/s
+                 gc.alloc.rate:      3322.986 MB/sec
+                 gc.alloc.rate.norm: 1052728.524 B/op
+                 gc.count:           232.000 counts
+                 gc.time:            141.000 ms
+
+Iteration   2: 3308.252 ops/s
+                 gc.alloc.rate:      3320.641 MB/sec
+                 gc.alloc.rate.norm: 1052728.525 B/op
+                 gc.count:           232.000 counts
+                 gc.time:            143.000 ms
+
+Iteration   3: 3333.206 ops/s
+                 gc.alloc.rate:      3346.131 MB/sec
+                 gc.alloc.rate.norm: 1052728.521 B/op
+                 gc.count:           234.000 counts
+                 gc.time:            143.000 ms
+
+Iteration   4: 3356.941 ops/s
+                 gc.alloc.rate:      3369.885 MB/sec
+                 gc.alloc.rate.norm: 1052728.517 B/op
+                 gc.count:           236.000 counts
+                 gc.time:            142.000 ms
+
+
+
+Result "com.palantir.crypto2.jmh.EncryptionBenchmark.jdkDecrypt":
+  3327.153 ±(99.9%) 147.745 ops/s [Average]
+  (min, avg, max) = (3308.252, 3327.153, 3356.941), stdev = 22.864
+  CI (99.9%): [3179.407, 3474.898] (assumes normal distribution)
+
+Secondary result "com.palantir.crypto2.jmh.EncryptionBenchmark.jdkDecrypt:gc.alloc.rate":
+  3339.911 ±(99.9%) 148.998 MB/sec [Average]
+  (min, avg, max) = (3320.641, 3339.911, 3369.885), stdev = 23.058
+  CI (99.9%): [3190.913, 3488.909] (assumes normal distribution)
+
+Secondary result "com.palantir.crypto2.jmh.EncryptionBenchmark.jdkDecrypt:gc.alloc.rate.norm":
+  1052728.522 ±(99.9%) 0.023 B/op [Average]
+  (min, avg, max) = (1052728.517, 1052728.522, 1052728.525), stdev = 0.004
+  CI (99.9%): [1052728.499, 1052728.545] (assumes normal distribution)
+
+Secondary result "com.palantir.crypto2.jmh.EncryptionBenchmark.jdkDecrypt:gc.count":
+  934.000 ±(99.9%) 0.001 counts [Sum]
+  (min, avg, max) = (232.000, 233.500, 236.000), stdev = 1.915
+  CI (99.9%): [934.000, 934.000] (assumes normal distribution)
+
+Secondary result "com.palantir.crypto2.jmh.EncryptionBenchmark.jdkDecrypt:gc.time":
+  569.000 ±(99.9%) 0.001 ms [Sum]
+  (min, avg, max) = (141.000, 142.250, 143.000), stdev = 0.957
+  CI (99.9%): [569.000, 569.000] (assumes normal distribution)
+
+
+# JMH version: 1.37
+# VM version: JDK 21.0.12.1, OpenJDK 64-Bit Server VM, 21.0.12.1+9-LTS
+# VM invoker: /home/palantir/.gradle/gradle-jdks/amazon-corretto-21.0.12.9.1-linux-x64/bin/java
+# VM options: -Xmx1024m -Dfile.encoding=UTF-8 -Duser.country=US -Duser.language=en -Duser.variant
+# Blackhole mode: compiler (auto-detected, use -Djmh.blackhole.autoDetect=false to disable)
+# Warmup: 3 iterations, 3 s each
+# Measurement: 4 iterations, 4 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Throughput, ops/time
+# Benchmark: com.palantir.crypto2.jmh.EncryptionBenchmark.jdkDecrypt
+# Parameters: (numBytes = 10485760, writeStrategy = CHUNKED)
+
+# Run progress: 8.33% complete, ETA 00:04:40
+# Fork: 1 of 1
+# Warmup Iteration   1: 275.781 ops/s
+# Warmup Iteration   2: 272.918 ops/s
+# Warmup Iteration   3: 275.022 ops/s
+Iteration   1: 269.675 ops/s
+                 gc.alloc.rate:      2697.709 MB/sec
+                 gc.alloc.rate.norm: 10490286.843 B/op
+                 gc.count:           154.000 counts
+                 gc.time:            94.000 ms
+
+Iteration   2: 277.783 ops/s
+                 gc.alloc.rate:      2778.545 MB/sec
+                 gc.alloc.rate.norm: 10490195.237 B/op
+                 gc.count:           159.000 counts
+                 gc.time:            94.000 ms
+
+Iteration   3: 279.550 ops/s
+                 gc.alloc.rate:      2796.386 MB/sec
+                 gc.alloc.rate.norm: 10489918.842 B/op
+                 gc.count:           160.000 counts
+                 gc.time:            93.000 ms
+
+Iteration   4: 276.518 ops/s
+                 gc.alloc.rate:      2765.971 MB/sec
+                 gc.alloc.rate.norm: 10489918.432 B/op
+                 gc.count:           158.000 counts
+                 gc.time:            93.000 ms
+
+
+
+Result "com.palantir.crypto2.jmh.EncryptionBenchmark.jdkDecrypt":
+  275.881 ±(99.9%) 27.921 ops/s [Average]
+  (min, avg, max) = (269.675, 275.881, 279.550), stdev = 4.321
+  CI (99.9%): [247.961, 303.802] (assumes normal distribution)
+
+Secondary result "com.palantir.crypto2.jmh.EncryptionBenchmark.jdkDecrypt:gc.alloc.rate":
+  2759.653 ±(99.9%) 278.770 MB/sec [Average]
+  (min, avg, max) = (2697.709, 2759.653, 2796.386), stdev = 43.140
+  CI (99.9%): [2480.883, 3038.423] (assumes normal distribution)
+
+Secondary result "com.palantir.crypto2.jmh.EncryptionBenchmark.jdkDecrypt:gc.alloc.rate.norm":
+  10490079.839 ±(99.9%) 1226.871 B/op [Average]
+  (min, avg, max) = (10489918.432, 10490079.839, 10490286.843), stdev = 189.860
+  CI (99.9%): [10488852.968, 10491306.709] (assumes normal distribution)
+
+Secondary result "com.palantir.crypto2.jmh.EncryptionBenchmark.jdkDecrypt:gc.count":
+  631.000 ±(99.9%) 0.001 counts [Sum]
+  (min, avg, max) = (154.000, 157.750, 160.000), stdev = 2.630
+  CI (99.9%): [631.000, 631.000] (assumes normal distribution)
+
+Secondary result "com.palantir.crypto2.jmh.EncryptionBenchmark.jdkDecrypt:gc.time":
+  374.000 ±(99.9%) 0.001 ms [Sum]
+  (min, avg, max) = (93.000, 93.500, 94.000), stdev = 0.577
+  CI (99.9%): [374.000, 374.000] (assumes normal distribution)
+
+
+# JMH version: 1.37
+# VM version: JDK 21.0.12.1, OpenJDK 64-Bit Server VM, 21.0.12.1+9-LTS
+# VM invoker: /home/palantir/.gradle/gradle-jdks/amazon-corretto-21.0.12.9.1-linux-x64/bin/java
+# VM options: -Xmx1024m -Dfile.encoding=UTF-8 -Duser.country=US -Duser.language=en -Duser.variant
+# Blackhole mode: compiler (auto-detected, use -Djmh.blackhole.autoDetect=false to disable)
+# Warmup: 3 iterations, 3 s each
+# Measurement: 4 iterations, 4 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Throughput, ops/time
+# Benchmark: com.palantir.crypto2.jmh.EncryptionBenchmark.jdkDecrypt
+# Parameters: (numBytes = 104857600, writeStrategy = CHUNKED)
+
+# Run progress: 16.67% complete, ETA 00:04:15
+# Fork: 1 of 1
+# Warmup Iteration   1: 27.398 ops/s
+# Warmup Iteration   2: 27.301 ops/s
+# Warmup Iteration   3: 27.325 ops/s
+Iteration   1: 27.438 ops/s
+                 gc.alloc.rate:      2743.680 MB/sec
+                 gc.alloc.rate.norm: 104862466.255 B/op
+                 gc.count:           110.000 counts
+                 gc.time:            74.000 ms
+
+Iteration   2: 27.571 ops/s
+                 gc.alloc.rate:      2756.985 MB/sec
+                 gc.alloc.rate.norm: 104862462.559 B/op
+                 gc.count:           111.000 counts
+                 gc.time:            75.000 ms
+
+Iteration   3: 27.640 ops/s
+                 gc.alloc.rate:      2763.885 MB/sec
+                 gc.alloc.rate.norm: 104862462.559 B/op
+                 gc.count:           111.000 counts
+                 gc.time:            74.000 ms
+
+Iteration   4: 27.559 ops/s
+                 gc.alloc.rate:      2755.762 MB/sec
+                 gc.alloc.rate.norm: 104862462.559 B/op
+                 gc.count:           111.000 counts
+                 gc.time:            75.000 ms
+
+
+
+Result "com.palantir.crypto2.jmh.EncryptionBenchmark.jdkDecrypt":
+  27.552 ±(99.9%) 0.543 ops/s [Average]
+  (min, avg, max) = (27.438, 27.552, 27.640), stdev = 0.084
+  CI (99.9%): [27.009, 28.094] (assumes normal distribution)
+
+Secondary result "com.palantir.crypto2.jmh.EncryptionBenchmark.jdkDecrypt:gc.alloc.rate":
+  2755.078 ±(99.9%) 54.268 MB/sec [Average]
+  (min, avg, max) = (2743.680, 2755.078, 2763.885), stdev = 8.398
+  CI (99.9%): [2700.811, 2809.346] (assumes normal distribution)
+
+Secondary result "com.palantir.crypto2.jmh.EncryptionBenchmark.jdkDecrypt:gc.alloc.rate.norm":
+  104862463.483 ±(99.9%) 11.942 B/op [Average]
+  (min, avg, max) = (104862462.559, 104862463.483, 104862466.255), stdev = 1.848
+  CI (99.9%): [104862451.541, 104862475.424] (assumes normal distribution)
+
+Secondary result "com.palantir.crypto2.jmh.EncryptionBenchmark.jdkDecrypt:gc.count":
+  443.000 ±(99.9%) 0.001 counts [Sum]
+  (min, avg, max) = (110.000, 110.750, 111.000), stdev = 0.500
+  CI (99.9%): [443.000, 443.000] (assumes normal distribution)
+
+Secondary result "com.palantir.crypto2.jmh.EncryptionBenchmark.jdkDecrypt:gc.time":
+  298.000 ±(99.9%) 0.001 ms [Sum]
+  (min, avg, max) = (74.000, 74.500, 75.000), stdev = 0.577
+  CI (99.9%): [298.000, 298.000] (assumes normal distribution)
+
+
+# JMH version: 1.37
+# VM version: JDK 21.0.12.1, OpenJDK 64-Bit Server VM, 21.0.12.1+9-LTS
+# VM invoker: /home/palantir/.gradle/gradle-jdks/amazon-corretto-21.0.12.9.1-linux-x64/bin/java
+# VM options: -Xmx1024m -Dfile.encoding=UTF-8 -Duser.country=US -Duser.language=en -Duser.variant
+# Blackhole mode: compiler (auto-detected, use -Djmh.blackhole.autoDetect=false to disable)
+# Warmup: 3 iterations, 3 s each
+# Measurement: 4 iterations, 4 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Throughput, ops/time
+# Benchmark: com.palantir.crypto2.jmh.EncryptionBenchmark.jdkEncrypt
+# Parameters: (numBytes = 1048576, writeStrategy = CHUNKED)
+
+# Run progress: 25.00% complete, ETA 00:03:52
+# Fork: 1 of 1
+# Warmup Iteration   1: 12400.999 ops/s
+# Warmup Iteration   2: 13579.967 ops/s
+# Warmup Iteration   3: 13561.028 ops/s
+Iteration   1: 13607.037 ops/s
+                 gc.alloc.rate:      250.905 MB/sec
+                 gc.alloc.rate.norm: 19336.128 B/op
+                 gc.count:           7.000 counts
+                 gc.time:            4.000 ms
+
+Iteration   2: 13619.076 ops/s
+                 gc.alloc.rate:      251.122 MB/sec
+                 gc.alloc.rate.norm: 19336.127 B/op
+                 gc.count:           6.000 counts
+                 gc.time:            4.000 ms
+
+Iteration   3: 13539.060 ops/s
+                 gc.alloc.rate:      249.652 MB/sec
+                 gc.alloc.rate.norm: 19336.128 B/op
+                 gc.count:           7.000 counts
+                 gc.time:            4.000 ms
+
+Iteration   4: 13611.620 ops/s
+                 gc.alloc.rate:      250.987 MB/sec
+                 gc.alloc.rate.norm: 19336.128 B/op
+                 gc.count:           7.000 counts
+                 gc.time:            3.000 ms
+
+
+
+Result "com.palantir.crypto2.jmh.EncryptionBenchmark.jdkEncrypt":
+  13594.198 ±(99.9%) 239.686 ops/s [Average]
+  (min, avg, max) = (13539.060, 13594.198, 13619.076), stdev = 37.092
+  CI (99.9%): [13354.512, 13833.884] (assumes normal distribution)
+
+Secondary result "com.palantir.crypto2.jmh.EncryptionBenchmark.jdkEncrypt:gc.alloc.rate":
+  250.667 ±(99.9%) 4.409 MB/sec [Average]
+  (min, avg, max) = (249.652, 250.667, 251.122), stdev = 0.682
+  CI (99.9%): [246.258, 255.076] (assumes normal distribution)
+
+Secondary result "com.palantir.crypto2.jmh.EncryptionBenchmark.jdkEncrypt:gc.alloc.rate.norm":
+  19336.128 ±(99.9%) 0.004 B/op [Average]
+  (min, avg, max) = (19336.127, 19336.128, 19336.128), stdev = 0.001
+  CI (99.9%): [19336.124, 19336.131] (assumes normal distribution)
+
+Secondary result "com.palantir.crypto2.jmh.EncryptionBenchmark.jdkEncrypt:gc.count":
+  27.000 ±(99.9%) 0.001 counts [Sum]
+  (min, avg, max) = (6.000, 6.750, 7.000), stdev = 0.500
+  CI (99.9%): [27.000, 27.000] (assumes normal distribution)
+
+Secondary result "com.palantir.crypto2.jmh.EncryptionBenchmark.jdkEncrypt:gc.time":
+  15.000 ±(99.9%) 0.001 ms [Sum]
+  (min, avg, max) = (3.000, 3.750, 4.000), stdev = 0.500
+  CI (99.9%): [15.000, 15.000] (assumes normal distribution)
+
+
+# JMH version: 1.37
+# VM version: JDK 21.0.12.1, OpenJDK 64-Bit Server VM, 21.0.12.1+9-LTS
+# VM invoker: /home/palantir/.gradle/gradle-jdks/amazon-corretto-21.0.12.9.1-linux-x64/bin/java
+# VM options: -Xmx1024m -Dfile.encoding=UTF-8 -Duser.country=US -Duser.language=en -Duser.variant
+# Blackhole mode: compiler (auto-detected, use -Djmh.blackhole.autoDetect=false to disable)
+# Warmup: 3 iterations, 3 s each
+# Measurement: 4 iterations, 4 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Throughput, ops/time
+# Benchmark: com.palantir.crypto2.jmh.EncryptionBenchmark.jdkEncrypt
+# Parameters: (numBytes = 10485760, writeStrategy = CHUNKED)
+
+# Run progress: 33.33% complete, ETA 00:03:26
+# Fork: 1 of 1
+# Warmup Iteration   1: 1376.787 ops/s
+# Warmup Iteration   2: 1401.459 ops/s
+# Warmup Iteration   3: 1408.086 ops/s
+Iteration   1: 1412.007 ops/s
+                 gc.alloc.rate:      26.253 MB/sec
+                 gc.alloc.rate.norm: 19497.219 B/op
+                 gc.count:           ≈ 0 counts
+
+Iteration   2: 1412.130 ops/s
+                 gc.alloc.rate:      26.253 MB/sec
+                 gc.alloc.rate.norm: 19497.229 B/op
+                 gc.count:           1.000 counts
+                 gc.time:            1.000 ms
+
+Iteration   3: 1412.964 ops/s
+                 gc.alloc.rate:      26.271 MB/sec
+                 gc.alloc.rate.norm: 19497.228 B/op
+                 gc.count:           1.000 counts
+                 gc.time:            1.000 ms
+
+Iteration   4: 1412.473 ops/s
+                 gc.alloc.rate:      26.261 MB/sec
+                 gc.alloc.rate.norm: 19497.229 B/op
+                 gc.count:           1.000 counts
+                 gc.time:            ≈ 0 ms
+
+
+
+Result "com.palantir.crypto2.jmh.EncryptionBenchmark.jdkEncrypt":
+  1412.394 ±(99.9%) 2.770 ops/s [Average]
+  (min, avg, max) = (1412.007, 1412.394, 1412.964), stdev = 0.429
+  CI (99.9%): [1409.624, 1415.163] (assumes normal distribution)
+
+Secondary result "com.palantir.crypto2.jmh.EncryptionBenchmark.jdkEncrypt:gc.alloc.rate":
+  26.260 ±(99.9%) 0.057 MB/sec [Average]
+  (min, avg, max) = (26.253, 26.260, 26.271), stdev = 0.009
+  CI (99.9%): [26.203, 26.316] (assumes normal distribution)
+
+Secondary result "com.palantir.crypto2.jmh.EncryptionBenchmark.jdkEncrypt:gc.alloc.rate.norm":
+  19497.226 ±(99.9%) 0.031 B/op [Average]
+  (min, avg, max) = (19497.219, 19497.226, 19497.229), stdev = 0.005
+  CI (99.9%): [19497.196, 19497.257] (assumes normal distribution)
+
+Secondary result "com.palantir.crypto2.jmh.EncryptionBenchmark.jdkEncrypt:gc.count":
+  3.000 ±(99.9%) 0.001 counts [Sum]
+  (min, avg, max) = (≈ 0, 0.750, 1.000), stdev = 0.500
+  CI (99.9%): [3.000, 3.000] (assumes normal distribution)
+
+Secondary result "com.palantir.crypto2.jmh.EncryptionBenchmark.jdkEncrypt:gc.time":
+  2.000 ±(99.9%) 0.001 ms [Sum]
+  (min, avg, max) = (≈ 0, 0.500, 1.000), stdev = 0.577
+  CI (99.9%): [2.000, 2.000] (assumes normal distribution)
+
+
+# JMH version: 1.37
+# VM version: JDK 21.0.12.1, OpenJDK 64-Bit Server VM, 21.0.12.1+9-LTS
+# VM invoker: /home/palantir/.gradle/gradle-jdks/amazon-corretto-21.0.12.9.1-linux-x64/bin/java
+# VM options: -Xmx1024m -Dfile.encoding=UTF-8 -Duser.country=US -Duser.language=en -Duser.variant
+# Blackhole mode: compiler (auto-detected, use -Djmh.blackhole.autoDetect=false to disable)
+# Warmup: 3 iterations, 3 s each
+# Measurement: 4 iterations, 4 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Throughput, ops/time
+# Benchmark: com.palantir.crypto2.jmh.EncryptionBenchmark.jdkEncrypt
+# Parameters: (numBytes = 104857600, writeStrategy = CHUNKED)
+
+# Run progress: 41.67% complete, ETA 00:03:00
+# Fork: 1 of 1
+# Warmup Iteration   1: 106.320 ops/s
+# Warmup Iteration   2: 105.731 ops/s
+# Warmup Iteration   3: 107.363 ops/s
+Iteration   1: 107.575 ops/s
+                 gc.alloc.rate:      2.065 MB/sec
+                 gc.alloc.rate.norm: 20128.148 B/op
+                 gc.count:           ≈ 0 counts
+
+Iteration   2: 107.386 ops/s
+                 gc.alloc.rate:      2.036 MB/sec
+                 gc.alloc.rate.norm: 19880.019 B/op
+                 gc.count:           ≈ 0 counts
+
+Iteration   3: 108.086 ops/s
+                 gc.alloc.rate:      2.049 MB/sec
+                 gc.alloc.rate.norm: 19879.908 B/op
+                 gc.count:           ≈ 0 counts
+
+Iteration   4: 108.233 ops/s
+                 gc.alloc.rate:      2.052 MB/sec
+                 gc.alloc.rate.norm: 19880.037 B/op
+                 gc.count:           1.000 counts
+                 gc.time:            2.000 ms
+
+
+
+Result "com.palantir.crypto2.jmh.EncryptionBenchmark.jdkEncrypt":
+  107.820 ±(99.9%) 2.610 ops/s [Average]
+  (min, avg, max) = (107.386, 107.820, 108.233), stdev = 0.404
+  CI (99.9%): [105.209, 110.430] (assumes normal distribution)
+
+Secondary result "com.palantir.crypto2.jmh.EncryptionBenchmark.jdkEncrypt:gc.alloc.rate":
+  2.050 ±(99.9%) 0.077 MB/sec [Average]
+  (min, avg, max) = (2.036, 2.050, 2.065), stdev = 0.012
+  CI (99.9%): [1.973, 2.127] (assumes normal distribution)
+
+Secondary result "com.palantir.crypto2.jmh.EncryptionBenchmark.jdkEncrypt:gc.alloc.rate.norm":
+  19942.028 ±(99.9%) 801.806 B/op [Average]
+  (min, avg, max) = (19879.908, 19942.028, 20128.148), stdev = 124.080
+  CI (99.9%): [19140.222, 20743.834] (assumes normal distribution)
+
+Secondary result "com.palantir.crypto2.jmh.EncryptionBenchmark.jdkEncrypt:gc.count":
+  1.000 ±(99.9%) 0.001 counts [Sum]
+  (min, avg, max) = (≈ 0, 0.250, 1.000), stdev = 0.500
+  CI (99.9%): [1.000, 1.000] (assumes normal distribution)
+
+Secondary result "com.palantir.crypto2.jmh.EncryptionBenchmark.jdkEncrypt:gc.time":
+  2.000 ±(99.9%) 0.001 ms [Sum]
+  (min, avg, max) = (≈ 0, 0.500, 2.000), stdev = 1.000
+  CI (99.9%): [2.000, 2.000] (assumes normal distribution)
+
+
+# JMH version: 1.37
+# VM version: JDK 21.0.12.1, OpenJDK 64-Bit Server VM, 21.0.12.1+9-LTS
+# VM invoker: /home/palantir/.gradle/gradle-jdks/amazon-corretto-21.0.12.9.1-linux-x64/bin/java
+# VM options: -Xmx1024m -Dfile.encoding=UTF-8 -Duser.country=US -Duser.language=en -Duser.variant
+# Blackhole mode: compiler (auto-detected, use -Djmh.blackhole.autoDetect=false to disable)
+# Warmup: 3 iterations, 3 s each
+# Measurement: 4 iterations, 4 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Throughput, ops/time
+# Benchmark: com.palantir.crypto2.jmh.EncryptionBenchmark.opensslDecrypt
+# Parameters: (numBytes = 1048576, writeStrategy = CHUNKED)
+
+# Run progress: 50.00% complete, ETA 00:02:35
+# Fork: 1 of 1
+# Warmup Iteration   1: 2420.612 ops/s
+# Warmup Iteration   2: 2751.930 ops/s
+# Warmup Iteration   3: 2752.558 ops/s
+Iteration   1: 2777.877 ops/s
+                 gc.alloc.rate:      2822.032 MB/sec
+                 gc.alloc.rate.norm: 1065400.625 B/op
+                 gc.count:           173.000 counts
+                 gc.time:            127.000 ms
+
+Iteration   2: 2778.237 ops/s
+                 gc.alloc.rate:      2822.602 MB/sec
+                 gc.alloc.rate.norm: 1065400.625 B/op
+                 gc.count:           174.000 counts
+                 gc.time:            128.000 ms
+
+Iteration   3: 2745.912 ops/s
+                 gc.alloc.rate:      2789.773 MB/sec
+                 gc.alloc.rate.norm: 1065400.632 B/op
+                 gc.count:           171.000 counts
+                 gc.time:            127.000 ms
+
+Iteration   4: 2751.906 ops/s
+                 gc.alloc.rate:      2795.787 MB/sec
+                 gc.alloc.rate.norm: 1065400.631 B/op
+                 gc.count:           173.000 counts
+                 gc.time:            130.000 ms
+
+
+
+Result "com.palantir.crypto2.jmh.EncryptionBenchmark.opensslDecrypt":
+  2763.483 ±(99.9%) 109.895 ops/s [Average]
+  (min, avg, max) = (2745.912, 2763.483, 2778.237), stdev = 17.006
+  CI (99.9%): [2653.588, 2873.378] (assumes normal distribution)
+
+Secondary result "com.palantir.crypto2.jmh.EncryptionBenchmark.opensslDecrypt:gc.alloc.rate":
+  2807.548 ±(99.9%) 111.344 MB/sec [Average]
+  (min, avg, max) = (2789.773, 2807.548, 2822.602), stdev = 17.231
+  CI (99.9%): [2696.205, 2918.892] (assumes normal distribution)
+
+Secondary result "com.palantir.crypto2.jmh.EncryptionBenchmark.opensslDecrypt:gc.alloc.rate.norm":
+  1065400.628 ±(99.9%) 0.025 B/op [Average]
+  (min, avg, max) = (1065400.625, 1065400.628, 1065400.632), stdev = 0.004
+  CI (99.9%): [1065400.603, 1065400.653] (assumes normal distribution)
+
+Secondary result "com.palantir.crypto2.jmh.EncryptionBenchmark.opensslDecrypt:gc.count":
+  691.000 ±(99.9%) 0.001 counts [Sum]
+  (min, avg, max) = (171.000, 172.750, 174.000), stdev = 1.258
+  CI (99.9%): [691.000, 691.000] (assumes normal distribution)
+
+Secondary result "com.palantir.crypto2.jmh.EncryptionBenchmark.opensslDecrypt:gc.time":
+  512.000 ±(99.9%) 0.001 ms [Sum]
+  (min, avg, max) = (127.000, 128.000, 130.000), stdev = 1.414
+  CI (99.9%): [512.000, 512.000] (assumes normal distribution)
+
+
+# JMH version: 1.37
+# VM version: JDK 21.0.12.1, OpenJDK 64-Bit Server VM, 21.0.12.1+9-LTS
+# VM invoker: /home/palantir/.gradle/gradle-jdks/amazon-corretto-21.0.12.9.1-linux-x64/bin/java
+# VM options: -Xmx1024m -Dfile.encoding=UTF-8 -Duser.country=US -Duser.language=en -Duser.variant
+# Blackhole mode: compiler (auto-detected, use -Djmh.blackhole.autoDetect=false to disable)
+# Warmup: 3 iterations, 3 s each
+# Measurement: 4 iterations, 4 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Throughput, ops/time
+# Benchmark: com.palantir.crypto2.jmh.EncryptionBenchmark.opensslDecrypt
+# Parameters: (numBytes = 10485760, writeStrategy = CHUNKED)
+
+# Run progress: 58.33% complete, ETA 00:02:08
+# Fork: 1 of 1
+# Warmup Iteration   1: 240.252 ops/s
+# Warmup Iteration   2: 241.459 ops/s
+# Warmup Iteration   3: 248.000 ops/s
+Iteration   1: 244.144 ops/s
+                 gc.alloc.rate:      2445.253 MB/sec
+                 gc.alloc.rate.norm: 10502938.162 B/op
+                 gc.count:           140.000 counts
+                 gc.time:            95.000 ms
+
+Iteration   2: 243.015 ops/s
+                 gc.alloc.rate:      2433.903 MB/sec
+                 gc.alloc.rate.norm: 10502767.359 B/op
+                 gc.count:           139.000 counts
+                 gc.time:            95.000 ms
+
+Iteration   3: 247.063 ops/s
+                 gc.alloc.rate:      2474.478 MB/sec
+                 gc.alloc.rate.norm: 10502758.876 B/op
+                 gc.count:           141.000 counts
+                 gc.time:            95.000 ms
+
+Iteration   4: 248.294 ops/s
+                 gc.alloc.rate:      2486.697 MB/sec
+                 gc.alloc.rate.norm: 10502642.286 B/op
+                 gc.count:           142.000 counts
+                 gc.time:            96.000 ms
+
+
+
+Result "com.palantir.crypto2.jmh.EncryptionBenchmark.opensslDecrypt":
+  245.629 ±(99.9%) 15.915 ops/s [Average]
+  (min, avg, max) = (243.015, 245.629, 248.294), stdev = 2.463
+  CI (99.9%): [229.714, 261.544] (assumes normal distribution)
+
+Secondary result "com.palantir.crypto2.jmh.EncryptionBenchmark.opensslDecrypt:gc.alloc.rate":
+  2460.083 ±(99.9%) 159.199 MB/sec [Average]
+  (min, avg, max) = (2433.903, 2460.083, 2486.697), stdev = 24.636
+  CI (99.9%): [2300.884, 2619.282] (assumes normal distribution)
+
+Secondary result "com.palantir.crypto2.jmh.EncryptionBenchmark.opensslDecrypt:gc.alloc.rate.norm":
+  10502776.670 ±(99.9%) 787.391 B/op [Average]
+  (min, avg, max) = (10502642.286, 10502776.670, 10502938.162), stdev = 121.850
+  CI (99.9%): [10501989.279, 10503564.062] (assumes normal distribution)
+
+Secondary result "com.palantir.crypto2.jmh.EncryptionBenchmark.opensslDecrypt:gc.count":
+  562.000 ±(99.9%) 0.001 counts [Sum]
+  (min, avg, max) = (139.000, 140.500, 142.000), stdev = 1.291
+  CI (99.9%): [562.000, 562.000] (assumes normal distribution)
+
+Secondary result "com.palantir.crypto2.jmh.EncryptionBenchmark.opensslDecrypt:gc.time":
+  381.000 ±(99.9%) 0.001 ms [Sum]
+  (min, avg, max) = (95.000, 95.250, 96.000), stdev = 0.500
+  CI (99.9%): [381.000, 381.000] (assumes normal distribution)
+
+
+# JMH version: 1.37
+# VM version: JDK 21.0.12.1, OpenJDK 64-Bit Server VM, 21.0.12.1+9-LTS
+# VM invoker: /home/palantir/.gradle/gradle-jdks/amazon-corretto-21.0.12.9.1-linux-x64/bin/java
+# VM options: -Xmx1024m -Dfile.encoding=UTF-8 -Duser.country=US -Duser.language=en -Duser.variant
+# Blackhole mode: compiler (auto-detected, use -Djmh.blackhole.autoDetect=false to disable)
+# Warmup: 3 iterations, 3 s each
+# Measurement: 4 iterations, 4 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Throughput, ops/time
+# Benchmark: com.palantir.crypto2.jmh.EncryptionBenchmark.opensslDecrypt
+# Parameters: (numBytes = 104857600, writeStrategy = CHUNKED)
+
+# Run progress: 66.67% complete, ETA 00:01:43
+# Fork: 1 of 1
+# Warmup Iteration   1: 22.458 ops/s
+# Warmup Iteration   2: 22.582 ops/s
+# Warmup Iteration   3: 22.212 ops/s
+Iteration   1: 21.868 ops/s
+                 gc.alloc.rate:      2187.011 MB/sec
+                 gc.alloc.rate.norm: 104875727.545 B/op
+                 gc.count:           88.000 counts
+                 gc.time:            69.000 ms
+
+Iteration   2: 22.173 ops/s
+                 gc.alloc.rate:      2217.509 MB/sec
+                 gc.alloc.rate.norm: 104875726.022 B/op
+                 gc.count:           89.000 counts
+                 gc.time:            68.000 ms
+
+Iteration   3: 22.525 ops/s
+                 gc.alloc.rate:      2252.740 MB/sec
+                 gc.alloc.rate.norm: 104875726.593 B/op
+                 gc.count:           91.000 counts
+                 gc.time:            67.000 ms
+
+Iteration   4: 22.351 ops/s
+                 gc.alloc.rate:      2235.257 MB/sec
+                 gc.alloc.rate.norm: 104875727.200 B/op
+                 gc.count:           90.000 counts
+                 gc.time:            67.000 ms
+
+
+
+Result "com.palantir.crypto2.jmh.EncryptionBenchmark.opensslDecrypt":
+  22.229 ±(99.9%) 1.812 ops/s [Average]
+  (min, avg, max) = (21.868, 22.229, 22.525), stdev = 0.280
+  CI (99.9%): [20.417, 24.042] (assumes normal distribution)
+
+Secondary result "com.palantir.crypto2.jmh.EncryptionBenchmark.opensslDecrypt:gc.alloc.rate":
+  2223.129 ±(99.9%) 181.243 MB/sec [Average]
+  (min, avg, max) = (2187.011, 2223.129, 2252.740), stdev = 28.048
+  CI (99.9%): [2041.886, 2404.372] (assumes normal distribution)
+
+Secondary result "com.palantir.crypto2.jmh.EncryptionBenchmark.opensslDecrypt:gc.alloc.rate.norm":
+  104875726.840 ±(99.9%) 4.345 B/op [Average]
+  (min, avg, max) = (104875726.022, 104875726.840, 104875727.545), stdev = 0.672
+  CI (99.9%): [104875722.495, 104875731.185] (assumes normal distribution)
+
+Secondary result "com.palantir.crypto2.jmh.EncryptionBenchmark.opensslDecrypt:gc.count":
+  358.000 ±(99.9%) 0.001 counts [Sum]
+  (min, avg, max) = (88.000, 89.500, 91.000), stdev = 1.291
+  CI (99.9%): [358.000, 358.000] (assumes normal distribution)
+
+Secondary result "com.palantir.crypto2.jmh.EncryptionBenchmark.opensslDecrypt:gc.time":
+  271.000 ±(99.9%) 0.001 ms [Sum]
+  (min, avg, max) = (67.000, 67.750, 69.000), stdev = 0.957
+  CI (99.9%): [271.000, 271.000] (assumes normal distribution)
+
+
+# JMH version: 1.37
+# VM version: JDK 21.0.12.1, OpenJDK 64-Bit Server VM, 21.0.12.1+9-LTS
+# VM invoker: /home/palantir/.gradle/gradle-jdks/amazon-corretto-21.0.12.9.1-linux-x64/bin/java
+# VM options: -Xmx1024m -Dfile.encoding=UTF-8 -Duser.country=US -Duser.language=en -Duser.variant
+# Blackhole mode: compiler (auto-detected, use -Djmh.blackhole.autoDetect=false to disable)
+# Warmup: 3 iterations, 3 s each
+# Measurement: 4 iterations, 4 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Throughput, ops/time
+# Benchmark: com.palantir.crypto2.jmh.EncryptionBenchmark.opensslEncrypt
+# Parameters: (numBytes = 1048576, writeStrategy = CHUNKED)
+
+# Run progress: 75.00% complete, ETA 00:01:17
+# Fork: 1 of 1
+# Warmup Iteration   1: 4466.438 ops/s
+# Warmup Iteration   2: 4882.753 ops/s
+# Warmup Iteration   3: 4914.676 ops/s
+Iteration   1: 4910.794 ops/s
+                 gc.alloc.rate:      78.339 MB/sec
+                 gc.alloc.rate.norm: 16728.353 B/op
+                 gc.count:           2.000 counts
+                 gc.time:            11.000 ms
+
+Iteration   2: 4902.397 ops/s
+                 gc.alloc.rate:      78.205 MB/sec
+                 gc.alloc.rate.norm: 16728.354 B/op
+                 gc.count:           3.000 counts
+                 gc.time:            19.000 ms
+
+Iteration   3: 4898.311 ops/s
+                 gc.alloc.rate:      78.140 MB/sec
+                 gc.alloc.rate.norm: 16728.360 B/op
+                 gc.count:           2.000 counts
+                 gc.time:            13.000 ms
+
+Iteration   4: 4891.858 ops/s
+                 gc.alloc.rate:      78.035 MB/sec
+                 gc.alloc.rate.norm: 16728.355 B/op
+                 gc.count:           2.000 counts
+                 gc.time:            12.000 ms
+
+
+
+Result "com.palantir.crypto2.jmh.EncryptionBenchmark.opensslEncrypt":
+  4900.840 ±(99.9%) 51.232 ops/s [Average]
+  (min, avg, max) = (4891.858, 4900.840, 4910.794), stdev = 7.928
+  CI (99.9%): [4849.608, 4952.071] (assumes normal distribution)
+
+Secondary result "com.palantir.crypto2.jmh.EncryptionBenchmark.opensslEncrypt:gc.alloc.rate":
+  78.180 ±(99.9%) 0.822 MB/sec [Average]
+  (min, avg, max) = (78.035, 78.180, 78.339), stdev = 0.127
+  CI (99.9%): [77.357, 79.002] (assumes normal distribution)
+
+Secondary result "com.palantir.crypto2.jmh.EncryptionBenchmark.opensslEncrypt:gc.alloc.rate.norm":
+  16728.356 ±(99.9%) 0.018 B/op [Average]
+  (min, avg, max) = (16728.353, 16728.356, 16728.360), stdev = 0.003
+  CI (99.9%): [16728.337, 16728.374] (assumes normal distribution)
+
+Secondary result "com.palantir.crypto2.jmh.EncryptionBenchmark.opensslEncrypt:gc.count":
+  9.000 ±(99.9%) 0.001 counts [Sum]
+  (min, avg, max) = (2.000, 2.250, 3.000), stdev = 0.500
+  CI (99.9%): [9.000, 9.000] (assumes normal distribution)
+
+Secondary result "com.palantir.crypto2.jmh.EncryptionBenchmark.opensslEncrypt:gc.time":
+  55.000 ±(99.9%) 0.001 ms [Sum]
+  (min, avg, max) = (11.000, 13.750, 19.000), stdev = 3.594
+  CI (99.9%): [55.000, 55.000] (assumes normal distribution)
+
+
+# JMH version: 1.37
+# VM version: JDK 21.0.12.1, OpenJDK 64-Bit Server VM, 21.0.12.1+9-LTS
+# VM invoker: /home/palantir/.gradle/gradle-jdks/amazon-corretto-21.0.12.9.1-linux-x64/bin/java
+# VM options: -Xmx1024m -Dfile.encoding=UTF-8 -Duser.country=US -Duser.language=en -Duser.variant
+# Blackhole mode: compiler (auto-detected, use -Djmh.blackhole.autoDetect=false to disable)
+# Warmup: 3 iterations, 3 s each
+# Measurement: 4 iterations, 4 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Throughput, ops/time
+# Benchmark: com.palantir.crypto2.jmh.EncryptionBenchmark.opensslEncrypt
+# Parameters: (numBytes = 10485760, writeStrategy = CHUNKED)
+
+# Run progress: 83.33% complete, ETA 00:00:51
+# Fork: 1 of 1
+# Warmup Iteration   1: 471.981 ops/s
+# Warmup Iteration   2: 485.308 ops/s
+# Warmup Iteration   3: 478.749 ops/s
+Iteration   1: 483.056 ops/s
+                 gc.alloc.rate:      7.786 MB/sec
+                 gc.alloc.rate.norm: 16901.848 B/op
+                 gc.count:           1.000 counts
+                 gc.time:            3.000 ms
+
+Iteration   2: 486.445 ops/s
+                 gc.alloc.rate:      7.794 MB/sec
+                 gc.alloc.rate.norm: 16803.630 B/op
+                 gc.count:           ≈ 0 counts
+
+Iteration   3: 458.942 ops/s
+                 gc.alloc.rate:      7.354 MB/sec
+                 gc.alloc.rate.norm: 16803.752 B/op
+                 gc.count:           ≈ 0 counts
+
+Iteration   4: 465.171 ops/s
+                 gc.alloc.rate:      7.454 MB/sec
+                 gc.alloc.rate.norm: 16803.701 B/op
+                 gc.count:           ≈ 0 counts
+
+
+
+Result "com.palantir.crypto2.jmh.EncryptionBenchmark.opensslEncrypt":
+  473.404 ±(99.9%) 86.710 ops/s [Average]
+  (min, avg, max) = (458.942, 473.404, 486.445), stdev = 13.419
+  CI (99.9%): [386.693, 560.114] (assumes normal distribution)
+
+Secondary result "com.palantir.crypto2.jmh.EncryptionBenchmark.opensslEncrypt:gc.alloc.rate":
+  7.597 ±(99.9%) 1.464 MB/sec [Average]
+  (min, avg, max) = (7.354, 7.597, 7.794), stdev = 0.227
+  CI (99.9%): [6.133, 9.061] (assumes normal distribution)
+
+Secondary result "com.palantir.crypto2.jmh.EncryptionBenchmark.opensslEncrypt:gc.alloc.rate.norm":
+  16828.233 ±(99.9%) 317.134 B/op [Average]
+  (min, avg, max) = (16803.630, 16828.233, 16901.848), stdev = 49.077
+  CI (99.9%): [16511.099, 17145.367] (assumes normal distribution)
+
+Secondary result "com.palantir.crypto2.jmh.EncryptionBenchmark.opensslEncrypt:gc.count":
+  1.000 ±(99.9%) 0.001 counts [Sum]
+  (min, avg, max) = (≈ 0, 0.250, 1.000), stdev = 0.500
+  CI (99.9%): [1.000, 1.000] (assumes normal distribution)
+
+Secondary result "com.palantir.crypto2.jmh.EncryptionBenchmark.opensslEncrypt:gc.time":
+  3.000 ±(99.9%) 0.001 ms [Sum]
+  (min, avg, max) = (≈ 0, 0.750, 3.000), stdev = 1.500
+  CI (99.9%): [3.000, 3.000] (assumes normal distribution)
+
+
+# JMH version: 1.37
+# VM version: JDK 21.0.12.1, OpenJDK 64-Bit Server VM, 21.0.12.1+9-LTS
+# VM invoker: /home/palantir/.gradle/gradle-jdks/amazon-corretto-21.0.12.9.1-linux-x64/bin/java
+# VM options: -Xmx1024m -Dfile.encoding=UTF-8 -Duser.country=US -Duser.language=en -Duser.variant
+# Blackhole mode: compiler (auto-detected, use -Djmh.blackhole.autoDetect=false to disable)
+# Warmup: 3 iterations, 3 s each
+# Measurement: 4 iterations, 4 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Throughput, ops/time
+# Benchmark: com.palantir.crypto2.jmh.EncryptionBenchmark.opensslEncrypt
+# Parameters: (numBytes = 104857600, writeStrategy = CHUNKED)
+
+# Run progress: 91.67% complete, ETA 00:00:25
+# Fork: 1 of 1
+# Warmup Iteration   1: 39.649 ops/s
+# Warmup Iteration   2: 39.751 ops/s
+# Warmup Iteration   3: 40.082 ops/s
+Iteration   1: 40.338 ops/s
+                 gc.alloc.rate:      0.695 MB/sec
+                 gc.alloc.rate.norm: 18060.642 B/op
+                 gc.count:           ≈ 0 counts
+
+Iteration   2: 40.489 ops/s
+                 gc.alloc.rate:      0.697 MB/sec
+                 gc.alloc.rate.norm: 18059.309 B/op
+                 gc.count:           ≈ 0 counts
+
+Iteration   3: 40.604 ops/s
+                 gc.alloc.rate:      0.699 MB/sec
+                 gc.alloc.rate.norm: 18058.258 B/op
+                 gc.count:           ≈ 0 counts
+
+Iteration   4: 40.532 ops/s
+                 gc.alloc.rate:      0.685 MB/sec
+                 gc.alloc.rate.norm: 17711.362 B/op
+                 gc.count:           ≈ 0 counts
+
+
+
+Result "com.palantir.crypto2.jmh.EncryptionBenchmark.opensslEncrypt":
+  40.491 ±(99.9%) 0.728 ops/s [Average]
+  (min, avg, max) = (40.338, 40.491, 40.604), stdev = 0.113
+  CI (99.9%): [39.763, 41.218] (assumes normal distribution)
+
+Secondary result "com.palantir.crypto2.jmh.EncryptionBenchmark.opensslEncrypt:gc.alloc.rate":
+  0.694 ±(99.9%) 0.042 MB/sec [Average]
+  (min, avg, max) = (0.685, 0.694, 0.699), stdev = 0.007
+  CI (99.9%): [0.652, 0.736] (assumes normal distribution)
+
+Secondary result "com.palantir.crypto2.jmh.EncryptionBenchmark.opensslEncrypt:gc.alloc.rate.norm":
+  17972.393 ±(99.9%) 1124.536 B/op [Average]
+  (min, avg, max) = (17711.362, 17972.393, 18060.642), stdev = 174.023
+  CI (99.9%): [16847.857, 19096.928] (assumes normal distribution)
+
+Secondary result "com.palantir.crypto2.jmh.EncryptionBenchmark.opensslEncrypt:gc.count":
+  ≈ 0 counts
+
+
+# Run complete. Total time: 00:05:10
+
+REMEMBER: The numbers below are just data. To gain reusable insights, you need to follow up on
+why the numbers are the way they are. Use profilers (see -prof, -lprof), design factorial
+experiments, perform baseline and negative tests that provide experimental control, make sure
+the benchmarking environment is safe on JVM/OS/HW level, ask for reviews from the domain experts.
+Do not assume the numbers tell you what you want them to tell.
+
+NOTE: Current JVM experimentally supports Compiler Blackholes, and they are in use. Please exercise
+extra caution when trusting the results, look into the generated code to check the benchmark still
+works, and factor in a small probability of new VM bugs. Additionally, while comparisons between
+different JVMs are already problematic, the performance difference caused by different Blackhole
+modes can be very significant. Please make sure you use the consistent Blackhole mode for comparisons.
+
+Benchmark                                              (numBytes)  (writeStrategy)   Mode  Cnt          Score      Error   Units
+EncryptionBenchmark.jdkDecrypt                            1048576          CHUNKED  thrpt    4       3327.153 ±  147.745   ops/s
+EncryptionBenchmark.jdkDecrypt:gc.alloc.rate              1048576          CHUNKED  thrpt    4       3339.911 ±  148.998  MB/sec
+EncryptionBenchmark.jdkDecrypt:gc.alloc.rate.norm         1048576          CHUNKED  thrpt    4    1052728.522 ±    0.023    B/op
+EncryptionBenchmark.jdkDecrypt:gc.count                   1048576          CHUNKED  thrpt    4        934.000             counts
+EncryptionBenchmark.jdkDecrypt:gc.time                    1048576          CHUNKED  thrpt    4        569.000                 ms
+EncryptionBenchmark.jdkDecrypt                           10485760          CHUNKED  thrpt    4        275.881 ±   27.921   ops/s
+EncryptionBenchmark.jdkDecrypt:gc.alloc.rate             10485760          CHUNKED  thrpt    4       2759.653 ±  278.770  MB/sec
+EncryptionBenchmark.jdkDecrypt:gc.alloc.rate.norm        10485760          CHUNKED  thrpt    4   10490079.839 ± 1226.871    B/op
+EncryptionBenchmark.jdkDecrypt:gc.count                  10485760          CHUNKED  thrpt    4        631.000             counts
+EncryptionBenchmark.jdkDecrypt:gc.time                   10485760          CHUNKED  thrpt    4        374.000                 ms
+EncryptionBenchmark.jdkDecrypt                          104857600          CHUNKED  thrpt    4         27.552 ±    0.543   ops/s
+EncryptionBenchmark.jdkDecrypt:gc.alloc.rate            104857600          CHUNKED  thrpt    4       2755.078 ±   54.268  MB/sec
+EncryptionBenchmark.jdkDecrypt:gc.alloc.rate.norm       104857600          CHUNKED  thrpt    4  104862463.483 ±   11.942    B/op
+EncryptionBenchmark.jdkDecrypt:gc.count                 104857600          CHUNKED  thrpt    4        443.000             counts
+EncryptionBenchmark.jdkDecrypt:gc.time                  104857600          CHUNKED  thrpt    4        298.000                 ms
+EncryptionBenchmark.jdkEncrypt                            1048576          CHUNKED  thrpt    4      13594.198 ±  239.686   ops/s
+EncryptionBenchmark.jdkEncrypt:gc.alloc.rate              1048576          CHUNKED  thrpt    4        250.667 ±    4.409  MB/sec
+EncryptionBenchmark.jdkEncrypt:gc.alloc.rate.norm         1048576          CHUNKED  thrpt    4      19336.128 ±    0.004    B/op
+EncryptionBenchmark.jdkEncrypt:gc.count                   1048576          CHUNKED  thrpt    4         27.000             counts
+EncryptionBenchmark.jdkEncrypt:gc.time                    1048576          CHUNKED  thrpt    4         15.000                 ms
+EncryptionBenchmark.jdkEncrypt                           10485760          CHUNKED  thrpt    4       1412.394 ±    2.770   ops/s
+EncryptionBenchmark.jdkEncrypt:gc.alloc.rate             10485760          CHUNKED  thrpt    4         26.260 ±    0.057  MB/sec
+EncryptionBenchmark.jdkEncrypt:gc.alloc.rate.norm        10485760          CHUNKED  thrpt    4      19497.226 ±    0.031    B/op
+EncryptionBenchmark.jdkEncrypt:gc.count                  10485760          CHUNKED  thrpt    4          3.000             counts
+EncryptionBenchmark.jdkEncrypt:gc.time                   10485760          CHUNKED  thrpt    4          2.000                 ms
+EncryptionBenchmark.jdkEncrypt                          104857600          CHUNKED  thrpt    4        107.820 ±    2.610   ops/s
+EncryptionBenchmark.jdkEncrypt:gc.alloc.rate            104857600          CHUNKED  thrpt    4          2.050 ±    0.077  MB/sec
+EncryptionBenchmark.jdkEncrypt:gc.alloc.rate.norm       104857600          CHUNKED  thrpt    4      19942.028 ±  801.806    B/op
+EncryptionBenchmark.jdkEncrypt:gc.count                 104857600          CHUNKED  thrpt    4          1.000             counts
+EncryptionBenchmark.jdkEncrypt:gc.time                  104857600          CHUNKED  thrpt    4          2.000                 ms
+EncryptionBenchmark.opensslDecrypt                        1048576          CHUNKED  thrpt    4       2763.483 ±  109.895   ops/s
+EncryptionBenchmark.opensslDecrypt:gc.alloc.rate          1048576          CHUNKED  thrpt    4       2807.548 ±  111.344  MB/sec
+EncryptionBenchmark.opensslDecrypt:gc.alloc.rate.norm     1048576          CHUNKED  thrpt    4    1065400.628 ±    0.025    B/op
+EncryptionBenchmark.opensslDecrypt:gc.count               1048576          CHUNKED  thrpt    4        691.000             counts
+EncryptionBenchmark.opensslDecrypt:gc.time                1048576          CHUNKED  thrpt    4        512.000                 ms
+EncryptionBenchmark.opensslDecrypt                       10485760          CHUNKED  thrpt    4        245.629 ±   15.915   ops/s
+EncryptionBenchmark.opensslDecrypt:gc.alloc.rate         10485760          CHUNKED  thrpt    4       2460.083 ±  159.199  MB/sec
+EncryptionBenchmark.opensslDecrypt:gc.alloc.rate.norm    10485760          CHUNKED  thrpt    4   10502776.670 ±  787.391    B/op
+EncryptionBenchmark.opensslDecrypt:gc.count              10485760          CHUNKED  thrpt    4        562.000             counts
+EncryptionBenchmark.opensslDecrypt:gc.time               10485760          CHUNKED  thrpt    4        381.000                 ms
+EncryptionBenchmark.opensslDecrypt                      104857600          CHUNKED  thrpt    4         22.229 ±    1.812   ops/s
+EncryptionBenchmark.opensslDecrypt:gc.alloc.rate        104857600          CHUNKED  thrpt    4       2223.129 ±  181.243  MB/sec
+EncryptionBenchmark.opensslDecrypt:gc.alloc.rate.norm   104857600          CHUNKED  thrpt    4  104875726.840 ±    4.345    B/op
+EncryptionBenchmark.opensslDecrypt:gc.count             104857600          CHUNKED  thrpt    4        358.000             counts
+EncryptionBenchmark.opensslDecrypt:gc.time              104857600          CHUNKED  thrpt    4        271.000                 ms
+EncryptionBenchmark.opensslEncrypt                        1048576          CHUNKED  thrpt    4       4900.840 ±   51.232   ops/s
+EncryptionBenchmark.opensslEncrypt:gc.alloc.rate          1048576          CHUNKED  thrpt    4         78.180 ±    0.822  MB/sec
+EncryptionBenchmark.opensslEncrypt:gc.alloc.rate.norm     1048576          CHUNKED  thrpt    4      16728.356 ±    0.018    B/op
+EncryptionBenchmark.opensslEncrypt:gc.count               1048576          CHUNKED  thrpt    4          9.000             counts
+EncryptionBenchmark.opensslEncrypt:gc.time                1048576          CHUNKED  thrpt    4         55.000                 ms
+EncryptionBenchmark.opensslEncrypt                       10485760          CHUNKED  thrpt    4        473.404 ±   86.710   ops/s
+EncryptionBenchmark.opensslEncrypt:gc.alloc.rate         10485760          CHUNKED  thrpt    4          7.597 ±    1.464  MB/sec
+EncryptionBenchmark.opensslEncrypt:gc.alloc.rate.norm    10485760          CHUNKED  thrpt    4      16828.233 ±  317.134    B/op
+EncryptionBenchmark.opensslEncrypt:gc.count              10485760          CHUNKED  thrpt    4          1.000             counts
+EncryptionBenchmark.opensslEncrypt:gc.time               10485760          CHUNKED  thrpt    4          3.000                 ms
+EncryptionBenchmark.opensslEncrypt                      104857600          CHUNKED  thrpt    4         40.491 ±    0.728   ops/s
+EncryptionBenchmark.opensslEncrypt:gc.alloc.rate        104857600          CHUNKED  thrpt    4          0.694 ±    0.042  MB/sec
+EncryptionBenchmark.opensslEncrypt:gc.alloc.rate.norm   104857600          CHUNKED  thrpt    4      17972.393 ± 1124.536    B/op
+EncryptionBenchmark.opensslEncrypt:gc.count             104857600          CHUNKED  thrpt    4            ≈ 0             counts
+
+Benchmark result is saved to /home/palantir/git/hadoop-crypto/benchmark-results/encryption/xeon-8375C-20260917T191355Z/xeon-8375C-jdk25-blackhole-chunked.json
+
+[Incubating] Problems report is available at: file:///home/palantir/git/hadoop-crypto/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 10.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/9.7.1/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 5m 18s
+7 actionable tasks: 1 executed, 6 up-to-date
+Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.7.1/userguide/configuration_cache_enabling.html
