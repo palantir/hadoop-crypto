@@ -52,11 +52,11 @@ subprojects {
 }
 
 javaVersions {
-    javaCompiler = 21
+    javaCompiler = 25
     libraryTarget = 17
     runtime = 21
 }
 
 jdks {
-    daemonTarget = 21
+    daemonTarget = 25
 }
