@@ -48,6 +48,19 @@ subprojects {
     apply plugin: 'java-library'
     apply plugin: 'com.palantir.external-publish-jar'
 
+    tasks.withType(JavaCompile) {
+        options.compilerArgs += [
+            '-Xlint:rawtypes',
+            '-Xlint:unchecked',
+            '-Werror',
+        ]
+        options.errorprone {
+            errorproneArgs = [
+                '-XepAllSuggestionsAsWarnings',
+            ]
+        }
+    }
+
     tasks.check.dependsOn javadoc, checkImplicitDependencies, checkUnusedDependencies
 }
 
