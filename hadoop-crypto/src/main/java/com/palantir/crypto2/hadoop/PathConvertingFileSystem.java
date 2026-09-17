@@ -24,7 +24,6 @@ import java.util.function.Function;
 import org.apache.hadoop.fs.CreateFlag;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FSDataOutputStream;
-import org.apache.hadoop.fs.FSDataOutputStreamBuilder;
 import org.apache.hadoop.fs.FileChecksum;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
@@ -107,11 +106,6 @@ public final class PathConvertingFileSystem extends DelegatingFileSystem {
     @Override
     public boolean delete(Path path, boolean recursive) throws IOException {
         return delegate.delete(to(path), recursive);
-    }
-
-    @Override
-    public FSDataOutputStreamBuilder<?, ?> createFile(Path path) {
-        return delegate.createFile(to(path));
     }
 
     @Override

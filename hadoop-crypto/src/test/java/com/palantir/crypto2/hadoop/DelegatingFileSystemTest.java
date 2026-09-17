@@ -17,27 +17,39 @@
 package com.palantir.crypto2.hadoop;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.google.common.io.ByteStreams;
 import com.google.common.io.Files;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.BlockLocation;
+import org.apache.hadoop.fs.CreateFlag;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FSInputStream;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Options.ChecksumOpt;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.PathHandle;
+import org.apache.hadoop.fs.RawLocalFileSystem;
 import org.apache.hadoop.fs.permission.FsPermission;
+import org.apache.hadoop.util.Progressable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -119,6 +131,176 @@ public final class DelegatingFileSystemTest {
 
         assertThat(delegatingFs.getFileBlockLocations(path, 0L, 0L)).containsExactly(location);
         verify(delegate).getFileBlockLocations(path, 0L, 0L);
+    }
+
+    @Test // https://github.com/palantir/hadoop-crypto/issues/105
+    public void testCreateFileBuilderRoutesThroughCreate() throws IOException {
+        RecordingFileSystem recordingFs = recordingFs();
+
+        try (FSDataOutputStream os =
+                recordingFs.createFile(localPath("created.bin")).build()) {
+            os.write(bytes);
+        }
+
+        assertThat(recordingFs.calls).containsExactly("create");
+    }
+
+    @Test // https://github.com/palantir/hadoop-crypto/issues/105
+    public void testCreateNonRecursiveRoutesThroughCreate() throws IOException {
+        RecordingFileSystem recordingFs = recordingFs();
+
+        try (FSDataOutputStream os = createNonRecursive(recordingFs, localPath("non-recursive.bin"))) {
+            os.write(bytes);
+        }
+
+        assertThat(recordingFs.calls).containsExactly("create");
+    }
+
+    @Test // https://github.com/palantir/hadoop-crypto/issues/105
+    public void testCreateNonRecursiveFailsWhenParentDoesNotExist() throws IOException {
+        RecordingFileSystem recordingFs = recordingFs();
+
+        assertThatExceptionOfType(FileNotFoundException.class)
+                .isThrownBy(() -> createNonRecursive(recordingFs, localPath("missing-parent/child.bin")));
+        assertThat(recordingFs.calls).isEmpty();
+    }
+
+    @Test // https://github.com/palantir/hadoop-crypto/issues/105
+    public void testPrimitiveCreateRoutesThroughCreate() throws IOException {
+        RecordingFileSystem recordingFs = recordingFs();
+
+        try (FSDataOutputStream os = recordingFs.primitiveCreate(
+                localPath("primitive.bin"),
+                FsPermission.getFileDefault(),
+                EnumSet.of(CreateFlag.CREATE),
+                4096,
+                (short) 1,
+                4096,
+                null,
+                null)) {
+            os.write(bytes);
+        }
+
+        assertThat(recordingFs.calls).containsExactly("create");
+    }
+
+    @Test // https://github.com/palantir/hadoop-crypto/issues/105
+    public void testAppendFileBuilderRoutesThroughAppend() throws IOException {
+        RecordingFileSystem recordingFs = recordingFs();
+        Path file = localPath("appended.bin");
+        try (FSDataOutputStream os = recordingFs.createFile(file).build()) {
+            os.write(bytes);
+        }
+        recordingFs.calls.clear();
+
+        try (FSDataOutputStream os = recordingFs.appendFile(file).build()) {
+            os.write(bytes);
+        }
+
+        assertThat(recordingFs.calls).containsExactly("append");
+    }
+
+    @Test // https://github.com/palantir/hadoop-crypto/issues/105
+    public void testOpenFileBuilderRoutesThroughOpen() throws Exception {
+        RecordingFileSystem recordingFs = recordingFs();
+        Path file = localPath("opened.bin");
+        try (FSDataOutputStream os = recordingFs.createFile(file).build()) {
+            os.write(bytes);
+        }
+        recordingFs.calls.clear();
+
+        try (FSDataInputStream is = recordingFs.openFile(file).build().get()) {
+            assertThat(ByteStreams.toByteArray(is)).isEqualTo(bytes);
+        }
+
+        assertThat(recordingFs.calls).containsExactly("open");
+    }
+
+    @Test // https://github.com/palantir/hadoop-crypto/issues/105
+    public void testPathHandlesAreUnsupported() throws IOException {
+        RecordingFileSystem recordingFs = recordingFs();
+        Path file = localPath("handle.bin");
+        try (FSDataOutputStream os = recordingFs.createFile(file).build()) {
+            os.write(bytes);
+        }
+        FileStatus status = recordingFs.getFileStatus(file);
+
+        assertThatExceptionOfType(UnsupportedOperationException.class)
+                .isThrownBy(() -> recordingFs.getPathHandle(status));
+        assertThatExceptionOfType(UnsupportedOperationException.class)
+                .isThrownBy(() -> recordingFs.open(mock(PathHandle.class), 4096));
+    }
+
+    private static FSDataOutputStream createNonRecursive(FileSystem fileSystem, Path path) throws IOException {
+        return fileSystem.createNonRecursive(
+                path, FsPermission.getFileDefault(), EnumSet.of(CreateFlag.CREATE), 4096, (short) 1, 4096, null);
+    }
+
+    private Path localPath(String name) {
+        return new Path(new File(folder, name).getAbsolutePath());
+    }
+
+    private RecordingFileSystem recordingFs() throws IOException {
+        RawLocalFileSystem local = new RawLocalFileSystem();
+        local.initialize(URI.create("file://" + folder.getAbsolutePath()), new Configuration());
+        return new RecordingFileSystem(local);
+    }
+
+    /**
+     * Records which of the {@link DelegatingFileSystem} extension points each entry point funnels into. A subclass
+     * that only overrides these methods must see every create/open/append call, otherwise the raw delegate stream
+     * escapes undecorated.
+     */
+    private static final class RecordingFileSystem extends DelegatingFileSystem {
+
+        private final List<String> calls = new ArrayList<>();
+        private final FileSystem delegate;
+
+        RecordingFileSystem(FileSystem delegate) {
+            super(delegate);
+            this.delegate = delegate;
+        }
+
+        @Override
+        public FSDataInputStream open(Path path, int bufferSize) throws IOException {
+            calls.add("open");
+            return delegate.open(path, bufferSize);
+        }
+
+        @Override
+        public FSDataOutputStream create(
+                Path path,
+                FsPermission permission,
+                boolean overwrite,
+                int bufferSize,
+                short replication,
+                long blockSize,
+                Progressable progress)
+                throws IOException {
+            calls.add("create");
+            return delegate.create(path, permission, overwrite, bufferSize, replication, blockSize, progress);
+        }
+
+        @Override
+        public FSDataOutputStream create(
+                Path path,
+                FsPermission permission,
+                EnumSet<CreateFlag> flags,
+                int bufferSize,
+                short replication,
+                long blockSize,
+                Progressable progress,
+                ChecksumOpt checksumOpt)
+                throws IOException {
+            calls.add("create");
+            return delegate.create(path, permission, flags, bufferSize, replication, blockSize, progress, checksumOpt);
+        }
+
+        @Override
+        public FSDataOutputStream append(Path path, int bufferSize, Progressable progress) throws IOException {
+            calls.add("append");
+            return delegate.append(path, bufferSize, progress);
+        }
     }
 
     private static final class ByteArrayFsInputStream extends FSInputStream {

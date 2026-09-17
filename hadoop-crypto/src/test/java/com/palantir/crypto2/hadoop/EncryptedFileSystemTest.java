@@ -39,6 +39,7 @@ import com.palantir.crypto2.keys.KeyMaterial;
 import com.palantir.crypto2.keys.KeyStorageStrategy;
 import com.palantir.logsafe.SafeArg;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -53,6 +54,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.CreateFlag;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FSDataOutputStream;
+import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.RawLocalFileSystem;
@@ -64,6 +66,7 @@ import org.junit.jupiter.api.io.TempDir;
 public final class EncryptedFileSystemTest {
 
     private static final int MB = 1024 * 1024;
+    private static final byte[] DATA = "some data to encrypt".getBytes(StandardCharsets.UTF_8);
     private static final Random random = new Random();
 
     private EncryptedFileSystem efs;
@@ -403,5 +406,77 @@ public final class EncryptedFileSystemTest {
         FSDataInputStream input = efs.open(path);
         byte[] readBytes = ByteStreams.toByteArray(input);
         assertThat(readBytes).isEqualTo(data);
+    }
+
+    @Test // https://github.com/palantir/hadoop-crypto/issues/105
+    public void testCreateFile_encryptsAndStoresKeyMaterial() throws IOException {
+        Path newFile = new Path(new File(folder, "created-by-builder.bin").getAbsolutePath());
+
+        try (FSDataOutputStream os = efs.createFile(newFile).build()) {
+            os.write(DATA);
+        }
+
+        assertThat(keyStore.get(newFile.toString())).isInstanceOf(KeyMaterial.class);
+        assertThat(ByteStreams.toByteArray(delegateFs.open(newFile))).isNotEqualTo(DATA);
+        assertThat(ByteStreams.toByteArray(efs.open(newFile))).isEqualTo(DATA);
+    }
+
+    @Test // https://github.com/palantir/hadoop-crypto/issues/105
+    public void testCreateNonRecursive_encryptsAndStoresKeyMaterial() throws IOException {
+        Path newFile = new Path(new File(folder, "created-non-recursively.bin").getAbsolutePath());
+
+        try (FSDataOutputStream os = createNonRecursive(newFile)) {
+            os.write(DATA);
+        }
+
+        assertThat(keyStore.get(newFile.toString())).isInstanceOf(KeyMaterial.class);
+        assertThat(ByteStreams.toByteArray(delegateFs.open(newFile))).isNotEqualTo(DATA);
+        assertThat(ByteStreams.toByteArray(efs.open(newFile))).isEqualTo(DATA);
+    }
+
+    @Test // https://github.com/palantir/hadoop-crypto/issues/105
+    public void testCreateNonRecursive_failsWhenParentDoesNotExist() {
+        Path newFile = new Path(new File(folder, "missing-parent/child.bin").getAbsolutePath());
+
+        assertThatExceptionOfType(FileNotFoundException.class).isThrownBy(() -> createNonRecursive(newFile));
+    }
+
+    @Test // https://github.com/palantir/hadoop-crypto/issues/105
+    public void testOpenFile_decrypts() throws Exception {
+        try (FSDataOutputStream os = efs.create(path)) {
+            os.write(DATA);
+        }
+
+        try (FSDataInputStream is = efs.openFile(path).build().get()) {
+            assertThat(ByteStreams.toByteArray(is)).isEqualTo(DATA);
+        }
+    }
+
+    @Test // https://github.com/palantir/hadoop-crypto/issues/105
+    public void testAppendFile_isUnsupported() {
+        assertThatExceptionOfType(UnsupportedOperationException.class)
+                .isThrownBy(() -> efs.appendFile(path).build())
+                .withMessage("appending to encrypted files is not supported");
+    }
+
+    @Test // https://github.com/palantir/hadoop-crypto/issues/105
+    public void testPathHandles_areUnsupported() throws IOException {
+        FileStatus status = efs.getFileStatus(path);
+
+        assertThatLoggableExceptionThrownBy(() -> efs.getPathHandle(status))
+                .isInstanceOf(UnsupportedOperationException.class)
+                .hasLogMessage("Creating a PathHandle is not supported")
+                .hasExactlyArgs(SafeArg.of("fileSystem", "EncryptedFileSystem"));
+    }
+
+    private FSDataOutputStream createNonRecursive(Path newPathToCreate) throws IOException {
+        return efs.createNonRecursive(
+                newPathToCreate,
+                FsPermission.getFileDefault(),
+                EnumSet.of(CreateFlag.CREATE),
+                4096,
+                (short) 1,
+                4096,
+                null);
     }
 }
