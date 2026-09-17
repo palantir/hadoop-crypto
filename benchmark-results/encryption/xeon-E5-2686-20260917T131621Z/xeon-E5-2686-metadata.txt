@@ -1,0 +1,73 @@
+timestamp_utc=20260917T131621Z
+host_label=xeon-E5-2686
+git_commit=adb6d13871f658bac51e01ca18b5aea224d8fd32
+git_describe=3.11.0-4-gadb6d13-dirty
+git_status:
+ M gradle/wrapper/gradle-wrapper.properties
+ M versions.lock
+ M versions.props
+?? Process
+?? benchmark-encryption.sh
+?? benchmark-results/encryption/xeon-E5-2686-20260917T131621Z/
+uname=Linux il-pg-alpha-5322425.use1.palantir.global 5.15.0-1077-aws #84~20.04.1-Ubuntu SMP Mon Jan 20 22:14:54 UTC 2025 x86_64 x86_64 x86_64 GNU/Linux
+
+JDK 21:
+openjdk version "21.0.3" 2024-04-16 LTS
+OpenJDK Runtime Environment Corretto-21.0.3.9.1 (build 21.0.3+9-LTS)
+OpenJDK 64-Bit Server VM Corretto-21.0.3.9.1 (build 21.0.3+9-LTS, mixed mode, sharing)
+
+JDK 25:
+openjdk version "25.0.4.1" 2026-08-18 LTS
+OpenJDK Runtime Environment Corretto-25.0.4.8.1 (build 25.0.4.1+8-LTS)
+OpenJDK 64-Bit Server VM Corretto-25.0.4.8.1 (build 25.0.4.1+8-LTS, mixed mode, sharing)
+
+OpenSSL:
+OpenSSL 1.1.1f  31 Mar 2020
+built on: Wed Feb  5 13:26:48 2025 UTC
+platform: debian-amd64
+options:  bn(64,64) rc4(16x,int) des(int) blowfish(ptr) 
+compiler: gcc -fPIC -pthread -m64 -Wa,--noexecstack -Wall -Wa,--noexecstack -g -O2 -fdebug-prefix-map=/build/openssl-zfps2k/openssl-1.1.1f=. -fstack-protector-strong -Wformat -Werror=format-security -DOPENSSL_TLS_SECURITY_LEVEL=2 -DOPENSSL_USE_NODELETE -DL_ENDIAN -DOPENSSL_PIC -DOPENSSL_CPUID_OBJ -DOPENSSL_IA32_SSE2 -DOPENSSL_BN_ASM_MONT -DOPENSSL_BN_ASM_MONT5 -DOPENSSL_BN_ASM_GF2m -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM -DKECCAK1600_ASM -DRC4_ASM -DMD5_ASM -DAESNI_ASM -DVPAES_ASM -DGHASH_ASM -DECP_NISTZ256_ASM -DX25519_ASM -DPOLY1305_ASM -DNDEBUG -Wdate-time -D_FORTIFY_SOURCE=2
+OPENSSLDIR: "/usr/lib/ssl"
+ENGINESDIR: "/usr/lib/x86_64-linux-gnu/engines-1.1"
+Seeding source: os-specific
+
+CPU:
+Architecture:                         x86_64
+CPU op-mode(s):                       32-bit, 64-bit
+Byte Order:                           Little Endian
+Address sizes:                        46 bits physical, 48 bits virtual
+CPU(s):                               4
+On-line CPU(s) list:                  0-3
+Thread(s) per core:                   2
+Core(s) per socket:                   2
+Socket(s):                            1
+NUMA node(s):                         1
+Vendor ID:                            GenuineIntel
+CPU family:                           6
+Model:                                79
+Model name:                           Intel(R) Xeon(R) CPU E5-2686 v4 @ 2.30GHz
+Stepping:                             1
+CPU MHz:                              2299.998
+BogoMIPS:                             4599.99
+Hypervisor vendor:                    Xen
+Virtualization type:                  full
+L1d cache:                            64 KiB
+L1i cache:                            64 KiB
+L2 cache:                             512 KiB
+L3 cache:                             45 MiB
+NUMA node0 CPU(s):                    0-3
+Vulnerability Gather data sampling:   Not affected
+Vulnerability Itlb multihit:          KVM: Mitigation: VMX unsupported
+Vulnerability L1tf:                   Mitigation; PTE Inversion
+Vulnerability Mds:                    Vulnerable: Clear CPU buffers attempted, no microcode; SMT Host state unknown
+Vulnerability Meltdown:               Mitigation; PTI
+Vulnerability Mmio stale data:        Vulnerable: Clear CPU buffers attempted, no microcode; SMT Host state unknown
+Vulnerability Reg file data sampling: Not affected
+Vulnerability Retbleed:               Not affected
+Vulnerability Spec rstack overflow:   Not affected
+Vulnerability Spec store bypass:      Vulnerable
+Vulnerability Spectre v1:             Mitigation; usercopy/swapgs barriers and __user pointer sanitization
+Vulnerability Spectre v2:             Mitigation; Retpolines; STIBP disabled; RSB filling; PBRSB-eIBRS Not affected; BHI Retpoline
+Vulnerability Srbds:                  Not affected
+Vulnerability Tsx async abort:        Not affected
+Flags:                                fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx pdpe1gb rdtscp lm constant_tsc rep_good nopl xtopology cpuid tsc_known_freq pni pclmulqdq ssse3 fma cx16 pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand hypervisor lahf_lm abm invpcid_single pti fsgsbase bmi1 avx2 smep bmi2 erms invpcid xsaveopt
