@@ -6,7 +6,6 @@ dependencies {
     api 'com.google.guava:guava'
     api 'com.palantir.seek-io:seek-io'
 
-    implementation 'com.palantir.safe-logging:logger'
     implementation 'com.palantir.safe-logging:preconditions'
     implementation 'com.palantir.safe-logging:safe-logging'
 
