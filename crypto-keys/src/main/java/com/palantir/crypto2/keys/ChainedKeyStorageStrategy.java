@@ -72,8 +72,9 @@ public final class ChainedKeyStorageStrategy implements KeyStorageStrategy {
         RuntimeException toThrow = new SafeRuntimeException(
                 "Unable to get key material for key using any of the provided strategies",
                 UnsafeArg.of("fileKey", fileKey),
-                SafeArg.of("strategies", Collections2.transform(strategies, s -> s.getClass()
-                        .getCanonicalName())));
+                SafeArg.of(
+                        "strategies",
+                        Collections2.transform(strategies, s -> s.getClass().getCanonicalName())));
         suppressedExceptions.forEach(toThrow::addSuppressed);
         throw toThrow;
     }

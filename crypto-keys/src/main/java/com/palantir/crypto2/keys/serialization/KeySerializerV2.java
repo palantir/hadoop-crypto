@@ -16,11 +16,11 @@
 
 package com.palantir.crypto2.keys.serialization;
 
-import com.google.common.base.Throwables;
 import com.palantir.crypto2.keys.KeyMaterial;
 import com.palantir.logsafe.Preconditions;
 import com.palantir.logsafe.SafeArg;
 import com.palantir.logsafe.exceptions.SafeRuntimeException;
+import com.palantir.logsafe.exceptions.SafeUncheckedIoException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
@@ -80,8 +80,10 @@ enum KeySerializerV2 implements KeySerializer {
 
             stream.close();
             return byteStream.toByteArray();
-        } catch (IOException | InvalidKeyException | IllegalBlockSizeException e) {
-            throw Throwables.propagate(e);
+        } catch (IOException e) {
+            throw new SafeUncheckedIoException("Unable to wrap key", e);
+        } catch (InvalidKeyException | IllegalBlockSizeException e) {
+            throw new SafeRuntimeException("Unable to wrap key", e);
         }
     }
 

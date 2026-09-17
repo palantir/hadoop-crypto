@@ -16,7 +16,7 @@
 
 package com.palantir.crypto2.hadoop;
 
-import com.palantir.logsafe.exceptions.SafeRuntimeException;
+import com.palantir.logsafe.exceptions.SafeUncheckedIoException;
 import java.io.IOException;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.BlockLocation;
@@ -40,7 +40,7 @@ public abstract class DelegatingFileSystem extends FilterFileSystem {
         try {
             super.initialize(delegate.getUri(), delegate.getConf());
         } catch (IOException e) {
-            throw new SafeRuntimeException("Failed to initialize the delegating filesystem", e);
+            throw new SafeUncheckedIoException("Failed to initialize the delegating filesystem", e);
         }
     }
 

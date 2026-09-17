@@ -16,8 +16,8 @@
 
 package com.palantir.crypto2.keys.serialization;
 
-import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableMap;
+import com.palantir.logsafe.exceptions.SafeRuntimeException;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
@@ -42,7 +42,7 @@ final class KeySerializers {
             cipher.init(cipherMode, key);
             return cipher;
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException e) {
-            throw Throwables.propagate(e);
+            throw new SafeRuntimeException("Unable to initialize key cipher", e);
         }
     }
 

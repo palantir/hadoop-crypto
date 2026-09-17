@@ -16,10 +16,11 @@
 
 package com.palantir.crypto2.keys.serialization;
 
-import com.google.common.base.Throwables;
 import com.palantir.crypto2.keys.KeyMaterial;
 import com.palantir.logsafe.Preconditions;
 import com.palantir.logsafe.SafeArg;
+import com.palantir.logsafe.exceptions.SafeRuntimeException;
+import com.palantir.logsafe.exceptions.SafeUncheckedIoException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
@@ -76,8 +77,10 @@ enum KeySerializerV1 implements KeySerializer {
 
             stream.close();
             return stream.toByteArray();
-        } catch (IOException | InvalidKeyException | IllegalBlockSizeException e) {
-            throw Throwables.propagate(e);
+        } catch (IOException e) {
+            throw new SafeUncheckedIoException("Unable to wrap key", e);
+        } catch (InvalidKeyException | IllegalBlockSizeException e) {
+            throw new SafeRuntimeException("Unable to wrap key", e);
         }
     }
 
@@ -109,8 +112,10 @@ enum KeySerializerV1 implements KeySerializer {
             String algorithm = new String(algorithmBytes, StandardCharsets.UTF_8);
             SecretKey secretKey = (SecretKey) keyUnwrappingCipher.unwrap(secretKeyBytes, algorithm, Cipher.SECRET_KEY);
             return KeyMaterial.of(secretKey, iv);
-        } catch (InvalidKeyException | NoSuchAlgorithmException | IOException e) {
-            throw Throwables.propagate(e);
+        } catch (IOException e) {
+            throw new SafeUncheckedIoException("Unwrapping failed", e);
+        } catch (InvalidKeyException | NoSuchAlgorithmException e) {
+            throw new SafeRuntimeException("Unwrapping failed", e);
         }
     }
 

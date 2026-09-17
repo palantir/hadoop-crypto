@@ -16,7 +16,7 @@
 
 package com.palantir.crypto2.hadoop;
 
-import com.google.common.base.Throwables;
+import com.palantir.logsafe.exceptions.SafeRuntimeException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
@@ -40,7 +40,7 @@ public final class TestKeyPairs {
             keyGen = KeyPairGenerator.getInstance("RSA");
             random = SecureRandom.getInstance("SHA1PRNG", "SUN");
         } catch (NoSuchAlgorithmException | NoSuchProviderException e) {
-            throw Throwables.propagate(e);
+            throw new SafeRuntimeException("Unable to generate test key pair", e);
         }
         keyGen.initialize(keysize, random);
         return keyGen.generateKeyPair();

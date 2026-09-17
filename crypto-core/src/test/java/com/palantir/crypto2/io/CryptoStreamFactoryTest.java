@@ -51,13 +51,17 @@ public final class CryptoStreamFactoryTest {
 
     @Test
     @EnabledOnOs(OS.LINUX)
-    public void ensureDefaultIsApache() {
-        OutputStream encrypted = CryptoStreamFactory.encrypt(null, keyMaterial, AesCtrCipher.ALGORITHM);
-        SeekableInput decrypted =
-                CryptoStreamFactory.decrypt((SeekableInput) null, keyMaterial, AesCtrCipher.ALGORITHM);
-
-        assertThat(encrypted).isInstanceOf(CtrCryptoOutputStream.class);
-        assertThat(decrypted).isInstanceOf(CtrCryptoInputStream.class);
+    public void ensureDefaultIsApache() throws IOException {
+        assertThat(CryptoStreamFactory.isOpenSslAvailable())
+                .as("OpenSSL available")
+                .isTrue();
+        try (OutputStream encrypted =
+                        CryptoStreamFactory.encrypt(new ByteArrayOutputStream(), keyMaterial, AesCtrCipher.ALGORITHM);
+                SeekableInput decrypted = CryptoStreamFactory.decrypt(
+                        new InMemorySeekableDataInput(new byte[0]), keyMaterial, AesCtrCipher.ALGORITHM)) {
+            assertThat(encrypted).isInstanceOf(CtrCryptoOutputStream.class);
+            assertThat(decrypted).isInstanceOf(CtrCryptoInputStream.class);
+        }
     }
 
     @Test

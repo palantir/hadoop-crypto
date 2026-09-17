@@ -18,10 +18,10 @@ package com.palantir.crypto2.keys.serialization;
 
 import static com.palantir.logsafe.Preconditions.checkArgument;
 
-import com.google.common.base.Throwables;
 import com.palantir.crypto2.keys.KeyMaterial;
 import com.palantir.logsafe.SafeArg;
 import com.palantir.logsafe.exceptions.SafeRuntimeException;
+import com.palantir.logsafe.exceptions.SafeUncheckedIoException;
 import com.palantir.logsafe.logger.SafeLogger;
 import com.palantir.logsafe.logger.SafeLoggerFactory;
 import java.io.ByteArrayInputStream;
@@ -58,7 +58,7 @@ public final class KeyMaterials {
             keyGen.init(getSafeKeyLength(keyAlgorithm, keySize));
             return keyGen.generateKey();
         } catch (NoSuchAlgorithmException | InvalidKeyException e) {
-            throw Throwables.propagate(e);
+            throw new SafeRuntimeException("Unable to generate key", e);
         }
     }
 
@@ -121,7 +121,7 @@ public final class KeyMaterials {
             DataInputStream stream = new DataInputStream(new ByteArrayInputStream(wrappedKeyMaterial));
             return stream.read();
         } catch (IOException e) {
-            throw new SafeRuntimeException("Unable to read version from wrapped key", e);
+            throw new SafeUncheckedIoException("Unable to read version from wrapped key", e);
         }
     }
 
@@ -140,7 +140,7 @@ public final class KeyMaterials {
         try {
             maxAllowedKeyLength = Cipher.getMaxAllowedKeyLength(algorithm);
         } catch (NoSuchAlgorithmException e) {
-            throw Throwables.propagate(e);
+            throw new SafeRuntimeException("Unable to determine maximum key length", e);
         }
         int safeSize = Math.min(maxAllowedKeyLength, desiredLength);
         if (safeSize < desiredLength) {

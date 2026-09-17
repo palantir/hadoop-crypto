@@ -20,6 +20,10 @@ import static com.palantir.logsafe.testing.Assertions.assertThatLoggableExceptio
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyShort;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
@@ -48,6 +52,7 @@ import java.util.Random;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.CreateFlag;
 import org.apache.hadoop.fs.FSDataInputStream;
+import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.RawLocalFileSystem;
@@ -95,6 +100,9 @@ public final class EncryptedFileSystemTest {
         when(mockFs.getConf()).thenReturn(new Configuration());
         when(mockFs.getUri()).thenReturn(URI.create("foo://bar"));
         when(mockFs.rename(any(Path.class), any(Path.class))).thenReturn(true);
+        when(mockFs.create(
+                        any(Path.class), any(FsPermission.class), anyBoolean(), anyInt(), anyShort(), anyLong(), any()))
+                .thenReturn(mock(FSDataOutputStream.class));
         when(mockKeyStore.get(anyString())).thenReturn(keyMaterial);
 
         mockedEfs = new EncryptedFileSystem(mockFs, mockKeyStore);

@@ -16,12 +16,12 @@
 
 package com.palantir.crypto2.cipher;
 
-import com.google.common.base.Throwables;
 import com.palantir.crypto2.keys.KeyMaterial;
 import com.palantir.crypto2.keys.serialization.KeyMaterials;
 import com.palantir.logsafe.Preconditions;
 import com.palantir.logsafe.SafeArg;
 import com.palantir.logsafe.exceptions.SafeIllegalArgumentException;
+import com.palantir.logsafe.exceptions.SafeRuntimeException;
 import java.math.BigInteger;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -64,7 +64,7 @@ public final class AesCtrCipher implements SeekableCipher {
             cipher.init(opmode, key, new IvParameterSpec(initIv));
             return cipher;
         } catch (InvalidKeyException | InvalidAlgorithmParameterException e) {
-            throw Throwables.propagate(e);
+            throw new SafeRuntimeException("Unable to initialize AES/CTR cipher", e);
         }
     }
 
@@ -99,7 +99,7 @@ public final class AesCtrCipher implements SeekableCipher {
         try {
             cipher.init(currentOpmode, key, newIv);
         } catch (InvalidKeyException | InvalidAlgorithmParameterException e) {
-            throw Throwables.propagate(e);
+            throw new SafeRuntimeException("Unable to seek AES/CTR cipher", e);
         }
 
         // Skip to the byte offset in the block where 'pos' is located
@@ -128,7 +128,7 @@ public final class AesCtrCipher implements SeekableCipher {
         try {
             return Cipher.getInstance(ALGORITHM, PROVIDER);
         } catch (NoSuchAlgorithmException | NoSuchProviderException | NoSuchPaddingException e) {
-            throw Throwables.propagate(e);
+            throw new SafeRuntimeException("Unable to create AES/CTR cipher", e);
         }
     }
 }
