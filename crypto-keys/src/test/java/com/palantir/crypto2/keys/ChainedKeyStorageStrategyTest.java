@@ -23,6 +23,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
+import com.google.common.collect.ImmutableSet;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
@@ -47,6 +49,19 @@ public final class ChainedKeyStorageStrategyTest {
         when(failingStrategy.get(key)).thenThrow(new IllegalArgumentException());
 
         chained = new ChainedKeyStorageStrategy(successfulStrategy, failingStrategy);
+    }
+
+    @Test // https://github.com/palantir/hadoop-crypto/issues/117
+    public void testBatchRemoveDispatchedToEveryStrategy() {
+        Set<String> fileKeys = ImmutableSet.of("one", "two");
+
+        chained.remove(fileKeys);
+
+        InOrder inOrder = inOrder(successfulStrategy, failingStrategy);
+        // Each strategy receives the whole batch, rather than one remove(String) per key per strategy.
+        inOrder.verify(successfulStrategy).remove(fileKeys);
+        inOrder.verify(failingStrategy).remove(fileKeys);
+        verifyNoMoreInteractions(successfulStrategy, failingStrategy);
     }
 
     @Test

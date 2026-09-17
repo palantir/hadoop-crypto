@@ -17,6 +17,7 @@
 package com.palantir.crypto2.hadoop;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableSet;
 import com.palantir.crypto2.cipher.AesCtrCipher;
 import com.palantir.crypto2.cipher.SeekableCipher;
 import com.palantir.crypto2.cipher.SeekableCipherFactory;
@@ -30,15 +31,20 @@ import com.palantir.logsafe.exceptions.SafeIllegalStateException;
 import com.palantir.logsafe.exceptions.SafeUnsupportedOperationException;
 import com.palantir.logsafe.logger.SafeLogger;
 import com.palantir.logsafe.logger.SafeLoggerFactory;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.EnumSet;
 import java.util.Optional;
+import java.util.Set;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.CreateFlag;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FSDataOutputStream;
+import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Options.ChecksumOpt;
 import org.apache.hadoop.fs.Path;
@@ -167,15 +173,81 @@ public final class EncryptedFileSystem extends DelegatingFileSystem {
         }
     }
 
+    /**
+     * Deletes {@code path}, removing the {@link KeyMaterial} of every encrypted file that is deleted.
+     * <p>
+     * A recursive delete enumerates the tree so that the KeyMaterial for each file can be removed from the
+     * {@link KeyStorageStrategy} before the data itself is deleted. Removing KeyMaterial is best effort: a failure is
+     * logged and the data is deleted regardless, which matches the non recursive behaviour.
+     * <p>
+     * Strategies which store KeyMaterial inside the FileSystem holding the encrypted data, such as
+     * {@link FileKeyStorageStrategy}, have their key files enumerated as well. Removing the KeyMaterial of a key
+     * material file is a no-op, and the key files are deleted along with the rest of the tree.
+     */
     @Override
     public boolean delete(Path path, boolean recursive) throws IOException {
-        if (recursive) {
-            throw new SafeUnsupportedOperationException("EncryptedFileSystem does not support recursive deletes");
+        // Interrupted deletes should be resumable. They are expected to be retried.
+        if (!recursive) {
+            tryRemoveKey(path);
+            return fs.delete(path, false);
         }
 
-        // Interrupted deletes should be resumable. They are expected to be retried.
-        tryRemoveKey(path);
-        return fs.delete(path, false);
+        // The KeyMaterial is removed before the data so that an interrupted delete remains resumable: the encrypted
+        // files are still present, so the file keys that are left can be enumerated and removed again on a retry.
+        tryRemoveKeys(listFileKeys(path));
+        return fs.delete(path, true);
+    }
+
+    /**
+     * Returns the file key of every file in the tree rooted at {@code path}, or an empty set if {@code path} does not
+     * exist.
+     * <p>
+     * Child paths are resolved against {@code path} rather than taken from the {@link FileStatus}, which reports a
+     * fully qualified path. {@link #create} stores KeyMaterial under the path as spelled by the caller, so resolving
+     * against {@code path} is what produces the file keys the KeyStorageStrategy was actually populated with.
+     */
+    private Set<String> listFileKeys(Path path) throws IOException {
+        FileStatus status;
+        try {
+            status = fs.getFileStatus(path);
+        } catch (FileNotFoundException e) {
+            return ImmutableSet.of();
+        }
+
+        if (status.isFile()) {
+            return ImmutableSet.of(path.toString());
+        }
+
+        ImmutableSet.Builder<String> fileKeys = ImmutableSet.builder();
+        Deque<Path> directories = new ArrayDeque<>();
+        directories.add(path);
+        while (!directories.isEmpty()) {
+            Path directory = directories.removeFirst();
+            for (FileStatus child : fs.listStatus(directory)) {
+                Path childPath = new Path(directory, child.getPath().getName());
+                if (child.isDirectory()) {
+                    directories.add(childPath);
+                } else {
+                    fileKeys.add(childPath.toString());
+                }
+            }
+        }
+        return fileKeys.build();
+    }
+
+    private void tryRemoveKeys(Set<String> fileKeys) {
+        if (fileKeys.isEmpty()) {
+            return;
+        }
+
+        try {
+            keyStore.remove(fileKeys);
+        } catch (Exception e) {
+            log.warn(
+                    "Unable to remove KeyMaterial for one or more files",
+                    SafeArg.of("numFileKeys", fileKeys.size()),
+                    e);
+        }
     }
 
     @Override

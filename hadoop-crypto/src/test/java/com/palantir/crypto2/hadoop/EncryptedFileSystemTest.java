@@ -349,13 +349,84 @@ public final class EncryptedFileSystemTest {
         assertThat(keyStore.get(path.toString())).isNull();
     }
 
-    @Test
+    @Test // https://github.com/palantir/hadoop-crypto/issues/117
     public void testDelete_recursiveDelete() throws IOException {
-        Path folderPath = new Path(folder.getAbsolutePath());
+        Path root = new Path(new File(folder, "tree").getAbsolutePath());
+        Path topLevelFile = new Path(root, "top.bin");
+        Path nestedFile = new Path(new Path(root, "nested"), "nested.bin");
+        Path deeplyNestedFile = new Path(new Path(new Path(root, "nested"), "deeper"), "deep.bin");
+        createEncryptedFile(topLevelFile);
+        createEncryptedFile(nestedFile);
+        createEncryptedFile(deeplyNestedFile);
 
-        assertThatExceptionOfType(UnsupportedOperationException.class)
-                .isThrownBy(() -> efs.delete(folderPath, true))
-                .withMessage("EncryptedFileSystem does not support recursive deletes");
+        assertThat(efs.delete(root, true)).isTrue();
+
+        assertThat(efs.exists(root)).isFalse();
+        assertThat(keyStore.get(topLevelFile.toString())).isNull();
+        assertThat(keyStore.get(nestedFile.toString())).isNull();
+        assertThat(keyStore.get(deeplyNestedFile.toString())).isNull();
+    }
+
+    @Test // https://github.com/palantir/hadoop-crypto/issues/117
+    public void testDelete_recursiveDeleteOfSingleFile() throws IOException {
+        assertThat(efs.delete(path, true)).isTrue();
+
+        assertThat(efs.exists(path)).isFalse();
+        assertThat(keyStore.get(path.toString())).isNull();
+    }
+
+    @Test // https://github.com/palantir/hadoop-crypto/issues/117
+    public void testDelete_recursiveDeleteOfMissingPath() throws IOException {
+        Path missing = new Path(new File(folder, "does-not-exist").getAbsolutePath());
+
+        assertThat(efs.delete(missing, true)).isFalse();
+    }
+
+    @Test // https://github.com/palantir/hadoop-crypto/issues/117
+    public void testDelete_recursiveDeleteContinuesWhenKeyMaterialIsAlreadyGone() throws IOException {
+        Path root = new Path(new File(folder, "tree").getAbsolutePath());
+        Path first = new Path(root, "first.bin");
+        Path second = new Path(root, "second.bin");
+        createEncryptedFile(first);
+        createEncryptedFile(second);
+
+        // InMemoryKeyStorageStrategy throws when removing a key which is not present, mimicking a store which has
+        // already had this key removed by an interrupted delete.
+        keyStore.remove(first.toString());
+
+        assertThat(efs.delete(root, true)).isTrue();
+
+        assertThat(efs.exists(root)).isFalse();
+        assertThat(keyStore.get(second.toString())).isNull();
+    }
+
+    @Test // https://github.com/palantir/hadoop-crypto/issues/117
+    public void testDelete_recursiveDeleteWithFileKeyStorageStrategy() throws IOException {
+        // FileKeyStorageStrategy stores KeyMaterial alongside the encrypted data, so the recursive listing also
+        // turns up the .keymaterial files themselves. Removing "key material for key material" is a no-op, and the
+        // delegate's recursive delete removes the .keymaterial files along with the data.
+        FileKeyStorageStrategy fileKeyStore = new FileKeyStorageStrategy(delegateFs, TestKeyPairs.generateKeyPair());
+        EncryptedFileSystem fileKeyEfs = new EncryptedFileSystem(delegateFs, fileKeyStore);
+
+        Path root = new Path(new File(folder, "file-key-tree").getAbsolutePath());
+        Path nestedFile = new Path(new Path(root, "nested"), "nested.bin");
+        try (OutputStream os = fileKeyEfs.create(nestedFile)) {
+            os.write(0x00);
+        }
+        Path keyMaterialPath = nestedFile.suffix(FileKeyStorageStrategy.EXTENSION);
+        assertThat(delegateFs.exists(keyMaterialPath)).isTrue();
+
+        assertThat(fileKeyEfs.delete(root, true)).isTrue();
+
+        assertThat(delegateFs.exists(root)).isFalse();
+        assertThat(delegateFs.exists(keyMaterialPath)).isFalse();
+    }
+
+    private void createEncryptedFile(Path filePath) throws IOException {
+        try (OutputStream os = efs.create(filePath)) {
+            os.write(0x00);
+        }
+        assertThat(keyStore.get(filePath.toString())).isInstanceOf(KeyMaterial.class);
     }
 
     @Test

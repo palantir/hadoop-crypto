@@ -27,6 +27,7 @@ import com.palantir.logsafe.logger.SafeLoggerFactory;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Wrapper that allows ordered usage of multiple {@link KeyStorageStrategy}s. {@link #put} dispatches to every storage
@@ -83,6 +84,17 @@ public final class ChainedKeyStorageStrategy implements KeyStorageStrategy {
     public void remove(String fileKey) {
         for (KeyStorageStrategy strategy : strategies) {
             strategy.remove(fileKey);
+        }
+    }
+
+    /**
+     * Dispatches the batch to every storage strategy so that each one keeps the opportunity to remove the keys in a
+     * single call, rather than degrading to one {@link #remove(String)} per file key per strategy.
+     */
+    @Override
+    public void remove(Set<String> fileKeys) {
+        for (KeyStorageStrategy strategy : strategies) {
+            strategy.remove(fileKeys);
         }
     }
 }
