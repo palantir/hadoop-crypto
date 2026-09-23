@@ -1,0 +1,97 @@
+# JMH version: 1.37
+# VM version: JDK 21.0.12.1, OpenJDK 64-Bit Server VM, 21.0.12.1+9-LTS
+# VM invoker: /opt/amazon-corretto-21.0.12.9.1-linux-x64/bin/java
+# VM options: -Xmx1024m -Dfile.encoding=UTF-8 -Duser.country=US -Duser.language=en -Duser.variant
+# Blackhole mode: compiler (auto-detected, use -Djmh.blackhole.autoDetect=false to disable)
+# Warmup: 2 iterations, 25 s each
+# Measurement: 5 iterations, 3 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Throughput, ops/time
+# Benchmark: com.palantir.crypto2.jmh.EncryptionBenchmark.jdkEncrypt
+# Parameters: (numBytes = 1048576, writeStrategy = ENTIRE_BUFFER)
+
+# Run progress: 0.00% complete, ETA 00:01:05
+# Fork: 1 of 1
+# Warmup Iteration   1: 1149.837 ops/s
+# Warmup Iteration   2: 2096.785 ops/s
+Iteration   1: 2075.985 ops/s
+                 gc.alloc.rate:      6233.392 MB/sec
+                 gc.alloc.rate.norm: 3148929.115 B/op
+                 gc.count:           171.000 counts
+                 gc.time:            148.000 ms
+
+Iteration   2: 2103.439 ops/s
+                 gc.alloc.rate:      6316.129 MB/sec
+                 gc.alloc.rate.norm: 3148929.100 B/op
+                 gc.count:           173.000 counts
+                 gc.time:            147.000 ms
+
+Iteration   3: 2103.446 ops/s
+                 gc.alloc.rate:      6315.701 MB/sec
+                 gc.alloc.rate.norm: 3148929.095 B/op
+                 gc.count:           173.000 counts
+                 gc.time:            149.000 ms
+
+Iteration   4: 2108.421 ops/s
+                 gc.alloc.rate:      6330.922 MB/sec
+                 gc.alloc.rate.norm: 3148929.119 B/op
+                 gc.count:           173.000 counts
+                 gc.time:            147.000 ms
+
+Iteration   5: 2115.236 ops/s
+                 gc.alloc.rate:      6351.379 MB/sec
+                 gc.alloc.rate.norm: 3148929.094 B/op
+                 gc.count:           174.000 counts
+                 gc.time:            147.000 ms
+
+
+
+Result "com.palantir.crypto2.jmh.EncryptionBenchmark.jdkEncrypt":
+  2101.305 ±(99.9%) 57.597 ops/s [Average]
+  (min, avg, max) = (2075.985, 2101.305, 2115.236), stdev = 14.958
+  CI (99.9%): [2043.708, 2158.902] (assumes normal distribution)
+
+Secondary result "com.palantir.crypto2.jmh.EncryptionBenchmark.jdkEncrypt:gc.alloc.rate":
+  6309.504 ±(99.9%) 173.147 MB/sec [Average]
+  (min, avg, max) = (6233.392, 6309.504, 6351.379), stdev = 44.966
+  CI (99.9%): [6136.358, 6482.651] (assumes normal distribution)
+
+Secondary result "com.palantir.crypto2.jmh.EncryptionBenchmark.jdkEncrypt:gc.alloc.rate.norm":
+  3148929.105 ±(99.9%) 0.044 B/op [Average]
+  (min, avg, max) = (3148929.094, 3148929.105, 3148929.119), stdev = 0.012
+  CI (99.9%): [3148929.060, 3148929.149] (assumes normal distribution)
+
+Secondary result "com.palantir.crypto2.jmh.EncryptionBenchmark.jdkEncrypt:gc.count":
+  864.000 ±(99.9%) 0.001 counts [Sum]
+  (min, avg, max) = (171.000, 172.800, 174.000), stdev = 1.095
+  CI (99.9%): [864.000, 864.000] (assumes normal distribution)
+
+Secondary result "com.palantir.crypto2.jmh.EncryptionBenchmark.jdkEncrypt:gc.time":
+  738.000 ±(99.9%) 0.001 ms [Sum]
+  (min, avg, max) = (147.000, 147.600, 149.000), stdev = 0.894
+  CI (99.9%): [738.000, 738.000] (assumes normal distribution)
+
+
+# Run complete. Total time: 00:01:05
+
+REMEMBER: The numbers below are just data. To gain reusable insights, you need to follow up on
+why the numbers are the way they are. Use profilers (see -prof, -lprof), design factorial
+experiments, perform baseline and negative tests that provide experimental control, make sure
+the benchmarking environment is safe on JVM/OS/HW level, ask for reviews from the domain experts.
+Do not assume the numbers tell you what you want them to tell.
+
+NOTE: Current JVM experimentally supports Compiler Blackholes, and they are in use. Please exercise
+extra caution when trusting the results, look into the generated code to check the benchmark still
+works, and factor in a small probability of new VM bugs. Additionally, while comparisons between
+different JVMs are already problematic, the performance difference caused by different Blackhole
+modes can be very significant. Please make sure you use the consistent Blackhole mode for comparisons.
+
+Benchmark                                          (numBytes)  (writeStrategy)   Mode  Cnt        Score     Error   Units
+EncryptionBenchmark.jdkEncrypt                        1048576    ENTIRE_BUFFER  thrpt    5     2101.305 ±  57.597   ops/s
+EncryptionBenchmark.jdkEncrypt:gc.alloc.rate          1048576    ENTIRE_BUFFER  thrpt    5     6309.504 ± 173.147  MB/sec
+EncryptionBenchmark.jdkEncrypt:gc.alloc.rate.norm     1048576    ENTIRE_BUFFER  thrpt    5  3148929.105 ±   0.044    B/op
+EncryptionBenchmark.jdkEncrypt:gc.count               1048576    ENTIRE_BUFFER  thrpt    5      864.000            counts
+EncryptionBenchmark.jdkEncrypt:gc.time                1048576    ENTIRE_BUFFER  thrpt    5      738.000                ms
+
+Benchmark result is saved to /home/coder/git/hadoop-crypto/benchmark-results/encryption/jdk21-steady-state.json

@@ -1,0 +1,247 @@
+# JMH version: 1.37
+# VM version: JDK 21.0.12.1, OpenJDK 64-Bit Server VM, 21.0.12.1+9-LTS
+# VM invoker: /opt/amazon-corretto-21.0.12.9.1-linux-x64/bin/java
+# VM options: -Xmx1024m -Dfile.encoding=UTF-8 -Duser.country=US -Duser.language=en -Duser.variant
+# Blackhole mode: compiler (auto-detected, use -Djmh.blackhole.autoDetect=false to disable)
+# Warmup: 2 iterations, 2 s each
+# Measurement: 5 iterations, 3 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Throughput, ops/time
+# Benchmark: com.palantir.crypto2.jmh.EncryptionBenchmark.jdkEncrypt
+# Parameters: (numBytes = 1048576, writeStrategy = ENTIRE_BUFFER)
+
+# Run progress: 0.00% complete, ETA 00:01:16
+# Fork: 1 of 2
+# Warmup Iteration   1: 249.312 ops/s
+# Warmup Iteration   2: 261.664 ops/s
+Iteration   1: 263.245 ops/s
+                 gc.alloc.rate:      790.561 MB/sec
+                 gc.alloc.rate.norm: 3149511.068 B/op
+                 gc.count:           21.000 counts
+                 gc.time:            19.000 ms
+
+Iteration   2: 271.105 ops/s
+                 gc.alloc.rate:      814.146 MB/sec
+                 gc.alloc.rate.norm: 3149304.531 B/op
+                 gc.count:           23.000 counts
+                 gc.time:            20.000 ms
+
+Iteration   3: 266.780 ops/s
+                 gc.alloc.rate:      801.111 MB/sec
+                 gc.alloc.rate.norm: 3149305.218 B/op
+                 gc.count:           21.000 counts
+                 gc.time:            21.000 ms
+
+Iteration   4: 1885.381 ops/s
+                 gc.alloc.rate:      5660.824 MB/sec
+                 gc.alloc.rate.norm: 3149010.489 B/op
+                 gc.count:           155.000 counts
+                 gc.time:            138.000 ms
+
+Iteration   5: 1950.715 ops/s
+                 gc.alloc.rate:      5856.738 MB/sec
+                 gc.alloc.rate.norm: 3148929.186 B/op
+                 gc.count:           161.000 counts
+                 gc.time:            143.000 ms
+
+
+# Run progress: 25.00% complete, ETA 00:00:58
+# Fork: 2 of 2
+# Warmup Iteration   1: 249.997 ops/s
+# Warmup Iteration   2: 262.855 ops/s
+Iteration   1: 262.542 ops/s
+                 gc.alloc.rate:      788.465 MB/sec
+                 gc.alloc.rate.norm: 3149510.193 B/op
+                 gc.count:           21.000 counts
+                 gc.time:            21.000 ms
+
+Iteration   2: 268.364 ops/s
+                 gc.alloc.rate:      805.932 MB/sec
+                 gc.alloc.rate.norm: 3149304.615 B/op
+                 gc.count:           22.000 counts
+                 gc.time:            19.000 ms
+
+Iteration   3: 264.134 ops/s
+                 gc.alloc.rate:      793.164 MB/sec
+                 gc.alloc.rate.norm: 3149305.311 B/op
+                 gc.count:           22.000 counts
+                 gc.time:            22.000 ms
+
+Iteration   4: 1777.734 ops/s
+                 gc.alloc.rate:      5337.683 MB/sec
+                 gc.alloc.rate.norm: 3149016.312 B/op
+                 gc.count:           146.000 counts
+                 gc.time:            130.000 ms
+
+Iteration   5: 1967.716 ops/s
+                 gc.alloc.rate:      5907.977 MB/sec
+                 gc.alloc.rate.norm: 3148929.176 B/op
+                 gc.count:           162.000 counts
+                 gc.time:            144.000 ms
+
+
+
+Result "com.palantir.crypto2.jmh.EncryptionBenchmark.jdkEncrypt":
+  917.772 ±(99.9%) 1274.295 ops/s [Average]
+  (min, avg, max) = (262.542, 917.772, 1967.716), stdev = 842.867
+  CI (99.9%): [≈ 0, 2192.067] (assumes normal distribution)
+
+Secondary result "com.palantir.crypto2.jmh.EncryptionBenchmark.jdkEncrypt:gc.alloc.rate":
+  2755.660 ±(99.9%) 3825.880 MB/sec [Average]
+  (min, avg, max) = (788.465, 2755.660, 5907.977), stdev = 2530.583
+  CI (99.9%): [≈ 0, 6581.540] (assumes normal distribution)
+
+Secondary result "com.palantir.crypto2.jmh.EncryptionBenchmark.jdkEncrypt:gc.alloc.rate.norm":
+  3149212.610 ±(99.9%) 338.725 B/op [Average]
+  (min, avg, max) = (3148929.176, 3149212.610, 3149511.068), stdev = 224.045
+  CI (99.9%): [3148873.886, 3149551.335] (assumes normal distribution)
+
+Secondary result "com.palantir.crypto2.jmh.EncryptionBenchmark.jdkEncrypt:gc.count":
+  754.000 ±(99.9%) 0.001 counts [Sum]
+  (min, avg, max) = (21.000, 75.400, 162.000), stdev = 69.502
+  CI (99.9%): [754.000, 754.000] (assumes normal distribution)
+
+Secondary result "com.palantir.crypto2.jmh.EncryptionBenchmark.jdkEncrypt:gc.time":
+  677.000 ±(99.9%) 0.001 ms [Sum]
+  (min, avg, max) = (19.000, 67.700, 144.000), stdev = 61.268
+  CI (99.9%): [677.000, 677.000] (assumes normal distribution)
+
+
+# JMH version: 1.37
+# VM version: JDK 21.0.12.1, OpenJDK 64-Bit Server VM, 21.0.12.1+9-LTS
+# VM invoker: /opt/amazon-corretto-21.0.12.9.1-linux-x64/bin/java
+# VM options: -Xmx1024m -Dfile.encoding=UTF-8 -Duser.country=US -Duser.language=en -Duser.variant
+# Blackhole mode: compiler (auto-detected, use -Djmh.blackhole.autoDetect=false to disable)
+# Warmup: 2 iterations, 2 s each
+# Measurement: 5 iterations, 3 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Throughput, ops/time
+# Benchmark: com.palantir.crypto2.jmh.EncryptionBenchmark.opensslEncrypt
+# Parameters: (numBytes = 1048576, writeStrategy = ENTIRE_BUFFER)
+
+# Run progress: 50.00% complete, ETA 00:00:38
+# Fork: 1 of 2
+# Warmup Iteration   1: 1646.023 ops/s
+# Warmup Iteration   2: 1917.979 ops/s
+Iteration   1: 1931.770 ops/s
+                 gc.alloc.rate:      5797.880 MB/sec
+                 gc.alloc.rate.norm: 3147577.223 B/op
+                 gc.count:           132.000 counts
+                 gc.time:            159.000 ms
+
+Iteration   2: 1927.571 ops/s
+                 gc.alloc.rate:      5784.992 MB/sec
+                 gc.alloc.rate.norm: 3147577.200 B/op
+                 gc.count:           132.000 counts
+                 gc.time:            163.000 ms
+
+Iteration   3: 1939.436 ops/s
+                 gc.alloc.rate:      5820.969 MB/sec
+                 gc.alloc.rate.norm: 3147577.193 B/op
+                 gc.count:           132.000 counts
+                 gc.time:            157.000 ms
+
+Iteration   4: 1929.167 ops/s
+                 gc.alloc.rate:      5789.850 MB/sec
+                 gc.alloc.rate.norm: 3147577.200 B/op
+                 gc.count:           131.000 counts
+                 gc.time:            161.000 ms
+
+Iteration   5: 1895.812 ops/s
+                 gc.alloc.rate:      5689.744 MB/sec
+                 gc.alloc.rate.norm: 3147577.220 B/op
+                 gc.count:           130.000 counts
+                 gc.time:            159.000 ms
+
+
+# Run progress: 75.00% complete, ETA 00:00:19
+# Fork: 2 of 2
+# Warmup Iteration   1: 1643.717 ops/s
+# Warmup Iteration   2: 1921.979 ops/s
+Iteration   1: 1919.108 ops/s
+                 gc.alloc.rate:      5759.888 MB/sec
+                 gc.alloc.rate.norm: 3147577.231 B/op
+                 gc.count:           131.000 counts
+                 gc.time:            155.000 ms
+
+Iteration   2: 1938.537 ops/s
+                 gc.alloc.rate:      5818.031 MB/sec
+                 gc.alloc.rate.norm: 3147577.194 B/op
+                 gc.count:           132.000 counts
+                 gc.time:            160.000 ms
+
+Iteration   3: 1928.449 ops/s
+                 gc.alloc.rate:      5787.843 MB/sec
+                 gc.alloc.rate.norm: 3147577.200 B/op
+                 gc.count:           132.000 counts
+                 gc.time:            159.000 ms
+
+Iteration   4: 1968.528 ops/s
+                 gc.alloc.rate:      5908.062 MB/sec
+                 gc.alloc.rate.norm: 3147577.176 B/op
+                 gc.count:           134.000 counts
+                 gc.time:            160.000 ms
+
+Iteration   5: 1931.790 ops/s
+                 gc.alloc.rate:      5797.638 MB/sec
+                 gc.alloc.rate.norm: 3147577.198 B/op
+                 gc.count:           132.000 counts
+                 gc.time:            157.000 ms
+
+
+
+Result "com.palantir.crypto2.jmh.EncryptionBenchmark.opensslEncrypt":
+  1931.017 ±(99.9%) 27.319 ops/s [Average]
+  (min, avg, max) = (1895.812, 1931.017, 1968.528), stdev = 18.070
+  CI (99.9%): [1903.697, 1958.336] (assumes normal distribution)
+
+Secondary result "com.palantir.crypto2.jmh.EncryptionBenchmark.opensslEncrypt:gc.alloc.rate":
+  5795.490 ±(99.9%) 82.022 MB/sec [Average]
+  (min, avg, max) = (5689.744, 5795.490, 5908.062), stdev = 54.253
+  CI (99.9%): [5713.467, 5877.512] (assumes normal distribution)
+
+Secondary result "com.palantir.crypto2.jmh.EncryptionBenchmark.opensslEncrypt:gc.alloc.rate.norm":
+  3147577.203 ±(99.9%) 0.025 B/op [Average]
+  (min, avg, max) = (3147577.176, 3147577.203, 3147577.231), stdev = 0.017
+  CI (99.9%): [3147577.178, 3147577.228] (assumes normal distribution)
+
+Secondary result "com.palantir.crypto2.jmh.EncryptionBenchmark.opensslEncrypt:gc.count":
+  1318.000 ±(99.9%) 0.001 counts [Sum]
+  (min, avg, max) = (130.000, 131.800, 134.000), stdev = 1.033
+  CI (99.9%): [1318.000, 1318.000] (assumes normal distribution)
+
+Secondary result "com.palantir.crypto2.jmh.EncryptionBenchmark.opensslEncrypt:gc.time":
+  1590.000 ±(99.9%) 0.001 ms [Sum]
+  (min, avg, max) = (155.000, 159.000, 163.000), stdev = 2.261
+  CI (99.9%): [1590.000, 1590.000] (assumes normal distribution)
+
+
+# Run complete. Total time: 00:01:17
+
+REMEMBER: The numbers below are just data. To gain reusable insights, you need to follow up on
+why the numbers are the way they are. Use profilers (see -prof, -lprof), design factorial
+experiments, perform baseline and negative tests that provide experimental control, make sure
+the benchmarking environment is safe on JVM/OS/HW level, ask for reviews from the domain experts.
+Do not assume the numbers tell you what you want them to tell.
+
+NOTE: Current JVM experimentally supports Compiler Blackholes, and they are in use. Please exercise
+extra caution when trusting the results, look into the generated code to check the benchmark still
+works, and factor in a small probability of new VM bugs. Additionally, while comparisons between
+different JVMs are already problematic, the performance difference caused by different Blackhole
+modes can be very significant. Please make sure you use the consistent Blackhole mode for comparisons.
+
+Benchmark                                              (numBytes)  (writeStrategy)   Mode  Cnt        Score      Error   Units
+EncryptionBenchmark.jdkEncrypt                            1048576    ENTIRE_BUFFER  thrpt   10      917.772 ± 1274.295   ops/s
+EncryptionBenchmark.jdkEncrypt:gc.alloc.rate              1048576    ENTIRE_BUFFER  thrpt   10     2755.660 ± 3825.880  MB/sec
+EncryptionBenchmark.jdkEncrypt:gc.alloc.rate.norm         1048576    ENTIRE_BUFFER  thrpt   10  3149212.610 ±  338.725    B/op
+EncryptionBenchmark.jdkEncrypt:gc.count                   1048576    ENTIRE_BUFFER  thrpt   10      754.000             counts
+EncryptionBenchmark.jdkEncrypt:gc.time                    1048576    ENTIRE_BUFFER  thrpt   10      677.000                 ms
+EncryptionBenchmark.opensslEncrypt                        1048576    ENTIRE_BUFFER  thrpt   10     1931.017 ±   27.319   ops/s
+EncryptionBenchmark.opensslEncrypt:gc.alloc.rate          1048576    ENTIRE_BUFFER  thrpt   10     5795.490 ±   82.022  MB/sec
+EncryptionBenchmark.opensslEncrypt:gc.alloc.rate.norm     1048576    ENTIRE_BUFFER  thrpt   10  3147577.203 ±    0.025    B/op
+EncryptionBenchmark.opensslEncrypt:gc.count               1048576    ENTIRE_BUFFER  thrpt   10     1318.000             counts
+EncryptionBenchmark.opensslEncrypt:gc.time                1048576    ENTIRE_BUFFER  thrpt   10     1590.000                 ms
+
+Benchmark result is saved to /home/coder/git/hadoop-crypto/benchmark-results/encryption/jdk21-confirmation.json
