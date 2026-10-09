@@ -100,4 +100,4 @@ org.openjdk.jmh:jmh-generator-annprocess:1.37 (1 constraints: df04fc30)
 
 org.opentest4j:opentest4j:1.3.0 (2 constraints: cf209249)
 
-org.ow2.asm:asm:9.10.1 (2 constraints: b50c1c24)
+org.ow2.asm:asm:9.11 (2 constraints: 570c0411)
