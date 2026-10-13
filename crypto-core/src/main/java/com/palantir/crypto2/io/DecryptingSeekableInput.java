@@ -35,19 +35,30 @@ public final class DecryptingSeekableInput implements SeekableInput {
     private final SeekableCipher seekableCipher;
     private final CipherStreamSupplier supplier;
     private final long skipThreshold;
+    private final boolean fillBuffer;
 
     private CipherInputStream decryptedStream;
     private long decryptedStreamPos;
 
     public DecryptingSeekableInput(SeekableInput delegate, SeekableCipher cipher) {
-        this(delegate, cipher, new CipherStreamSupplierImpl());
+        this(delegate, cipher, true);
+    }
+
+    DecryptingSeekableInput(SeekableInput input, SeekableCipher cipher, boolean fillBuffer) {
+        this(input, cipher, new CipherStreamSupplierImpl(), fillBuffer);
     }
 
     @VisibleForTesting
     DecryptingSeekableInput(SeekableInput input, SeekableCipher cipher, CipherStreamSupplier supplier) {
+        this(input, cipher, supplier, true);
+    }
+
+    private DecryptingSeekableInput(
+            SeekableInput input, SeekableCipher cipher, CipherStreamSupplier supplier, boolean fillBuffer) {
         this.delegate = new DefaultSeekableInputStream(input);
         this.seekableCipher = cipher;
         this.supplier = supplier;
+        this.fillBuffer = fillBuffer;
 
         /* small forward seeks can generate reverse seeks in some circumstances:
          *  1. seeking within the current block or the next block causes reading of the previous block (negative seek).
@@ -121,11 +132,16 @@ public final class DecryptingSeekableInput implements SeekableInput {
 
     @Override
     public int read(byte[] buffer, int offset, int length) throws IOException {
-        int bytesRead = decryptedStream.read(buffer, offset, length);
-        if (bytesRead != -1) {
+        int totalRead = 0;
+        do {
+            int bytesRead = decryptedStream.read(buffer, offset + totalRead, length - totalRead);
+            if (bytesRead <= 0) {
+                return totalRead == 0 ? bytesRead : totalRead;
+            }
             decryptedStreamPos += bytesRead;
-        }
-        return bytesRead;
+            totalRead += bytesRead;
+        } while (fillBuffer && totalRead < length);
+        return totalRead;
     }
 
     @Override

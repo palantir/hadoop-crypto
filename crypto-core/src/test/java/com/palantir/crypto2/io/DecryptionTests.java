@@ -17,6 +17,7 @@
 package com.palantir.crypto2.io;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.google.common.io.ByteStreams;
 import com.palantir.crypto2.cipher.AesCbcCipher;
@@ -153,6 +154,101 @@ public final class DecryptionTests {
         assertThat(buffer).isEqualTo(data);
         assertThat(offset).isEqualTo(NUM_BYTES);
         cis.close();
+    }
+
+    @ParameterizedTest
+    @MethodSource("ciphers")
+    public void testBulkReadFillsRequest(@AggregateWith(StreamAggregator.class) SeekableInput cis) throws IOException {
+        try (cis) {
+            byte[] buffer = new byte[8198];
+            Arrays.fill(buffer, (byte) 91);
+            assertThat(cis.read(buffer, 3, 0)).isZero();
+            assertThat(cis.getPos()).isZero();
+            assertThat(cis.read(buffer, 3, 8192)).isEqualTo(8192);
+            assertThat(Arrays.copyOfRange(buffer, 3, 8195)).isEqualTo(Arrays.copyOf(data, 8192));
+            assertThat(Arrays.copyOf(buffer, 3)).containsOnly((byte) 91);
+            assertThat(Arrays.copyOfRange(buffer, 8195, buffer.length)).containsOnly((byte) 91);
+            assertThat(cis.getPos()).isEqualTo(8192);
+
+            cis.seek(37);
+            assertThat(cis.read(buffer, 0, buffer.length)).isEqualTo(buffer.length);
+            assertThat(buffer).isEqualTo(Arrays.copyOfRange(data, 37, 37 + buffer.length));
+        }
+    }
+
+    @ParameterizedTest
+    @MethodSource("ciphers")
+    public void testBulkReadReturnsPartialEof(@AggregateWith(StreamAggregator.class) SeekableInput cis)
+            throws IOException {
+        try (cis) {
+            cis.seek(NUM_BYTES - 1003);
+            byte[] buffer = new byte[1010];
+            Arrays.fill(buffer, (byte) 91);
+            assertThat(cis.read(buffer, 0, buffer.length)).isEqualTo(1003);
+            assertThat(Arrays.copyOf(buffer, 1003)).isEqualTo(Arrays.copyOfRange(data, NUM_BYTES - 1003, NUM_BYTES));
+            assertThat(Arrays.copyOfRange(buffer, 1003, buffer.length)).containsOnly((byte) 91);
+            assertThat(cis.getPos()).isEqualTo(NUM_BYTES);
+            assertThat(cis.read(buffer, 0, buffer.length)).isEqualTo(-1);
+        }
+    }
+
+    @ParameterizedTest
+    @MethodSource("ciphers")
+    public void testBulkReadTracksPositionAfterFailure(String algorithm) throws IOException {
+        KeyMaterial key = SeekableCipherFactory.generateKeyMaterial(algorithm);
+        ByteArrayOutputStream encrypted = new ByteArrayOutputStream();
+        try (OutputStream output = CryptoStreamFactory.encrypt(encrypted, key, algorithm)) {
+            output.write(data);
+        }
+        try (SeekableInput input =
+                CryptoStreamFactory.decrypt(new FailingInput(encrypted.toByteArray()), key, algorithm)) {
+            byte[] buffer = new byte[4096];
+            assertThatThrownBy(() -> input.read(buffer, 0, buffer.length))
+                    .isInstanceOf(IOException.class)
+                    .hasMessage("Read failed");
+            int consumed = Math.toIntExact(input.getPos());
+            assertThat(consumed).isPositive().isLessThan(buffer.length);
+            assertThat(Arrays.copyOf(buffer, consumed)).isEqualTo(Arrays.copyOf(data, consumed));
+            assertThat(input.read(buffer, consumed, buffer.length - consumed)).isEqualTo(buffer.length - consumed);
+            assertThat(buffer).isEqualTo(Arrays.copyOf(data, buffer.length));
+            assertThat(input.getPos()).isEqualTo(buffer.length);
+
+            input.seek(17);
+            assertThat(input.read(buffer, 0, buffer.length)).isEqualTo(buffer.length);
+            assertThat(buffer).isEqualTo(Arrays.copyOfRange(data, 17, 17 + buffer.length));
+        }
+    }
+
+    private static final class FailingInput implements SeekableInput {
+        private final InMemorySeekableDataInput delegate;
+        private int reads;
+
+        FailingInput(byte[] encrypted) {
+            delegate = new InMemorySeekableDataInput(encrypted);
+        }
+
+        @Override
+        public int read(byte[] buffer, int offset, int length) throws IOException {
+            if (++reads == 2) {
+                throw new IOException("Read failed");
+            }
+            return delegate.read(buffer, offset, Math.min(length, 512));
+        }
+
+        @Override
+        public void seek(long offset) throws IOException {
+            delegate.seek(offset);
+        }
+
+        @Override
+        public long getPos() throws IOException {
+            return delegate.getPos();
+        }
+
+        @Override
+        public void close() throws IOException {
+            delegate.close();
+        }
     }
 
     private static void testSeek(SeekableInput cis, int seekPos) throws IOException {
