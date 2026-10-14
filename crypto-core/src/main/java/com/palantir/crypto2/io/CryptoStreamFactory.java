@@ -46,9 +46,7 @@ public final class CryptoStreamFactory {
      * cipher {@code algorithm}. When OpenSSL is available an implementation that uses AES-NI will be returned.
      */
     public static InputStream decrypt(InputStream input, KeyMaterial keyMaterial, String algorithm) {
-        // Streaming inputs must return available plaintext without waiting for the entire requested buffer to fill.
-        return new DefaultSeekableInputStream(new DecryptingSeekableInput(
-                new StreamSeekableInput(input), SeekableCipherFactory.getCipher(algorithm, keyMaterial), false));
+        return new DefaultSeekableInputStream(decrypt(new StreamSeekableInput(input), keyMaterial, algorithm));
     }
 
     /**

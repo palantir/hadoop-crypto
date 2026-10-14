@@ -19,7 +19,6 @@ package com.palantir.crypto2.io;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.io.ByteStreams;
-import com.palantir.crypto2.cipher.AesCbcCipher;
 import com.palantir.crypto2.cipher.AesCtrCipher;
 import com.palantir.crypto2.keys.KeyMaterial;
 import java.io.ByteArrayInputStream;
@@ -28,13 +27,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 
 public final class CryptoStreamFactoryTest {
 
@@ -58,35 +53,6 @@ public final class CryptoStreamFactoryTest {
                 new ByteArrayInputStream(os.toByteArray()), keyMaterial, AesCtrCipher.ALGORITHM);
 
         assertThat(ByteStreams.toByteArray(decrypted)).isEqualTo(BYTES);
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = {AesCtrCipher.ALGORITHM, AesCbcCipher.ALGORITHM})
-    public void testInputStreamReturnsWithoutWaitingForMoreCiphertext(String algorithm) throws IOException {
-        byte[] data = new byte[4096];
-        new Random(0).nextBytes(data);
-        ByteArrayOutputStream encrypted = new ByteArrayOutputStream();
-        try (OutputStream output = CryptoStreamFactory.encrypt(encrypted, keyMaterial, algorithm)) {
-            output.write(data);
-        }
-        InputStream source = new ByteArrayInputStream(encrypted.toByteArray()) {
-            private boolean read;
-
-            @Override
-            public synchronized int read(byte[] buffer, int offset, int length) {
-                if (read) {
-                    throw new AssertionError("Reading more ciphertext would block");
-                }
-                read = true;
-                return super.read(buffer, offset, Math.min(length, 512));
-            }
-        };
-        try (InputStream decrypted = CryptoStreamFactory.decrypt(source, keyMaterial, algorithm)) {
-            byte[] actual = new byte[data.length];
-            int count = decrypted.read(actual);
-            assertThat(count).isPositive().isLessThan(actual.length);
-            assertThat(Arrays.copyOf(actual, count)).isEqualTo(Arrays.copyOf(data, count));
-        }
     }
 
     @Test

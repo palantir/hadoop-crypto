@@ -73,7 +73,17 @@ public final class FsCipherInputStream extends FSInputStream {
 
     @Override
     public int read(byte[] buf, int off, int len) throws IOException {
-        return delegate.read(buf, off, len);
+        // Hadoop's positioned reads seek back after each short read. Fill the buffer sequentially to avoid
+        // resetting decryption and refilling remote-storage buffers between cipher chunks.
+        int totalRead = 0;
+        do {
+            int bytesRead = delegate.read(buf, off + totalRead, len - totalRead);
+            if (bytesRead <= 0) {
+                return totalRead == 0 ? bytesRead : totalRead;
+            }
+            totalRead += bytesRead;
+        } while (totalRead < len);
+        return totalRead;
     }
 
     @Override
