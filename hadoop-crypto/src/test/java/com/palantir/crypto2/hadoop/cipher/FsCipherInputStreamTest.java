@@ -44,6 +44,7 @@ public final class FsCipherInputStreamTest {
     private KeyMaterial key;
     private byte[] encrypted;
     private FSDataInputStream underlying;
+    private FsCipherInputStream input;
 
     @BeforeEach
     void beforeEach() throws IOException {
@@ -53,51 +54,44 @@ public final class FsCipherInputStreamTest {
         key = AesCbcCipher.generateKeyMaterial();
         encrypted = encrypt(plaintext, key, AesCbcCipher.ALGORITHM);
         underlying = spy(new FSDataInputStream(new ByteArrayFsInputStream(encrypted)));
+        input = new FsCipherInputStream(underlying, key, AesCbcCipher.ALGORITHM);
     }
 
     @Test
     void readFullySeeksOnce() throws IOException {
-        try (FsCipherInputStream input = new FsCipherInputStream(underlying, key, AesCbcCipher.ALGORITHM)) {
-            byte[] result = new byte[MB];
-            input.readFully(0, result, 0, MB);
+        byte[] result = new byte[MB];
+        input.readFully(0, result, 0, MB);
 
-            assertThat(result).isEqualTo(plaintext);
-            verify(underlying).seek(anyLong());
-        }
+        assertThat(result).isEqualTo(plaintext);
+        verify(underlying).seek(anyLong());
     }
 
     @Test
     void readFullyAtOffsetSeeksTwice() throws IOException {
         int offset = 1_000;
 
-        try (FsCipherInputStream input = new FsCipherInputStream(underlying, key, AesCbcCipher.ALGORITHM)) {
-            byte[] result = new byte[MB - offset];
-            input.readFully(offset, result, 0, MB - offset);
+        byte[] result = new byte[MB - offset];
+        input.readFully(offset, result, 0, MB - offset);
 
-            assertThat(result).isEqualTo(Arrays.copyOfRange(plaintext, offset, MB));
-            verify(underlying, times(2)).seek(anyLong());
-        }
+        assertThat(result).isEqualTo(Arrays.copyOfRange(plaintext, offset, MB));
+        verify(underlying, times(2)).seek(anyLong());
     }
 
     @Test
     void readZeroBytes() throws IOException {
-        try (FsCipherInputStream input = new FsCipherInputStream(underlying, key, AesCbcCipher.ALGORITHM)) {
-            byte[] result = new byte[MB];
-            int bytesRead = input.read(result, 0, 0);
+        byte[] result = new byte[MB];
+        int bytesRead = input.read(result, 0, 0);
 
-            assertThat(bytesRead).isZero();
-            assertThat(result).containsOnly(0);
-        }
+        assertThat(bytesRead).isZero();
+        assertThat(result).containsOnly(0);
     }
 
     @Test
     void readEof() throws IOException {
-        try (FsCipherInputStream input = new FsCipherInputStream(underlying, key, AesCbcCipher.ALGORITHM)) {
-            byte[] result = new byte[MB];
-            int bytesRead = input.read(result, 0, MB + 1);
+        byte[] result = new byte[MB];
+        int bytesRead = input.read(result, 0, MB + 1);
 
-            assertThat(bytesRead).isEqualTo(-1);
-        }
+        assertThat(bytesRead).isEqualTo(-1);
     }
 
     private static byte[] encrypt(byte[] plaintext, KeyMaterial key, String algorithm) throws IOException {
