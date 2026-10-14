@@ -84,7 +84,7 @@ public final class FsCipherInputStream extends FSInputStream {
         while (totalRead < len) {
             int bytesRead = delegate.read(buf, off + totalRead, len - totalRead);
             if (bytesRead < 0) {
-                return bytesRead;
+                return totalRead > 0 ? totalRead : bytesRead;
             }
             totalRead += bytesRead;
         }

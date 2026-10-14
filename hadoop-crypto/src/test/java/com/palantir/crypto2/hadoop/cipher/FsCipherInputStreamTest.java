@@ -95,9 +95,19 @@ public final class FsCipherInputStreamTest {
     }
 
     @Test
-    void readEof() throws IOException {
+    void readThroughEof() throws IOException {
         byte[] result = new byte[MB];
         int bytesRead = input.read(result, 0, MB + 1);
+
+        assertThat(bytesRead).isEqualTo(MB);
+        assertThat(result).isEqualTo(plaintext);
+    }
+
+    @Test
+    void readEof() throws IOException {
+        byte[] result = new byte[10];
+        input.seek(MB);
+        int bytesRead = input.read(result, 0, 10);
 
         assertThat(bytesRead).isEqualTo(-1);
     }
