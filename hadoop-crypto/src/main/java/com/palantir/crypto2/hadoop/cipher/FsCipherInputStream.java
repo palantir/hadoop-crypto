@@ -62,7 +62,7 @@ public final class FsCipherInputStream extends FSInputStream {
     }
 
     @Override
-    public boolean seekToNewSource(long _targetPos) throws IOException {
+    public boolean seekToNewSource(long _targetPos) {
         return false;
     }
 
@@ -71,9 +71,25 @@ public final class FsCipherInputStream extends FSInputStream {
         return delegate.read();
     }
 
+    /**
+     * We implement this as readFully here because {@link FSInputStream#readFully(long, byte[], int, int)} currently
+     * has a degenerate case where small reads returned from {@link FSInputStream#read(byte[], int, int)} cause it to
+     * seek {@code len / N} times, where N is the size of the small read. So for now we try reading as many bytes as
+     * possible here to avoid seeking N times.
+     */
     @Override
     public int read(byte[] buf, int off, int len) throws IOException {
-        return delegate.read(buf, off, len);
+        int totalRead = 0;
+
+        while (totalRead < len) {
+            int bytesRead = delegate.read(buf, off + totalRead, len - totalRead);
+            if (bytesRead < 0) {
+                return bytesRead;
+            }
+            totalRead += bytesRead;
+        }
+
+        return totalRead;
     }
 
     @Override
