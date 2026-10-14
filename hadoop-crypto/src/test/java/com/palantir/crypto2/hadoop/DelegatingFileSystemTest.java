@@ -23,7 +23,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.google.common.io.Files;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -33,7 +32,6 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.BlockLocation;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FSDataOutputStream;
-import org.apache.hadoop.fs.FSInputStream;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -119,39 +117,5 @@ public final class DelegatingFileSystemTest {
 
         assertThat(delegatingFs.getFileBlockLocations(path, 0L, 0L)).containsExactly(location);
         verify(delegate).getFileBlockLocations(path, 0L, 0L);
-    }
-
-    private static final class ByteArrayFsInputStream extends FSInputStream {
-
-        private final ByteArrayInputStream in;
-
-        ByteArrayFsInputStream(byte[] bytes) {
-            in = new ByteArrayInputStream(bytes);
-        }
-
-        @Override
-        public void seek(long _pos) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public long getPos() {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public boolean seekToNewSource(long _targetPos) {
-            return false;
-        }
-
-        @Override
-        public int read() {
-            return in.read();
-        }
-
-        @Override
-        public int read(byte[] buf, int off, int len) {
-            return in.read(buf, off, len);
-        }
     }
 }
