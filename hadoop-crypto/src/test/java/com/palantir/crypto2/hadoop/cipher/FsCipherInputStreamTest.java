@@ -17,6 +17,7 @@
 package com.palantir.crypto2.hadoop.cipher;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -27,6 +28,7 @@ import com.palantir.crypto2.hadoop.ByteArrayFsInputStream;
 import com.palantir.crypto2.io.CryptoStreamFactory;
 import com.palantir.crypto2.keys.KeyMaterial;
 import java.io.ByteArrayOutputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Arrays;
@@ -78,8 +80,14 @@ public final class FsCipherInputStreamTest {
     }
 
     @Test
+    void readFullyEof() {
+        byte[] result = new byte[10];
+        assertThatThrownBy(() -> input.readFully(MB - 5, result, 0, 10)).isInstanceOf(EOFException.class);
+    }
+
+    @Test
     void readZeroBytes() throws IOException {
-        byte[] result = new byte[MB];
+        byte[] result = new byte[10];
         int bytesRead = input.read(result, 0, 0);
 
         assertThat(bytesRead).isZero();
