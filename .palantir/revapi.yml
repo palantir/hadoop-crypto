@@ -1,0 +1,11 @@
+acceptedBreaks:
+  "4.1.0":
+    com.palantir.hadoop-crypto2:hadoop-crypto:
+    - code: "java.method.exception.checkedAdded"
+      old: "method boolean com.palantir.crypto2.hadoop.cipher.FsCipherInputStream::seekToNewSource(long)"
+      new: "method boolean com.palantir.crypto2.hadoop.cipher.FsCipherInputStream::seekToNewSource(long)\
+        \ throws java.io.IOException"
+      justification: "Restore the IOException declaration removed in 4.1.0 to preserve\
+        \ source compatibility with callers written against earlier releases. Callers\
+        \ written against 4.1.0 may need to handle IOException; the method still returns\
+        \ false without throwing."

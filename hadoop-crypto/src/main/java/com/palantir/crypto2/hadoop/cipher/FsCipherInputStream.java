@@ -62,7 +62,7 @@ public final class FsCipherInputStream extends FSInputStream {
     }
 
     @Override
-    public boolean seekToNewSource(long _targetPos) {
+    public boolean seekToNewSource(long _targetPos) throws IOException {
         return false;
     }
 
