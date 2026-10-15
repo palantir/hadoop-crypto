@@ -22,6 +22,7 @@ import com.palantir.crypto2.io.DecryptingSeekableInput;
 import com.palantir.crypto2.io.DefaultSeekableInputStream;
 import com.palantir.crypto2.keys.KeyMaterial;
 import com.palantir.seekio.SeekableInput;
+import java.io.EOFException;
 import java.io.IOException;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FSInputStream;
@@ -81,12 +82,19 @@ public final class FsCipherInputStream extends FSInputStream {
     public int read(byte[] buf, int off, int len) throws IOException {
         int totalRead = 0;
 
-        while (totalRead < len) {
-            int bytesRead = delegate.read(buf, off + totalRead, len - totalRead);
-            if (bytesRead < 0) {
-                return totalRead > 0 ? totalRead : bytesRead;
+        try {
+            while (totalRead < len) {
+                int bytesRead = delegate.read(buf, off + totalRead, len - totalRead);
+                if (bytesRead < 0) {
+                    return totalRead > 0 ? totalRead : bytesRead;
+                }
+                totalRead += bytesRead;
             }
-            totalRead += bytesRead;
+        } catch (EOFException e) {
+            if (totalRead == 0) {
+                throw e;
+            }
+            // FSInputStream's positioned read converts EOFException to -1, losing any bytes already copied.
         }
 
         return totalRead;

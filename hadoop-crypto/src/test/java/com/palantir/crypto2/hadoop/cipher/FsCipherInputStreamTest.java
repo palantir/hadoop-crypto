@@ -96,11 +96,12 @@ public final class FsCipherInputStreamTest {
 
     @Test
     void readThroughEof() throws IOException {
-        byte[] result = new byte[MB];
-        int bytesRead = input.read(result, 0, MB + 1);
+        byte[] result = new byte[MB + 1];
+        int bytesRead = input.read(result, 0, result.length);
 
         assertThat(bytesRead).isEqualTo(MB);
-        assertThat(result).isEqualTo(plaintext);
+        assertThat(Arrays.copyOf(result, bytesRead)).isEqualTo(plaintext);
+        assertThat(result[MB]).isZero();
     }
 
     @Test
